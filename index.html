@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nayaka Industries | Component Database</title>
+    <title>Vinayaka Industries | Component Database</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -245,6 +245,21 @@
         </div>
     </div>
     
+    <!-- Image Namer Modal -->
+    <div id="imageNamerModal" class="modal-backdrop hidden fixed inset-0 z-50 justify-center items-center p-4">
+        <div class="glass-card border border-[--premium-border] rounded-xl shadow-2xl w-full max-w-lg m-4">
+            <div class="flex justify-between items-center p-6 border-b border-[--premium-border]"><h2 class="text-2xl font-bold text-[--premium-text-primary]">Image Name Generator</h2><button type="button" id="closeNamerModalBtn" class="text-[--premium-text-secondary] hover:text-[--premium-text-primary] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
+            <form id="imageNamerForm" class="p-6 space-y-4">
+                <div><label for="namer-model" class="block text-sm font-medium text-[--premium-text-secondary]">Model*</label><input type="text" id="namer-model" required placeholder="e.g., EX 200" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
+                <div><label for="namer-device" class="block text-sm font-medium text-[--premium-text-secondary]">Device*</label><input type="text" id="namer-device" required placeholder="e.g., Travel Device" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
+                <div><label for="namer-part-name" class="block text-sm font-medium text-[--premium-text-secondary]">Part Name*</label><input type="text" id="namer-part-name" required placeholder="e.g., Shaft" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
+                <div><label for="namer-image-count" class="block text-sm font-medium text-[--premium-text-secondary]">Number of Images*</label><input type="number" id="namer-image-count" required value="1" min="1" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
+                <div class="pt-4"><h3 class="text-lg font-semibold mb-2 text-[--premium-text-primary]">Generated Names</h3><div id="generated-names-output" class="p-3 bg-black/20 rounded-lg space-y-2 text-sm font-mono h-32 overflow-y-auto"></div></div>
+                <div class="flex justify-end"><button type="submit" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-500">Generate</button></div>
+            </form>
+        </div>
+    </div>
+    
     <script src="https://apis.google.com/js/api.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -294,6 +309,10 @@
             detailBackdrop: document.getElementById('detail-backdrop'),
             detailContent: document.getElementById('detail-content'),
             detailCloseBtn: document.getElementById('detail-close-btn'),
+            imageNamerBtn: document.getElementById('imageNamerBtn'),
+            imageNamerModal: document.getElementById('imageNamerModal'),
+            closeNamerModalBtn: document.getElementById('closeNamerModalBtn'),
+            imageNamerForm: document.getElementById('imageNamerForm'),
         };
 
         const COLUMN_HEADERS = ['id', 'model', 'device', 'size', 'itemName', 'price', 'quantity', 'imageLinks', 'note', 'spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_width', 'spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_splineOd', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'];
@@ -324,6 +343,10 @@
         dom.detailBackdrop.addEventListener('click', closeDetailPanel);
         dom.searchResults.addEventListener('click', handleCardClick);
         dom.detailContent.addEventListener('click', handleDetailPanelClick);
+        dom.imageNamerBtn.addEventListener('click', () => dom.imageNamerModal.classList.remove('hidden'));
+        dom.closeNamerModalBtn.addEventListener('click', () => dom.imageNamerModal.classList.add('hidden'));
+        dom.imageNamerForm.addEventListener('submit', handleImageNamer);
+
 
         // --- Core Functions ---
         async function initializeGapiClient() {
@@ -441,6 +464,35 @@
                 listComponents();
             } catch (err) {
                 Swal.fire('Update Error', `Could not update the component. Error: ${err.result.error.message}`, 'error');
+            }
+        }
+        async function deleteComponent(id) {
+            const itemToDelete = allItems.find(item => item.id === id);
+            if (!itemToDelete) {
+                Swal.fire('Error', 'Could not find the component to delete.', 'error');
+                return;
+            }
+            try {
+                await gapi.client.sheets.spreadsheets.batchUpdate({
+                    spreadsheetId: SPREADSHEET_ID,
+                    resource: {
+                        requests: [{
+                            deleteDimension: {
+                                range: {
+                                    sheetId: 0, // Assumes the first sheet
+                                    dimension: 'ROWS',
+                                    startIndex: itemToDelete.rowIndex - 1,
+                                    endIndex: itemToDelete.rowIndex
+                                }
+                            }
+                        }]
+                    }
+                });
+                Swal.fire('Deleted!', 'The component has been deleted.', 'success');
+                closeDetailPanel();
+                listComponents();
+            } catch (err) {
+                 Swal.fire('Delete Error', `Could not delete the component. Error: ${err.result.error.message}`, 'error');
             }
         }
         function renderItems(items) {
@@ -667,9 +719,9 @@
 
             dom.detailContent.innerHTML = `
                 <!-- Left Column: Images -->
-                <div class="md:col-span-1 relative image-gallery" data-images="${images.join(',')}" style="min-height: 300px;">
+                <div class="md:col-span-1 relative image-gallery flex items-center justify-center" data-images="${images.join(',')}" data-current-index="0" style="min-height: 300px;">
                     ${images.length > 0 ? `
-                        <img src="${getDriveThumbnail(images[0])}" class="gallery-image w-full h-full object-contain rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x400/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=Invalid+Image';">
+                        <img src="${getDriveThumbnail(images[0])}" class="gallery-image w-full h-full max-h-[60vh] object-contain rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x400/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=Invalid+Image';">
                         ${images.length > 1 ? `<button class="detail-gallery-arrow absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white" data-direction="-1"><i data-lucide="chevron-left"></i></button><button class="detail-gallery-arrow absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
                     ` : `<div class="h-full flex items-center justify-center bg-black/20 rounded-lg text-[--premium-text-secondary]">No Images</div>`}
                 </div>
@@ -709,7 +761,19 @@
                 }
             }
             if (deleteBtn) {
-                Swal.fire('Coming Soon', 'Delete functionality will be implemented in a future update.', 'info');
+                const itemId = deleteBtn.dataset.id;
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    background: 'var(--premium-surface)'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        deleteComponent(itemId);
+                    }
+                });
             }
             if (arrowBtn) {
                 const gallery = arrowBtn.closest('.image-gallery');
@@ -722,6 +786,25 @@
                 
                 gallery.querySelector('.gallery-image').src = getDriveThumbnail(images[currentIndex]);
                 gallery.dataset.currentIndex = currentIndex;
+            }
+        }
+        
+        function handleImageNamer(e) {
+            e.preventDefault();
+            const form = e.target;
+            const model = form.querySelector('#namer-model').value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+            const device = form.querySelector('#namer-device').value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+            const partName = form.querySelector('#namer-part-name').value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+            const count = parseInt(form.querySelector('#namer-image-count').value, 10);
+            const output = form.querySelector('#generated-names-output');
+            output.innerHTML = '';
+            for (let i = 1; i <= count; i++) {
+                const fileName = `${model}_${device}_${partName}_${i}.jpg`;
+                const el = document.createElement('div');
+                el.textContent = fileName;
+                el.className = 'p-2 bg-black/20 rounded cursor-pointer hover:bg-white/10';
+                el.onclick = () => { navigator.clipboard.writeText(fileName).then(() => { el.textContent = 'Copied!'; setTimeout(() => el.textContent = fileName, 1000); }); };
+                output.appendChild(el);
             }
         }
 
