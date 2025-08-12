@@ -642,22 +642,19 @@
         }
         function openDetailPanel(item) {
             populateDetailPanel(item);
-            dom.detailModal.classList.remove('hidden', 'opacity-0', 'scale-95');
-            dom.detailModal.classList.add('flex');
-            setTimeout(() => {
+            dom.detailModal.classList.remove('hidden');
+            requestAnimationFrame(() => {
                 dom.detailModal.classList.remove('opacity-0', 'scale-95');
-            }, 10);
+            });
         }
         function closeDetailPanel() {
             dom.detailModal.classList.add('opacity-0', 'scale-95');
             setTimeout(() => {
                 dom.detailModal.classList.add('hidden');
-                dom.detailModal.classList.remove('flex');
             }, 300);
         }
         function populateDetailPanel(item) {
             const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
-            const imagesHtml = images.map(img => `<img src="${getDriveThumbnail(img)}" class="w-full rounded-lg border border-[--premium-border] object-cover" onerror="this.style.display='none'">`).join('');
             
             let specsHtml = '';
             Object.keys(item).forEach(key => {
@@ -670,11 +667,14 @@
 
             dom.detailContent.innerHTML = `
                 <!-- Left Column: Images -->
-                <div class="md:col-span-1 space-y-4 overflow-y-auto max-h-[70vh]">
-                    ${images.length > 0 ? imagesHtml : `<div class="h-72 flex items-center justify-center bg-black/20 rounded-lg text-[--premium-text-secondary]">No Images</div>`}
+                <div class="md:col-span-1 relative image-gallery" data-images="${images.join(',')}" style="min-height: 300px;">
+                    ${images.length > 0 ? `
+                        <img src="${getDriveThumbnail(images[0])}" class="gallery-image w-full h-full object-contain rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x400/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=Invalid+Image';">
+                        ${images.length > 1 ? `<button class="detail-gallery-arrow absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white" data-direction="-1"><i data-lucide="chevron-left"></i></button><button class="detail-gallery-arrow absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
+                    ` : `<div class="h-full flex items-center justify-center bg-black/20 rounded-lg text-[--premium-text-secondary]">No Images</div>`}
                 </div>
                 <!-- Right Column: Data -->
-                <div class="md:col-span-1 space-y-6">
+                <div class="md:col-span-1 space-y-6 overflow-y-auto max-h-[70vh] p-2">
                     <div>
                         <h3 class="text-3xl font-bold text-[--premium-text-primary]">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
                         <div class="flex items-center gap-4 mt-4">
@@ -698,6 +698,8 @@
         function handleDetailPanelClick(e) {
             const editBtn = e.target.closest('.edit-btn');
             const deleteBtn = e.target.closest('.delete-btn');
+            const arrowBtn = e.target.closest('.detail-gallery-arrow');
+
             if (editBtn) {
                 const itemId = editBtn.dataset.id;
                 const item = allItems.find(i => i.id === itemId);
@@ -707,8 +709,19 @@
                 }
             }
             if (deleteBtn) {
-                // Future delete functionality
                 Swal.fire('Coming Soon', 'Delete functionality will be implemented in a future update.', 'info');
+            }
+            if (arrowBtn) {
+                const gallery = arrowBtn.closest('.image-gallery');
+                const images = (gallery.dataset.images || '').split(',').map(link => link.trim()).filter(Boolean);
+                if (images.length <= 1) return;
+                
+                let currentIndex = parseInt(gallery.dataset.currentIndex || '0');
+                const direction = parseInt(arrowBtn.dataset.direction);
+                currentIndex = (currentIndex + direction + images.length) % images.length;
+                
+                gallery.querySelector('.gallery-image').src = getDriveThumbnail(images[currentIndex]);
+                gallery.dataset.currentIndex = currentIndex;
             }
         }
 
