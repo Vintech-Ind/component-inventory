@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vin Industries | Component Database</title>
+    <title>Vinayaka Industries | Component Database</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -69,7 +69,7 @@
             box-shadow: 0 10px 30px -10px rgba(0,0,0,0.3);
             border-color: var(--premium-accent);
         }
-        .modal-backdrop {
+        .modal-backdrop, .detail-backdrop {
             background-color: rgba(13, 17, 23, 0.7);
             backdrop-filter: blur(8px);
         }
@@ -103,6 +103,14 @@
         }
         .image-gallery:hover .gallery-arrow {
             opacity: 1;
+        }
+        
+        .detail-panel {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(100%);
+        }
+        .detail-panel.open {
+            transform: translateX(0);
         }
 
         @media (max-width: 1024px) {
@@ -188,11 +196,12 @@
         </main>
     </div>
 
-    <!-- Modal -->
+    <!-- Add/Edit Modal -->
     <div id="formModal" class="modal-backdrop hidden fixed inset-0 z-50 justify-center items-center p-4">
         <div class="bg-[--premium-surface] border border-[--premium-border] rounded-xl shadow-2xl w-full max-w-4xl m-4 max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center p-6 border-b border-[--premium-border]"><h2 class="text-2xl font-bold text-[--premium-text-primary]">Add New Component</h2><button type="button" id="closeFormModalBtn" class="text-[--premium-text-secondary] hover:text-[--premium-text-primary] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
+            <div class="flex justify-between items-center p-6 border-b border-[--premium-border]"><h2 id="form-title" class="text-2xl font-bold text-[--premium-text-primary]">Add New Component</h2><button type="button" id="closeFormModalBtn" class="text-[--premium-text-secondary] hover:text-[--premium-text-primary] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
             <form id="partForm" class="p-6 space-y-6 overflow-y-auto">
+                <input type="hidden" id="edit-id">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div><label for="model" class="block text-sm font-medium text-[--premium-text-secondary]">Model*</label><input type="text" id="model" required class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
                     <div><label for="device" class="block text-sm font-medium text-[--premium-text-secondary]">Device</label><select id="device" class="mt-1 block w-full rounded-lg shadow-sm premium-input"><option value="">(None)</option><option value="SWING DEVICE">Swing Device</option><option value="TRAVEL DEVICE">Travel Device</option></select></div>
@@ -208,6 +217,20 @@
                 <div id="spec-fields-container" class="hidden"><h3 class="text-lg font-semibold border-b border-[--premium-border] pb-2 mb-4 text-[--premium-text-primary]">Specifications</h3><div id="spec-fields" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4"></div></div>
             </form>
             <div class="mt-auto p-6 border-t border-[--premium-border] bg-black/20 flex justify-end gap-3"><button type="button" id="cancelBtn" class="bg-gray-200 dark:bg-gray-700 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-sm font-semibold text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Cancel</button><button type="submit" form="partForm" class="bg-indigo-600 dark:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-500 dark:hover:bg-blue-500 transition-colors">Save Component</button></div>
+        </div>
+    </div>
+
+    <!-- Detail Panel -->
+    <div id="detail-backdrop" class="detail-backdrop hidden fixed inset-0 z-40"></div>
+    <div id="detail-panel" class="detail-panel fixed top-0 right-0 h-full w-full max-w-2xl bg-[--premium-surface] border-l border-[--premium-border] shadow-2xl z-50 flex flex-col">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-[--premium-border] flex-shrink-0">
+            <h2 class="text-xl font-bold text-[--premium-text-primary]">Component Details</h2>
+            <button id="detail-close-btn" class="p-2 text-[--premium-text-secondary] hover:text-[--premium-text-primary] rounded-full hover:bg-black/5 dark:hover:bg-white/5"><i data-lucide="x"></i></button>
+        </div>
+        <!-- Content -->
+        <div id="detail-content" class="overflow-y-auto p-6">
+            <!-- Content will be injected here -->
         </div>
     </div>
     
@@ -240,6 +263,8 @@
             userName: document.getElementById('user-name'),
             signInButtonMain: document.getElementById('signin-button-main'),
             partForm: document.getElementById('partForm'),
+            formTitle: document.getElementById('form-title'),
+            editId: document.getElementById('edit-id'),
             itemNameSelect: document.getElementById('item-name-main'),
             specFieldsContainer: document.getElementById('spec-fields-container'),
             specFields: document.getElementById('spec-fields'),
@@ -254,6 +279,10 @@
             gridViewBtn: document.getElementById('grid-view-btn'),
             listViewBtn: document.getElementById('list-view-btn'),
             themeToggle: document.getElementById('theme-toggle'),
+            detailBackdrop: document.getElementById('detail-backdrop'),
+            detailPanel: document.getElementById('detail-panel'),
+            detailContent: document.getElementById('detail-content'),
+            detailCloseBtn: document.getElementById('detail-close-btn'),
         };
 
         const COLUMN_HEADERS = ['id', 'model', 'device', 'size', 'itemName', 'price', 'quantity', 'imageLinks', 'note', 'spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_width', 'spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_splineOd', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'];
@@ -270,9 +299,9 @@
         document.body.appendChild(gisScript);
 
         // --- Event Listeners ---
-        dom.partForm.addEventListener('submit', addComponent);
+        dom.partForm.addEventListener('submit', handleFormSubmit);
         dom.search.addEventListener('input', (e) => renderItems(allItems.filter(item => Object.values(item).join(' ').toLowerCase().includes(e.target.value.toLowerCase()))));
-        dom.addPartBtn.addEventListener('click', () => { dom.formModal.classList.remove('hidden'); dom.formModal.classList.add('flex'); });
+        dom.addPartBtn.addEventListener('click', openAddModal);
         dom.closeFormModalBtn.addEventListener('click', closeFormModal);
         dom.cancelBtn.addEventListener('click', closeFormModal);
         dom.menuBtn.addEventListener('click', () => dom.sidebar.classList.toggle('open'));
@@ -280,7 +309,11 @@
         dom.gridViewBtn.addEventListener('click', () => switchLayout('grid'));
         dom.listViewBtn.addEventListener('click', () => switchLayout('list'));
         dom.themeToggle.addEventListener('click', toggleTheme);
-        
+        dom.detailCloseBtn.addEventListener('click', closeDetailPanel);
+        dom.detailBackdrop.addEventListener('click', closeDetailPanel);
+        dom.searchResults.addEventListener('click', handleCardClick);
+        dom.detailContent.addEventListener('click', handleDetailPanelClick);
+
         // --- Core Functions ---
         async function initializeGapiClient() {
             await gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS });
@@ -301,7 +334,6 @@
                 Swal.fire({ title: 'Authentication Error', text: 'Could not sign in. Please try again.', icon: 'error', background: 'var(--premium-surface)', color: 'var(--premium-text-primary)' });
                 updateAuthStatus(false); return;
             }
-            // *** FIX: Explicitly set the token on the gapi client ***
             gapi.client.setToken(resp);
             updateAuthStatus(true);
         }
@@ -341,7 +373,11 @@
             try {
                 const response = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: RANGE });
                 const values = response.result.values;
-                allItems = (values && values.length > 1) ? values.slice(1).map(row => values[0].reduce((obj, header, index) => ({...obj, [header]: row[index]}), {})).filter(item => item.id && item.id.trim() !== '') : [];
+                allItems = (values && values.length > 1) ? values.slice(1).map((row, index) => {
+                    const item = values[0].reduce((obj, header, i) => ({...obj, [header]: row[i]}), {});
+                    item.rowIndex = index + 2; // +2 because of 1-based index and header row
+                    return item;
+                }).filter(item => item.id && item.id.trim() !== '') : [];
             } catch (err) {
                 Swal.fire({ title: 'Data Loading Error', text: `Could not load data. Check Sheet ID and permissions. Error: ${err.result.error.message}`, icon: 'error', background: 'var(--premium-surface)', color: 'var(--premium-text-primary)' });
                 updateAuthStatus(false);
@@ -350,10 +386,18 @@
                 renderItems(allItems);
             }
         }
-        async function addComponent(e) {
+        async function handleFormSubmit(e) {
             e.preventDefault();
-            const newItem = { id: Date.now(), model: dom.partForm.querySelector('#model').value, device: dom.partForm.querySelector('#device').value, size: dom.partForm.querySelector('#size').value, itemName: dom.partForm.querySelector('#item-name-main').value, price: dom.partForm.querySelector('#price').value, quantity: dom.partForm.querySelector('#quantity').value, imageLinks: dom.imageLinksInput.value, note: dom.partForm.querySelector('#note').value };
-            dom.partForm.querySelectorAll('#spec-fields input').forEach(input => { newItem[input.name.replace(/-/g, '_')] = input.value; });
+            const editId = dom.editId.value;
+            if (editId) {
+                await updateComponent(editId);
+            } else {
+                await addComponent();
+            }
+        }
+        async function addComponent() {
+            const newItem = collectFormData();
+            newItem.id = Date.now();
             const newRow = COLUMN_HEADERS.map(header => newItem[header] || "");
             try {
                 await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SPREADSHEET_ID, range: RANGE, valueInputOption: 'USER_ENTERED', resource: { values: [newRow] } });
@@ -364,19 +408,39 @@
                 Swal.fire({ title: 'Save Error', text: `Could not save the component. Error: ${err.result.error.message}`, icon: 'error', background: 'var(--premium-surface)', color: 'var(--premium-text-primary)' });
             }
         }
+        async function updateComponent(id) {
+            const itemToUpdate = allItems.find(item => item.id === id);
+            if (!itemToUpdate) {
+                Swal.fire('Error', 'Could not find the component to update.', 'error');
+                return;
+            }
+            const updatedItem = collectFormData();
+            updatedItem.id = id; // Preserve original ID
+            const updatedRow = COLUMN_HEADERS.map(header => updatedItem[header] || "");
+            const updateRange = `Sheet1!A${itemToUpdate.rowIndex}:AC${itemToUpdate.rowIndex}`;
+            try {
+                await gapi.client.sheets.spreadsheets.values.update({
+                    spreadsheetId: SPREADSHEET_ID,
+                    range: updateRange,
+                    valueInputOption: 'USER_ENTERED',
+                    resource: { values: [updatedRow] }
+                });
+                Swal.fire('Success!', 'Component updated successfully.', 'success');
+                closeFormModal();
+                listComponents();
+            } catch (err) {
+                Swal.fire('Update Error', `Could not update the component. Error: ${err.result.error.message}`, 'error');
+            }
+        }
         function renderItems(items) {
             dom.searchResults.innerHTML = '';
             dom.noResults.classList.toggle('hidden', items.length > 0 || !gapi.client.getToken());
             dom.searchResults.classList.toggle('hidden', items.length === 0);
             if (items.length === 0) return;
             
-            if (currentLayout === 'grid') {
-                dom.searchResults.className = 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6';
-                items.forEach(item => dom.searchResults.insertAdjacentHTML('beforeend', createGridCard(item)));
-            } else {
-                dom.searchResults.className = 'space-y-3';
-                items.forEach(item => dom.searchResults.insertAdjacentHTML('beforeend', createListCard(item)));
-            }
+            const itemHtml = items.map(item => currentLayout === 'grid' ? createGridCard(item) : createListCard(item)).join('');
+            dom.searchResults.innerHTML = itemHtml;
+            
             lucide.createIcons();
             initGalleries();
         }
@@ -394,7 +458,7 @@
                             ${images.length > 1 ? `<button class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white" data-direction="-1"><i data-lucide="chevron-left"></i></button><button class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
                             <div class="absolute top-4 right-4 ${statusColor} text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm">${statusText}</div>
                         </div>
-                        <div class="p-5 flex-grow flex flex-col"><h3 class="text-lg font-bold text-[--premium-text-primary] leading-tight">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3><p class="text-sm text-[--premium-text-secondary] mt-1">Price: ₹${item.price || 'N/A'}</p><div class="mt-auto pt-4 text-right"><a href="#" class="text-sm font-semibold text-[--premium-accent] hover:text-[--premium-accent-hover]">View Details &rarr;</a></div></div>
+                        <div class="p-5 flex-grow flex flex-col"><h3 class="text-lg font-bold text-[--premium-text-primary] leading-tight">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3><p class="text-sm text-[--premium-text-secondary] mt-1">Price: ₹${item.price || 'N/A'}</p><div class="mt-auto pt-4 text-right"><button class="view-details-btn text-sm font-semibold text-[--premium-accent] hover:text-[--premium-accent-hover]" data-id="${item.id}">View Details &rarr;</button></div></div>
                     </div>`;
         }
         function createListCard(item) {
@@ -407,7 +471,7 @@
                             <h3 class="col-span-2 font-semibold text-[--premium-text-primary]">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
                             <p class="text-[--premium-text-secondary]">₹${item.price || 'N/A'}</p>
                             <p class="${statusColor} font-medium">${quantity > 0 ? `${quantity} in Stock` : 'Out of Stock'}</p>
-                            <div class="text-right"><a href="#" class="text-sm font-semibold text-[--premium-accent] hover:text-[--premium-accent-hover]">Details</a></div>
+                            <div class="text-right"><button class="view-details-btn text-sm font-semibold text-[--premium-accent] hover:text-[--premium-accent-hover]" data-id="${item.id}">Details</button></div>
                         </div>
                     </div>`;
         }
@@ -466,11 +530,61 @@
         }
         
         // --- Modal & Form ---
+        function openAddModal() {
+            dom.formTitle.textContent = 'Add New Component';
+            dom.editId.value = '';
+            dom.partForm.reset();
+            dom.specFieldsContainer.classList.add('hidden');
+            dom.specFields.innerHTML = '';
+            dom.formModal.classList.remove('hidden');
+            dom.formModal.classList.add('flex');
+        }
+        function openEditModal(item) {
+            dom.formTitle.textContent = 'Edit Component';
+            dom.editId.value = item.id;
+            // Populate form
+            dom.partForm.querySelector('#model').value = item.model || '';
+            dom.partForm.querySelector('#device').value = item.device || '';
+            dom.partForm.querySelector('#size').value = item.size || '';
+            dom.itemNameSelect.value = item.itemName || '';
+            dom.partForm.querySelector('#price').value = item.price || '';
+            dom.partForm.querySelector('#quantity').value = item.quantity || '0';
+            dom.imageLinksInput.value = item.imageLinks || '';
+            dom.partForm.querySelector('#note').value = item.note || '';
+
+            updateSpecFields(); // This will show the spec container if needed
+            // Populate spec fields
+            Object.keys(item).forEach(key => {
+                if (key.startsWith('spec_')) {
+                    const input = dom.partForm.querySelector(`[name="${key}"]`);
+                    if (input) input.value = item[key];
+                }
+            });
+
+            dom.formModal.classList.remove('hidden');
+            dom.formModal.classList.add('flex');
+        }
         function closeFormModal() { 
             dom.formModal.classList.add('hidden'); dom.formModal.classList.remove('flex');
             dom.partForm.reset();
             dom.specFieldsContainer.classList.add('hidden');
             dom.specFields.innerHTML = '';
+        }
+        function collectFormData() {
+            const formData = {
+                model: dom.partForm.querySelector('#model').value,
+                device: dom.partForm.querySelector('#device').value,
+                size: dom.partForm.querySelector('#size').value,
+                itemName: dom.itemNameSelect.value,
+                price: dom.partForm.querySelector('#price').value,
+                quantity: dom.partForm.querySelector('#quantity').value,
+                imageLinks: dom.imageLinksInput.value,
+                note: dom.partForm.querySelector('#note').value,
+            };
+            dom.partForm.querySelectorAll('#spec-fields input').forEach(input => {
+                formData[input.name] = input.value;
+            });
+            return formData;
         }
         function updateSpecFields() {
             const selectedType = dom.itemNameSelect.value;
@@ -494,6 +608,85 @@
             input.className = 'mt-1 block w-full rounded-lg shadow-sm premium-input';
             wrapper.appendChild(label); wrapper.appendChild(input);
             return wrapper;
+        }
+
+        // --- Detail Panel ---
+        function handleCardClick(e) {
+            const viewBtn = e.target.closest('.view-details-btn');
+            if (viewBtn) {
+                const itemId = viewBtn.dataset.id;
+                const item = allItems.find(i => i.id === itemId);
+                if (item) openDetailPanel(item);
+            }
+        }
+        function openDetailPanel(item) {
+            populateDetailPanel(item);
+            dom.detailBackdrop.classList.remove('hidden');
+            dom.detailPanel.classList.add('open');
+        }
+        function closeDetailPanel() {
+            dom.detailPanel.classList.remove('open');
+            dom.detailBackdrop.classList.add('hidden');
+        }
+        function populateDetailPanel(item) {
+            const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
+            const firstImage = getDriveThumbnail(images[0]) || `https://placehold.co/600x400/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=No+Image`;
+            
+            let specsHtml = '';
+            Object.keys(item).forEach(key => {
+                if (key.startsWith('spec_') && item[key]) {
+                    const label = key.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                    specsHtml += `<div class="flex justify-between py-2 border-b border-[--premium-border]"><dt class="text-[--premium-text-secondary]">${label}</dt><dd class="font-semibold text-[--premium-text-primary]">${item[key]}</dd></div>`;
+                }
+            });
+            if (!specsHtml) specsHtml = '<p class="text-[--premium-text-secondary] text-sm">No specifications provided.</p>';
+
+            dom.detailContent.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Image Gallery -->
+                    <div class="relative image-gallery" data-images="${images.join(',')}">
+                        <img src="${firstImage}" class="gallery-image w-full h-72 object-cover rounded-lg border border-[--premium-border]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=Invalid+Image';">
+                        ${images.length > 1 ? `<button class="gallery-arrow absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white" data-direction="-1"><i data-lucide="chevron-left"></i></button><button class="gallery-arrow absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
+                    </div>
+                    <!-- Title & Actions -->
+                    <div>
+                        <h3 class="text-2xl font-bold text-[--premium-text-primary]">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
+                        <div class="flex items-center gap-4 mt-4">
+                            <button data-id="${item.id}" class="edit-btn flex-1 bg-indigo-600/10 dark:bg-blue-500/10 text-indigo-600 dark:text-blue-400 font-semibold py-2.5 px-4 rounded-lg hover:bg-indigo-600/20 dark:hover:bg-blue-500/20 transition-colors flex items-center justify-center gap-2"><i data-lucide="edit"></i>Edit</button>
+                            <button data-id="${item.id}" class="delete-btn flex-1 bg-red-600/10 text-red-500 font-semibold py-2.5 px-4 rounded-lg hover:bg-red-600/20 transition-colors flex items-center justify-center gap-2"><i data-lucide="trash-2"></i>Delete</button>
+                        </div>
+                    </div>
+                    <!-- Core Details -->
+                    <dl class="divide-y divide-[--premium-border] border-t border-[--premium-border]">
+                        <div class="flex justify-between py-2"><dt class="text-[--premium-text-secondary]">Price</dt><dd class="font-semibold text-[--premium-text-primary]">₹${item.price || 'N/A'}</dd></div>
+                        <div class="flex justify-between py-2"><dt class="text-[--premium-text-secondary]">Quantity</dt><dd class="font-semibold text-[--premium-text-primary]">${item.quantity || '0'}</dd></div>
+                        <div class="flex justify-between py-2"><dt class="text-[--premium-text-secondary]">Note</dt><dd class="font-semibold text-[--premium-text-primary] text-right">${item.note || 'None'}</dd></div>
+                    </dl>
+                    <!-- Specifications -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-[--premium-text-primary] mb-2">Specifications</h4>
+                        <dl>${specsHtml}</dl>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+            initGalleries();
+        }
+        function handleDetailPanelClick(e) {
+            const editBtn = e.target.closest('.edit-btn');
+            const deleteBtn = e.target.closest('.delete-btn');
+            if (editBtn) {
+                const itemId = editBtn.dataset.id;
+                const item = allItems.find(i => i.id === itemId);
+                if (item) {
+                    closeDetailPanel();
+                    openEditModal(item);
+                }
+            }
+            if (deleteBtn) {
+                // Future delete functionality
+                Swal.fire('Coming Soon', 'Delete functionality will be implemented in a future update.', 'info');
+            }
         }
 
         lucide.createIcons();
