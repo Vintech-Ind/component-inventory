@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nayaka Industries | Component Database</title>
+    <title>Vinayaka Industries | Component Database</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -119,8 +119,11 @@
         .swal2-confirm { background-color: var(--premium-accent) !important; }
         .image-gallery .gallery-arrow { opacity: 0; transition: opacity 0.2s ease-in-out; }
         .image-gallery:hover .gallery-arrow { opacity: 1; }
-        .detail-panel { background-color: var(--premium-surface); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(100%); }
-        .detail-panel.open { transform: translateX(0); }
+        
+        .detail-modal {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
         .card-enter { opacity: 0; transform: translateY(20px); }
         .card-enter-active { opacity: 1; transform: translateY(0); }
 
@@ -228,17 +231,17 @@
         </div>
     </div>
 
-    <!-- Detail Panel -->
-    <div id="detail-backdrop" class="detail-backdrop hidden fixed inset-0 z-40"></div>
-    <div id="detail-panel" class="detail-panel fixed top-0 right-0 h-full w-full max-w-2xl border-l border-[--premium-border] shadow-2xl z-50 flex flex-col">
-        <!-- Header -->
-        <div class="flex items-center justify-between p-4 border-b border-[--premium-border] flex-shrink-0">
-            <h2 class="text-xl font-bold text-[--premium-text-primary]">Component Details</h2>
-            <button id="detail-close-btn" class="p-2 text-[--premium-text-secondary] hover:text-[--premium-text-primary] rounded-full hover:bg-white/5"><i data-lucide="x"></i></button>
-        </div>
-        <!-- Content -->
-        <div id="detail-content" class="overflow-y-auto p-6">
-            <!-- Content will be injected here -->
+    <!-- Detail Modal -->
+    <div id="detail-modal" class="detail-modal fixed inset-0 z-50 justify-center items-center p-4 hidden opacity-0 scale-95">
+        <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" id="detail-backdrop"></div>
+        <div class="relative glass-card w-full max-w-6xl max-h-[90vh] rounded-2xl border border-[--premium-border] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b border-[--premium-border] flex-shrink-0">
+                <h2 class="text-xl font-bold text-[--premium-text-primary]">Component Details</h2>
+                <button id="detail-close-btn" class="p-2 text-[--premium-text-secondary] hover:text-[--premium-text-primary] rounded-full hover:bg-white/5"><i data-lucide="x"></i></button>
+            </div>
+            <div id="detail-content" class="grid md:grid-cols-2 gap-6 p-6 overflow-y-auto">
+                <!-- Content will be injected here -->
+            </div>
         </div>
     </div>
     
@@ -287,8 +290,8 @@
             gridViewBtn: document.getElementById('grid-view-btn'),
             listViewBtn: document.getElementById('list-view-btn'),
             themeToggle: document.getElementById('theme-toggle'),
+            detailModal: document.getElementById('detail-modal'),
             detailBackdrop: document.getElementById('detail-backdrop'),
-            detailPanel: document.getElementById('detail-panel'),
             detailContent: document.getElementById('detail-content'),
             detailCloseBtn: document.getElementById('detail-close-btn'),
         };
@@ -639,48 +642,51 @@
         }
         function openDetailPanel(item) {
             populateDetailPanel(item);
-            dom.detailBackdrop.classList.remove('hidden');
-            dom.detailPanel.classList.add('open');
+            dom.detailModal.classList.remove('hidden', 'opacity-0', 'scale-95');
+            dom.detailModal.classList.add('flex');
+            setTimeout(() => {
+                dom.detailModal.classList.remove('opacity-0', 'scale-95');
+            }, 10);
         }
         function closeDetailPanel() {
-            dom.detailPanel.classList.remove('open');
-            dom.detailBackdrop.classList.add('hidden');
+            dom.detailModal.classList.add('opacity-0', 'scale-95');
+            setTimeout(() => {
+                dom.detailModal.classList.add('hidden');
+                dom.detailModal.classList.remove('flex');
+            }, 300);
         }
         function populateDetailPanel(item) {
             const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
-            const firstImage = getDriveThumbnail(images[0]) || `https://placehold.co/600x400/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=No+Image`;
+            const imagesHtml = images.map(img => `<img src="${getDriveThumbnail(img)}" class="w-full rounded-lg border border-[--premium-border] object-cover" onerror="this.style.display='none'">`).join('');
             
             let specsHtml = '';
             Object.keys(item).forEach(key => {
                 if (key.startsWith('spec_') && item[key]) {
                     const label = key.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-                    specsHtml += `<div class="flex justify-between py-2 border-b border-[--premium-border]"><dt class="text-[--premium-text-secondary]">${label}</dt><dd class="font-semibold text-[--premium-text-primary]">${item[key]}</dd></div>`;
+                    specsHtml += `<div class="flex justify-between py-3 border-b border-[--premium-border]"><dt class="text-[--premium-text-secondary]">${label}</dt><dd class="font-semibold text-[--premium-text-primary]">${item[key]}</dd></div>`;
                 }
             });
             if (!specsHtml) specsHtml = '<p class="text-[--premium-text-secondary] text-sm">No specifications provided.</p>';
 
             dom.detailContent.innerHTML = `
-                <div class="space-y-6">
-                    <!-- Image Gallery -->
-                    <div class="relative image-gallery" data-images="${images.join(',')}">
-                        <img src="${firstImage}" class="gallery-image w-full h-72 object-cover rounded-lg border border-[--premium-border]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=Invalid+Image';">
-                        ${images.length > 1 ? `<button class="gallery-arrow absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white" data-direction="-1"><i data-lucide="chevron-left"></i></button><button class="gallery-arrow absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
-                    </div>
-                    <!-- Title & Actions -->
+                <!-- Left Column: Images -->
+                <div class="md:col-span-1 space-y-4 overflow-y-auto max-h-[70vh]">
+                    ${images.length > 0 ? imagesHtml : `<div class="h-72 flex items-center justify-center bg-black/20 rounded-lg text-[--premium-text-secondary]">No Images</div>`}
+                </div>
+                <!-- Right Column: Data -->
+                <div class="md:col-span-1 space-y-6">
                     <div>
-                        <h3 class="text-2xl font-bold text-[--premium-text-primary]">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
+                        <h3 class="text-3xl font-bold text-[--premium-text-primary]">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
                         <div class="flex items-center gap-4 mt-4">
                             <button data-id="${item.id}" class="edit-btn flex-1 bg-indigo-600/10 dark:bg-blue-500/10 text-indigo-600 dark:text-blue-400 font-semibold py-2.5 px-4 rounded-lg hover:bg-indigo-600/20 dark:hover:bg-blue-500/20 transition-colors flex items-center justify-center gap-2"><i data-lucide="edit"></i>Edit</button>
                             <button data-id="${item.id}" class="delete-btn flex-1 bg-red-600/10 text-red-500 font-semibold py-2.5 px-4 rounded-lg hover:bg-red-600/20 transition-colors flex items-center justify-center gap-2"><i data-lucide="trash-2"></i>Delete</button>
                         </div>
                     </div>
-                    <!-- Core Details -->
                     <dl class="divide-y divide-[--premium-border] border-t border-[--premium-border]">
-                        <div class="flex justify-between py-2"><dt class="text-[--premium-text-secondary]">Price</dt><dd class="font-semibold text-[--premium-text-primary]">₹${item.price || 'N/A'}</dd></div>
-                        <div class="flex justify-between py-2"><dt class="text-[--premium-text-secondary]">Quantity</dt><dd class="font-semibold text-[--premium-text-primary]">${item.quantity || '0'}</dd></div>
-                        <div class="flex justify-between py-2"><dt class="text-[--premium-text-secondary]">Note</dt><dd class="font-semibold text-[--premium-text-primary] text-right">${item.note || 'None'}</dd></div>
+                        <div class="flex justify-between py-3"><dt class="text-[--premium-text-secondary]">Price</dt><dd class="font-semibold text-[--premium-text-primary]">₹${item.price || 'N/A'}</dd></div>
+                        <div class="flex justify-between py-3"><dt class="text-[--premium-text-secondary]">Quantity</dt><dd class="font-semibold text-[--premium-text-primary]">${item.quantity || '0'}</dd></div>
+                        <div class="flex justify-between py-3"><dt class="text-[--premium-text-secondary]">Note</dt><dd class="font-semibold text-[--premium-text-primary] text-right">${item.note || 'None'}</dd></div>
                     </dl>
-                    <!-- Specifications -->
                     <div>
                         <h4 class="text-lg font-semibold text-[--premium-text-primary] mb-2">Specifications</h4>
                         <dl>${specsHtml}</dl>
@@ -688,7 +694,6 @@
                 </div>
             `;
             lucide.createIcons();
-            initGalleries();
         }
         function handleDetailPanelClick(e) {
             const editBtn = e.target.closest('.edit-btn');
