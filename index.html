@@ -62,7 +62,7 @@
         .card, .list-item, .skeleton-card {
             background-color: var(--premium-surface);
             border: 1px solid var(--premium-border);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s, opacity 0.3s;
         }
         .card:hover, .list-item:hover {
             transform: translateY(-5px);
@@ -112,6 +112,16 @@
         .detail-panel.open {
             transform: translateX(0);
         }
+        
+        .card-enter {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .card-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
 
         @media (max-width: 1024px) {
             .main-content { margin-left: 0; width: 100%; }
@@ -206,7 +216,7 @@
                     <div><label for="model" class="block text-sm font-medium text-[--premium-text-secondary]">Model*</label><input type="text" id="model" required class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
                     <div><label for="device" class="block text-sm font-medium text-[--premium-text-secondary]">Device</label><select id="device" class="mt-1 block w-full rounded-lg shadow-sm premium-input"><option value="">(None)</option><option value="SWING DEVICE">Swing Device</option><option value="TRAVEL DEVICE">Travel Device</option></select></div>
                     <div><label for="size" class="block text-sm font-medium text-[--premium-text-secondary]">Size</label><select id="size" class="mt-1 block w-full rounded-lg shadow-sm premium-input"><option value="">(None)</option><option value="SMALL">Small</option><option value="MIDDLE">Middle</option><option value="BIG">Big</option></select></div>
-                    <div><label for="item-name-main" class="block text-sm font-medium text-[--premium-text-secondary]">Item Name*</label><select id="item-name-main" required class="mt-1 block w-full rounded-lg shadow-sm premium-input"><option value="">Select item type...</option><option value="Planetary Gear">Planetary Gear</option><option value="Sun Gear">Sun Gear</option><option value="Ring Gear">Ring Gear</option><option value="Splain/Pinion Shaft">Spline/Pinion Shaft</option><option value="Track Motor Shaft">Track Motor Shaft</option><option value="Bearing">Bearing</option><option value="Bushes">Bushes</option></select></div>
+                    <div><label for="item-name-main" class="block text-sm font-medium text-[--premium-text-secondary]">Item Name*</label><select id="item-name-main" required class="mt-1 block w-full rounded-lg shadow-sm premium-input"><option value="">Select item type...</option><option value="Planetary Gear">Planetary Gear</option><option value="Sun Gear">Sun Gear</option><option value="Ring Gear">Ring Gear</option><option value="Spline/Pinion Shaft">Spline/Pinion Shaft</option><option value="Track Motor Shaft">Track Motor Shaft</option><option value="Bearing">Bearing</option><option value="Bushes">Bushes</option></select></div>
                     <div><label for="price" class="block text-sm font-medium text-[--premium-text-secondary]">Price</label><input type="number" id="price" placeholder="e.g., 4500" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
                     <div><label for="quantity" class="block text-sm font-medium text-[--premium-text-secondary]">Quantity*</label><input type="number" id="quantity" required value="1" min="0" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
                 </div>
@@ -438,9 +448,18 @@
             dom.searchResults.classList.toggle('hidden', items.length === 0);
             if (items.length === 0) return;
             
-            const itemHtml = items.map(item => currentLayout === 'grid' ? createGridCard(item) : createListCard(item)).join('');
-            dom.searchResults.innerHTML = itemHtml;
-            
+            if (currentLayout === 'grid') {
+                dom.searchResults.className = 'grid gap-6 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]';
+                items.forEach((item, index) => {
+                    const card = createGridCard(item);
+                    dom.searchResults.insertAdjacentHTML('beforeend', card);
+                    const cardEl = dom.searchResults.lastElementChild;
+                    setTimeout(() => cardEl.classList.add('card-enter-active'), index * 50);
+                });
+            } else {
+                dom.searchResults.className = 'space-y-3';
+                items.forEach(item => dom.searchResults.insertAdjacentHTML('beforeend', createListCard(item)));
+            }
             lucide.createIcons();
             initGalleries();
         }
@@ -452,13 +471,13 @@
             const quantity = parseInt(item.quantity, 10);
             const statusColor = quantity > 10 ? 'bg-green-400/10 text-green-300' : quantity > 0 ? 'bg-yellow-400/10 text-yellow-300' : 'bg-red-400/10 text-red-300';
             const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
-            return `<div class="card rounded-xl overflow-hidden flex flex-col group">
+            return `<div class="card rounded-xl overflow-hidden flex flex-col group card-enter">
                         <div class="relative image-gallery" data-images="${images.join(',')}">
-                            <img src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-56 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=Invalid+Image';">
+                            <img src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=Invalid+Image';">
                             ${images.length > 1 ? `<button class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white" data-direction="-1"><i data-lucide="chevron-left"></i></button><button class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
                             <div class="absolute top-4 right-4 ${statusColor} text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm">${statusText}</div>
                         </div>
-                        <div class="p-5 flex-grow flex flex-col"><h3 class="text-lg font-bold text-[--premium-text-primary] leading-tight">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3><p class="text-sm text-[--premium-text-secondary] mt-1">Price: ₹${item.price || 'N/A'}</p><div class="mt-auto pt-4 text-right"><button class="view-details-btn text-sm font-semibold text-[--premium-accent] hover:text-[--premium-accent-hover]" data-id="${item.id}">View Details &rarr;</button></div></div>
+                        <div class="p-5 flex-grow flex flex-col"><h3 class="font-bold text-[--premium-text-primary] leading-tight">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3><p class="text-sm text-[--premium-text-secondary] mt-1">Price: ₹${item.price || 'N/A'}</p><div class="mt-auto pt-4 text-right"><button class="view-details-btn text-sm font-semibold text-[--premium-accent] hover:text-[--premium-accent-hover]" data-id="${item.id}">View Details &rarr;</button></div></div>
                     </div>`;
         }
         function createListCard(item) {
@@ -493,7 +512,7 @@
             if (show) {
                 let skeletonHtml = '';
                 for(let i = 0; i < 8; i++) { skeletonHtml += `<div class="skeleton-card rounded-xl p-4 space-y-4"><div class="h-48 rounded bg-[--premium-border] skeleton-animate"></div><div class="space-y-2"><div class="h-6 w-3/4 rounded bg-[--premium-border] skeleton-animate"></div><div class="h-4 w-1/2 rounded bg-[--premium-border] skeleton-animate"></div></div></div>`; }
-                dom.skeletonLoader.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">${skeletonHtml}</div>`;
+                dom.skeletonLoader.innerHTML = `<div class="grid gap-6 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">${skeletonHtml}</div>`;
             }
         }
         function initTheme() {
