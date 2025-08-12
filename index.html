@@ -15,139 +15,137 @@
     <style>
         :root {
             --sidebar-width: 280px;
-            --header-height: 72px;
+            --header-height: 80px;
         }
-        /* Light Mode Variables */
+        
+        html.dark {
+            --premium-bg-start: #0f0c29;
+            --premium-bg-mid: #302b63;
+            --premium-bg-end: #24243e;
+            --premium-surface: rgba(30, 36, 42, 0.75);
+            --premium-border: rgba(255, 255, 255, 0.1);
+            --premium-border-hover: rgba(255, 255, 255, 0.2);
+            --premium-text-primary: #f0f6fc;
+            --premium-text-secondary: #8b949e;
+            --premium-accent: #6366f1; /* Electric Indigo */
+            --premium-accent-glow: rgba(99, 102, 241, 0.5);
+        }
+        
         html:not(.dark) {
-            --premium-bg: #f3f4f6;
-            --premium-surface: #ffffff;
-            --premium-border: #e5e7eb;
-            --premium-text-primary: #111827;
+            --premium-bg-start: #e0eafc;
+            --premium-bg-mid: #cfdef3;
+            --premium-bg-end: #e0eafc;
+            --premium-surface: rgba(255, 255, 255, 0.7);
+            --premium-border: rgba(0, 0, 0, 0.1);
+            --premium-border-hover: rgba(0, 0, 0, 0.2);
+            --premium-text-primary: #1f2937;
             --premium-text-secondary: #6b7280;
             --premium-accent: #4f46e5;
-            --premium-accent-hover: #4338ca;
+            --premium-accent-glow: rgba(79, 70, 229, 0.5);
         }
-        /* Dark Mode Variables */
-        html.dark {
-            --premium-bg: #0d1117;
-            --premium-surface: #161b22;
-            --premium-border: #30363d;
-            --premium-text-primary: #c9d1d9;
-            --premium-text-secondary: #8b949e;
-            --premium-accent: #58a6ff;
-            --premium-accent-hover: #79c0ff;
+
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
+
         html { scroll-behavior: smooth; }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--premium-bg);
+            background: linear-gradient(-45deg, var(--premium-bg-start), var(--premium-bg-mid), var(--premium-bg-end));
+            background-size: 400% 400%;
+            animation: gradient-animation 15s ease infinite;
             color: var(--premium-text-primary);
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .sidebar {
-            background-color: var(--premium-surface);
-            border-right-color: var(--premium-border);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s;
         }
         .main-content {
-            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            margin-left: var(--sidebar-width);
-            width: calc(100% - var(--sidebar-width));
+            transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding-left: calc(var(--sidebar-width) + 2rem);
         }
-        .header {
-            background-color: var(--premium-surface);
-            border-bottom-color: var(--premium-border);
+        
+        /* Floating Glass Sidebar */
+        .sidebar {
+            background: var(--premium-surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--premium-border);
+            border-radius: 1.5rem;
+            margin: 1rem;
+            height: calc(100vh - 2rem);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .card, .list-item, .skeleton-card {
-            background-color: var(--premium-surface);
+        .sidebar-nav-link.active {
+            background-color: var(--premium-accent);
+            color: white;
+            box-shadow: 0 0 20px var(--premium-accent-glow);
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--premium-surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--premium-border);
             transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
                         box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
-                        border-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                        background-color 0.3s, opacity 0.3s;
+                        border-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-        .card:hover, .list-item:hover {
+        .glass-card:hover {
             transform: scale(1.03) translateY(-5px);
-            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.2);
-            border-color: var(--premium-accent);
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.3);
+            border-color: var(--premium-border-hover);
         }
-        .modal-backdrop, .detail-backdrop {
-            background-color: rgba(13, 17, 23, 0.5);
-            backdrop-filter: blur(8px);
-        }
+        
         .premium-input {
-            background-color: var(--premium-bg);
+            background-color: rgba(0,0,0,0.2);
             border-color: var(--premium-border);
             color: var(--premium-text-primary);
+        }
+        html:not(.dark) .premium-input {
+             background-color: rgba(255,255,255,0.5);
         }
         .premium-input:focus {
             --tw-ring-color: var(--premium-accent);
             border-color: var(--premium-accent);
+            background-color: rgba(0,0,0,0.3);
         }
-        .swal2-popup {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--premium-surface) !important;
-            color: var(--premium-text-primary) !important;
+        html:not(.dark) .premium-input:focus {
+             background-color: rgba(255,255,255,0.7);
         }
+
+        /* Other styles from previous version adapted for the new theme */
+        .swal2-popup { font-family: 'Inter', sans-serif; background-color: var(--premium-surface) !important; color: var(--premium-text-primary) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
         .swal2-title { color: var(--premium-text-primary) !important; }
         .swal2-confirm { background-color: var(--premium-accent) !important; }
-
-        @keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-        .skeleton-animate {
-            background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--premium-border) 50%, transparent), transparent);
-            background-size: 200% 100%;
-            animation: skeleton-loading 1.5s infinite;
-        }
-
-        .image-gallery .gallery-arrow {
-            opacity: 0;
-            transition: opacity 0.2s ease-in-out;
-        }
-        .image-gallery:hover .gallery-arrow {
-            opacity: 1;
-        }
-        
-        .detail-panel {
-            background-color: var(--premium-surface);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            transform: translateX(100%);
-        }
-        .detail-panel.open {
-            transform: translateX(0);
-        }
-        
-        .card-enter {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        .card-enter-active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
+        .image-gallery .gallery-arrow { opacity: 0; transition: opacity 0.2s ease-in-out; }
+        .image-gallery:hover .gallery-arrow { opacity: 1; }
+        .detail-panel { background-color: var(--premium-surface); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(100%); }
+        .detail-panel.open { transform: translateX(0); }
+        .card-enter { opacity: 0; transform: translateY(20px); }
+        .card-enter-active { opacity: 1; transform: translateY(0); }
 
         @media (max-width: 1024px) {
-            .main-content { margin-left: 0; width: 100%; }
-            .sidebar { transform: translateX(-100%); }
+            .main-content { padding-left: 1rem; }
+            .sidebar { transform: translateX(-110%); }
             .sidebar.open { transform: translateX(0); }
         }
     </style>
 </head>
 <body class="antialiased">
 
-    <div class="flex h-screen">
+    <div class="relative min-h-screen">
         <!-- Sidebar -->
-        <aside class="sidebar fixed top-0 left-0 h-full w-[var(--sidebar-width)] z-40 flex flex-col lg:translate-x-0">
-            <div class="flex items-center gap-4 p-5 border-b h-[var(--header-height)]">
-                <div class="bg-indigo-600 p-2.5 rounded-lg shadow-inner"><i data-lucide="gem" class="w-6 h-6 text-white"></i></div>
+        <aside class="sidebar fixed top-0 left-0 w-[var(--sidebar-width)] z-40 flex flex-col">
+            <div class="flex items-center gap-4 p-5 h-[var(--header-height)]">
+                <div class="bg-indigo-500 p-2.5 rounded-lg shadow-inner"><i data-lucide="gem" class="w-6 h-6 text-white"></i></div>
                 <h1 class="text-xl font-bold text-[--premium-text-primary]">Vinayaka DB</h1>
             </div>
             
             <nav class="flex-1 px-4 py-6 space-y-2">
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 text-[--premium-text-primary] font-semibold bg-black/10 dark:bg-white/5 rounded-lg">
-                    <i data-lucide="layout-grid" class="w-5 h-5 text-indigo-500 dark:text-blue-400"></i><span>Dashboard</span>
+                <a href="#" class="sidebar-nav-link active flex items-center gap-3 px-3 py-2.5 font-semibold rounded-lg">
+                    <i data-lucide="layout-grid" class="w-5 h-5"></i><span>Dashboard</span>
                 </a>
-                <a href="#" id="imageNamerBtn" class="flex items-center gap-3 px-3 py-2.5 text-[--premium-text-secondary] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[--premium-text-primary] rounded-lg font-medium transition-colors">
+                <a href="#" id="imageNamerBtn" class="sidebar-nav-link flex items-center gap-3 px-3 py-2.5 text-[--premium-text-secondary] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[--premium-text-primary] rounded-lg font-medium transition-colors">
                     <i data-lucide="tag" class="w-5 h-5"></i><span>Image Namer</span>
                 </a>
             </nav>
@@ -155,23 +153,23 @@
             <div class="p-4 border-t border-t-[--premium-border]">
                 <div id="user-profile-area" class="p-2 rounded-lg cursor-pointer group hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                     <div id="auth-required-profile" class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-full bg-[--premium-bg] flex items-center justify-center border border-dashed border-[--premium-border]"><i data-lucide="user-x" class="text-[--premium-text-secondary]"></i></div>
+                        <div class="w-11 h-11 rounded-full bg-black/20 flex items-center justify-center border border-dashed border-[--premium-border]"><i data-lucide="user-x" class="text-[--premium-text-secondary]"></i></div>
                         <div>
                             <p class="font-semibold text-[--premium-text-secondary]">Not Signed In</p>
-                            <p class="text-xs text-[--premium-text-secondary] group-hover:text-[--premium-accent] transition-colors">Click to sign in</p>
+                            <p class="text-xs text-gray-500 group-hover:text-[--premium-accent] transition-colors">Click to sign in</p>
                         </div>
                     </div>
                     <div id="user-profile" class="hidden items-center gap-3">
                         <img id="user-dp" class="w-11 h-11 rounded-full" src="" alt="User">
                         <div>
                             <p id="user-name" class="font-semibold text-[--premium-text-primary]"></p>
-                            <p class="text-xs text-green-500 dark:text-green-400 font-medium">Online</p>
+                            <p class="text-xs text-green-400 font-medium">Online</p>
                         </div>
                     </div>
                 </div>
-                 <div class="mt-2 flex items-center justify-between">
+                <div class="mt-2 flex items-center justify-between p-2">
                     <span class="text-sm font-medium text-[--premium-text-secondary]">Theme</span>
-                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-[--premium-text-secondary]">
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-[--premium-text-secondary] transition-colors">
                         <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
                         <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
                     </button>
@@ -180,38 +178,35 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="main-content flex-1 flex flex-col h-screen overflow-y-auto">
-            <header class="header sticky top-0 z-30">
-                <div class="flex items-center justify-between p-4 mx-auto max-w-screen-2xl h-[var(--header-height)]">
-                    <div class="flex items-center gap-2">
-                         <button id="menuBtn" class="lg:hidden p-2 text-[--premium-text-secondary]"><i data-lucide="menu" class="w-6 h-6"></i></button>
-                         <h1 class="text-2xl font-bold text-[--premium-text-primary] hidden lg:block">Inventory</h1>
+        <main class="main-content flex-1 flex flex-col min-h-screen">
+            <header class="sticky top-0 z-30 h-[var(--header-height)] flex items-center justify-between p-4 lg:p-8">
+                <div class="flex items-center gap-2">
+                     <button id="menuBtn" class="lg:hidden p-2 text-[--premium-text-secondary]"><i data-lucide="menu" class="w-6 h-6"></i></button>
+                </div>
+                <div class="flex items-center gap-4">
+                     <div class="flex items-center gap-1 bg-black/20 p-1 rounded-lg border border-[--premium-border]">
+                        <button id="grid-view-btn" class="p-2 rounded-md bg-[--premium-surface] text-[--premium-accent]"><i data-lucide="layout-grid"></i></button>
+                        <button id="list-view-btn" class="p-2 rounded-md text-[--premium-text-secondary]"><i data-lucide="list"></i></button>
                     </div>
-                    <div class="flex-1 flex justify-center items-center">
-                         <div class="flex items-center gap-1 bg-[--premium-bg] p-1 rounded-lg border border-[--premium-border]">
-                            <button id="grid-view-btn" class="p-2 rounded-md bg-[--premium-surface] text-[--premium-accent]"><i data-lucide="layout-grid"></i></button>
-                            <button id="list-view-btn" class="p-2 rounded-md text-[--premium-text-secondary]"><i data-lucide="list"></i></button>
-                        </div>
-                    </div>
-                    <button id="addPartBtn" class="bg-indigo-600 dark:bg-blue-600 text-white font-semibold py-2.5 px-5 rounded-lg shadow-lg hover:bg-indigo-500 dark:hover:bg-blue-500 transition-all duration-200 flex items-center gap-2 disabled:bg-gray-200 dark:disabled:bg-gray-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed" disabled>
+                    <button id="addPartBtn" class="bg-indigo-600 text-white font-semibold py-2.5 px-5 rounded-lg shadow-lg hover:bg-indigo-500 transition-all duration-200 flex items-center gap-2 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed" disabled>
                         <i data-lucide="plus" class="w-5 h-5"></i><span class="hidden sm:inline">Add Component</span>
                     </button>
                 </div>
             </header>
 
-            <div id="app" class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8 w-full">
+            <div id="app" class="max-w-screen-2xl w-full p-4 sm:p-6 lg:p-8">
                 <div class="mb-8"><div class="relative"><i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[--premium-text-secondary]"></i><input type="text" id="search" placeholder="Search inventory..." class="w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[--premium-accent] transition shadow-sm premium-input"></div></div>
-                <div id="auth-required-main" class="text-center py-16 card rounded-xl"><i data-lucide="lock" class="w-16 h-16 mx-auto text-[--premium-text-secondary]"></i><h3 class="mt-4 text-2xl font-bold text-[--premium-text-primary]">Authentication Required</h3><p class="mt-2 text-[--premium-text-secondary] mb-6">Please sign in to load and manage your component data.</p><button id="signin-button-main" class="bg-indigo-600 dark:bg-blue-600 text-white font-semibold py-2.5 px-6 rounded-lg shadow-md hover:bg-indigo-500 dark:hover:bg-blue-500 transition-all">Sign In with Google</button></div>
+                <div id="auth-required-main" class="text-center py-16 glass-card rounded-xl"><i data-lucide="lock" class="w-16 h-16 mx-auto text-[--premium-text-secondary]"></i><h3 class="mt-4 text-2xl font-bold text-[--premium-text-primary]">Authentication Required</h3><p class="mt-2 text-[--premium-text-secondary] mb-6">Please sign in to load and manage your component data.</p><button id="signin-button-main" class="bg-indigo-600 text-white font-semibold py-2.5 px-6 rounded-lg shadow-md hover:bg-indigo-500 transition-all">Sign In with Google</button></div>
                 <div id="skeleton-loader" class="hidden"></div>
                 <div id="searchResults" class="hidden"></div>
-                <div id="no-results" class="hidden text-center py-16 card rounded-xl"><i data-lucide="search-x" class="w-16 h-16 mx-auto text-[--premium-text-secondary]"></i><h3 class="mt-4 text-2xl font-bold text-[--premium-text-primary]">No Components Found</h3><p class="mt-2 text-[--premium-text-secondary]">Your database is empty or your search returned no results.</p></div>
+                <div id="no-results" class="hidden text-center py-16 glass-card rounded-xl"><i data-lucide="search-x" class="w-16 h-16 mx-auto text-[--premium-text-secondary]"></i><h3 class="mt-4 text-2xl font-bold text-[--premium-text-primary]">No Components Found</h3><p class="mt-2 text-[--premium-text-secondary]">Your database is empty or your search returned no results.</p></div>
             </div>
         </main>
     </div>
 
     <!-- Add/Edit Modal -->
     <div id="formModal" class="modal-backdrop hidden fixed inset-0 z-50 justify-center items-center p-4">
-        <div class="bg-[--premium-surface] border border-[--premium-border] rounded-xl shadow-2xl w-full max-w-4xl m-4 max-h-[90vh] flex flex-col">
+        <div class="glass-card border border-[--premium-border] rounded-xl shadow-2xl w-full max-w-4xl m-4 max-h-[90vh] flex flex-col">
             <div class="flex justify-between items-center p-6 border-b border-[--premium-border]"><h2 id="form-title" class="text-2xl font-bold text-[--premium-text-primary]">Add New Component</h2><button type="button" id="closeFormModalBtn" class="text-[--premium-text-secondary] hover:text-[--premium-text-primary] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
             <form id="partForm" class="p-6 space-y-6 overflow-y-auto">
                 <input type="hidden" id="edit-id">
@@ -229,7 +224,7 @@
                 </div>
                 <div id="spec-fields-container" class="hidden"><h3 class="text-lg font-semibold border-b border-[--premium-border] pb-2 mb-4 text-[--premium-text-primary]">Specifications</h3><div id="spec-fields" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4"></div></div>
             </form>
-            <div class="mt-auto p-6 border-t border-[--premium-border] bg-black/20 flex justify-end gap-3"><button type="button" id="cancelBtn" class="bg-gray-200 dark:bg-gray-700 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-sm font-semibold text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Cancel</button><button type="submit" form="partForm" class="bg-indigo-600 dark:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-500 dark:hover:bg-blue-500 transition-colors">Save Component</button></div>
+            <div class="mt-auto p-6 border-t border-[--premium-border] bg-black/20 flex justify-end gap-3"><button type="button" id="cancelBtn" class="bg-gray-700 py-2 px-4 border border-gray-600 rounded-lg shadow-sm text-sm font-semibold text-white hover:bg-gray-600 transition-colors">Cancel</button><button type="submit" form="partForm" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-500 transition-colors">Save Component</button></div>
         </div>
     </div>
 
@@ -239,7 +234,7 @@
         <!-- Header -->
         <div class="flex items-center justify-between p-4 border-b border-[--premium-border] flex-shrink-0">
             <h2 class="text-xl font-bold text-[--premium-text-primary]">Component Details</h2>
-            <button id="detail-close-btn" class="p-2 text-[--premium-text-secondary] hover:text-[--premium-text-primary] rounded-full hover:bg-black/5 dark:hover:bg-white/5"><i data-lucide="x"></i></button>
+            <button id="detail-close-btn" class="p-2 text-[--premium-text-secondary] hover:text-[--premium-text-primary] rounded-full hover:bg-white/5"><i data-lucide="x"></i></button>
         </div>
         <!-- Content -->
         <div id="detail-content" class="overflow-y-auto p-6">
@@ -474,7 +469,7 @@
             const quantity = parseInt(item.quantity, 10);
             const statusColor = quantity > 10 ? 'bg-green-400/10 text-green-300' : quantity > 0 ? 'bg-yellow-400/10 text-yellow-300' : 'bg-red-400/10 text-red-300';
             const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
-            return `<div class="card rounded-xl overflow-hidden flex flex-col group card-enter">
+            return `<div class="glass-card rounded-xl overflow-hidden flex flex-col group card-enter">
                         <div class="relative image-gallery bg-black/10 dark:bg-black/20" data-images="${images.join(',')}">
                             <img src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-52 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/600x400/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=Invalid+Image';">
                             ${images.length > 1 ? `<button class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white" data-direction="-1"><i data-lucide="chevron-left"></i></button><button class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
@@ -636,7 +631,7 @@
         function handleCardClick(e) {
             const viewBtn = e.target.closest('.view-details-btn');
             if (viewBtn) {
-                const card = viewBtn.closest('.card, .list-item');
+                const card = viewBtn.closest('.glass-card, .list-item');
                 const itemId = viewBtn.dataset.id;
                 const item = allItems.find(i => i.id === itemId);
                 if (item) openDetailPanel(item);
