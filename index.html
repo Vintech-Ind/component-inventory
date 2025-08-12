@@ -20,8 +20,8 @@
         /* Light Mode Variables */
         html:not(.dark) {
             --premium-bg: #f3f4f6;
-            --premium-surface: #ffffff;
-            --premium-border: #e5e7eb;
+            --premium-surface: rgba(255, 255, 255, 0.5);
+            --premium-border: rgba(255, 255, 255, 0.3);
             --premium-text-primary: #111827;
             --premium-text-secondary: #6b7280;
             --premium-accent: #4f46e5;
@@ -30,8 +30,8 @@
         /* Dark Mode Variables */
         html.dark {
             --premium-bg: #0d1117;
-            --premium-surface: #161b22;
-            --premium-border: #30363d;
+            --premium-surface: rgba(30, 36, 42, 0.75);
+            --premium-border: rgba(255, 255, 255, 0.1);
             --premium-text-primary: #c9d1d9;
             --premium-text-secondary: #8b949e;
             --premium-accent: #58a6ff;
@@ -40,13 +40,16 @@
         html { scroll-behavior: smooth; }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--premium-bg);
+            background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+            background-attachment: fixed;
             color: var(--premium-text-primary);
             transition: background-color 0.3s, color 0.3s;
         }
         .sidebar {
             background-color: var(--premium-surface);
             border-right-color: var(--premium-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s;
         }
         .main-content {
@@ -55,36 +58,45 @@
             width: calc(100% - var(--sidebar-width));
         }
         .header {
-            background-color: color-mix(in srgb, var(--premium-surface) 80%, transparent);
-            backdrop-filter: blur(12px);
+            background-color: var(--premium-surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-bottom-color: var(--premium-border);
         }
-        .card, .list-item, .skeleton-card {
+        .glass-card, .list-item, .skeleton-card {
             background-color: var(--premium-surface);
             border: 1px solid var(--premium-border);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s, opacity 0.3s;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                        box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                        border-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        background-color 0.3s, opacity 0.3s;
         }
-        .card:hover, .list-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.3);
-            border-color: var(--premium-accent);
+        .glass-card:hover, .list-item:hover {
+            transform: scale(1.03) translateY(-5px);
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.2);
+            border-color: rgba(255, 255, 255, 0.3);
         }
         .modal-backdrop, .detail-backdrop {
-            background-color: rgba(13, 17, 23, 0.7);
+            background-color: rgba(13, 17, 23, 0.5);
             backdrop-filter: blur(8px);
         }
         .premium-input {
-            background-color: var(--premium-bg);
+            background-color: rgba(0,0,0,0.1);
             border-color: var(--premium-border);
             color: var(--premium-text-primary);
         }
         .premium-input:focus {
             --tw-ring-color: var(--premium-accent);
             border-color: var(--premium-accent);
+            background-color: rgba(0,0,0,0.2);
         }
         .swal2-popup {
             font-family: 'Inter', sans-serif;
             background-color: var(--premium-surface) !important;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             color: var(--premium-text-primary) !important;
         }
         .swal2-title { color: var(--premium-text-primary) !important; }
@@ -106,6 +118,9 @@
         }
         
         .detail-panel {
+            background-color: var(--premium-surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             transform: translateX(100%);
         }
@@ -198,10 +213,10 @@
 
             <div id="app" class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8 w-full">
                 <div class="mb-8"><div class="relative"><i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[--premium-text-secondary]"></i><input type="text" id="search" placeholder="Search inventory..." class="w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[--premium-accent] transition shadow-sm premium-input"></div></div>
-                <div id="auth-required-main" class="text-center py-16 card rounded-xl"><i data-lucide="lock" class="w-16 h-16 mx-auto text-[--premium-text-secondary]"></i><h3 class="mt-4 text-2xl font-bold text-[--premium-text-primary]">Authentication Required</h3><p class="mt-2 text-[--premium-text-secondary] mb-6">Please sign in to load and manage your component data.</p><button id="signin-button-main" class="bg-indigo-600 dark:bg-blue-600 text-white font-semibold py-2.5 px-6 rounded-lg shadow-md hover:bg-indigo-500 dark:hover:bg-blue-500 transition-all">Sign In with Google</button></div>
+                <div id="auth-required-main" class="text-center py-16 glass-card rounded-xl"><i data-lucide="lock" class="w-16 h-16 mx-auto text-[--premium-text-secondary]"></i><h3 class="mt-4 text-2xl font-bold text-[--premium-text-primary]">Authentication Required</h3><p class="mt-2 text-[--premium-text-secondary] mb-6">Please sign in to load and manage your component data.</p><button id="signin-button-main" class="bg-indigo-600 dark:bg-blue-600 text-white font-semibold py-2.5 px-6 rounded-lg shadow-md hover:bg-indigo-500 dark:hover:bg-blue-500 transition-all">Sign In with Google</button></div>
                 <div id="skeleton-loader" class="hidden"></div>
                 <div id="searchResults" class="hidden"></div>
-                <div id="no-results" class="hidden text-center py-16 card rounded-xl"><i data-lucide="search-x" class="w-16 h-16 mx-auto text-[--premium-text-secondary]"></i><h3 class="mt-4 text-2xl font-bold text-[--premium-text-primary]">No Components Found</h3><p class="mt-2 text-[--premium-text-secondary]">Your database is empty or your search returned no results.</p></div>
+                <div id="no-results" class="hidden text-center py-16 glass-card rounded-xl"><i data-lucide="search-x" class="w-16 h-16 mx-auto text-[--premium-text-secondary]"></i><h3 class="mt-4 text-2xl font-bold text-[--premium-text-primary]">No Components Found</h3><p class="mt-2 text-[--premium-text-secondary]">Your database is empty or your search returned no results.</p></div>
             </div>
         </main>
     </div>
@@ -232,7 +247,7 @@
 
     <!-- Detail Panel -->
     <div id="detail-backdrop" class="detail-backdrop hidden fixed inset-0 z-40"></div>
-    <div id="detail-panel" class="detail-panel fixed top-0 right-0 h-full w-full max-w-2xl bg-[--premium-surface] border-l border-[--premium-border] shadow-2xl z-50 flex flex-col">
+    <div id="detail-panel" class="detail-panel fixed top-0 right-0 h-full w-full max-w-2xl border-l border-[--premium-border] shadow-2xl z-50 flex flex-col">
         <!-- Header -->
         <div class="flex items-center justify-between p-4 border-b border-[--premium-border] flex-shrink-0">
             <h2 class="text-xl font-bold text-[--premium-text-primary]">Component Details</h2>
@@ -471,7 +486,7 @@
             const quantity = parseInt(item.quantity, 10);
             const statusColor = quantity > 10 ? 'bg-green-400/10 text-green-300' : quantity > 0 ? 'bg-yellow-400/10 text-yellow-300' : 'bg-red-400/10 text-red-300';
             const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
-            return `<div class="card rounded-xl overflow-hidden flex flex-col group card-enter">
+            return `<div class="glass-card rounded-xl overflow-hidden flex flex-col group card-enter">
                         <div class="relative image-gallery" data-images="${images.join(',')}">
                             <img src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=Invalid+Image';">
                             ${images.length > 1 ? `<button class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white" data-direction="-1"><i data-lucide="chevron-left"></i></button><button class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
