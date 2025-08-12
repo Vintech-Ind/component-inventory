@@ -1,48 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vinayaka Industries | Component Database</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         :root {
             --sidebar-width: 280px;
             --header-height: 72px;
-            --premium-bg: #0d1117; /* GitHub-inspired dark background */
-            --premium-surface: #161b22; /* Slightly lighter surface for cards */
+        }
+        /* Light Mode Variables */
+        html:not(.dark) {
+            --premium-bg: #f3f4f6;
+            --premium-surface: #ffffff;
+            --premium-border: #e5e7eb;
+            --premium-text-primary: #111827;
+            --premium-text-secondary: #6b7280;
+            --premium-accent: #4f46e5;
+            --premium-accent-hover: #4338ca;
+        }
+        /* Dark Mode Variables */
+        html.dark {
+            --premium-bg: #0d1117;
+            --premium-surface: #161b22;
             --premium-border: #30363d;
             --premium-text-primary: #c9d1d9;
             --premium-text-secondary: #8b949e;
-            --premium-accent: #58a6ff; /* A vibrant blue for accents */
+            --premium-accent: #58a6ff;
             --premium-accent-hover: #79c0ff;
         }
-        html {
-            scroll-behavior: smooth;
-        }
+        html { scroll-behavior: smooth; }
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--premium-bg);
             color: var(--premium-text-primary);
+            transition: background-color 0.3s, color 0.3s;
         }
         .sidebar {
-            background-color: var(--premium-bg);
+            background-color: var(--premium-surface);
             border-right-color: var(--premium-border);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s;
         }
         .main-content {
             transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -50,18 +55,19 @@
             width: calc(100% - var(--sidebar-width));
         }
         .header {
-            background-color: rgba(13, 17, 23, 0.8);
+            background-color: color-mix(in srgb, var(--premium-surface) 80%, transparent);
             backdrop-filter: blur(12px);
             border-bottom-color: var(--premium-border);
         }
-        .card, .skeleton-card {
+        .card, .list-item, .skeleton-card {
             background-color: var(--premium-surface);
             border: 1px solid var(--premium-border);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s;
         }
-        .card:hover {
+        .card:hover, .list-item:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 30px -10px rgba(0,0,0,0.3);
+            border-color: var(--premium-accent);
         }
         .modal-backdrop {
             background-color: rgba(13, 17, 23, 0.7);
@@ -81,21 +87,22 @@
             background-color: var(--premium-surface) !important;
             color: var(--premium-text-primary) !important;
         }
-        .swal2-title {
-            color: white !important;
-        }
-        .swal2-confirm {
-            background-color: var(--premium-accent) !important;
-        }
+        .swal2-title { color: var(--premium-text-primary) !important; }
+        .swal2-confirm { background-color: var(--premium-accent) !important; }
 
-        @keyframes skeleton-loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
+        @keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         .skeleton-animate {
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--premium-border) 50%, transparent), transparent);
             background-size: 200% 100%;
             animation: skeleton-loading 1.5s infinite;
+        }
+
+        .image-gallery .gallery-arrow {
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+        .image-gallery:hover .gallery-arrow {
+            opacity: 1;
         }
 
         @media (max-width: 1024px) {
@@ -108,42 +115,45 @@
 <body class="antialiased">
 
     <div class="flex h-screen">
-        <!-- Premium Sidebar -->
+        <!-- Sidebar -->
         <aside class="sidebar fixed top-0 left-0 h-full w-[var(--sidebar-width)] z-40 flex flex-col lg:translate-x-0">
             <div class="flex items-center gap-4 p-5 border-b h-[var(--header-height)]">
-                <div class="bg-blue-600 p-2.5 rounded-lg shadow-inner">
-                    <i data-lucide="gem" class="w-6 h-6 text-white"></i>
-                </div>
-                <h1 class="text-xl font-bold text-white">Vinayaka DB</h1>
+                <div class="bg-indigo-600 p-2.5 rounded-lg shadow-inner"><i data-lucide="gem" class="w-6 h-6 text-white"></i></div>
+                <h1 class="text-xl font-bold text-[--premium-text-primary]">Vinayaka DB</h1>
             </div>
             
             <nav class="flex-1 px-4 py-6 space-y-2">
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 text-white font-semibold bg-white/5 rounded-lg">
-                    <i data-lucide="layout-grid" class="w-5 h-5 text-blue-400"></i>
-                    <span>Dashboard</span>
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 text-[--premium-text-primary] font-semibold bg-black/10 dark:bg-white/5 rounded-lg">
+                    <i data-lucide="layout-grid" class="w-5 h-5 text-indigo-500 dark:text-blue-400"></i><span>Dashboard</span>
                 </a>
-                <a href="#" id="imageNamerBtn" class="flex items-center gap-3 px-3 py-2.5 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg font-medium transition-colors">
-                    <i data-lucide="tag" class="w-5 h-5"></i>
-                    <span>Image Namer</span>
+                <a href="#" id="imageNamerBtn" class="flex items-center gap-3 px-3 py-2.5 text-[--premium-text-secondary] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[--premium-text-primary] rounded-lg font-medium transition-colors">
+                    <i data-lucide="tag" class="w-5 h-5"></i><span>Image Namer</span>
                 </a>
             </nav>
 
-            <div id="user-profile-area" class="p-4 border-t border-t-gray-800 cursor-pointer group">
-                <div id="auth-required-profile" class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-full bg-gray-800 flex items-center justify-center border border-dashed border-gray-700">
-                        <i data-lucide="user-x" class="text-gray-600"></i>
+            <div class="p-4 border-t border-t-[--premium-border]">
+                <div id="user-profile-area" class="p-2 rounded-lg cursor-pointer group hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                    <div id="auth-required-profile" class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-full bg-[--premium-bg] flex items-center justify-center border border-dashed border-[--premium-border]"><i data-lucide="user-x" class="text-[--premium-text-secondary]"></i></div>
+                        <div>
+                            <p class="font-semibold text-[--premium-text-secondary]">Not Signed In</p>
+                            <p class="text-xs text-[--premium-text-secondary] group-hover:text-[--premium-accent] transition-colors">Click to sign in</p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="font-semibold text-gray-400">Not Signed In</p>
-                        <p class="text-xs text-gray-500 group-hover:text-blue-400 transition-colors">Click to sign in</p>
+                    <div id="user-profile" class="hidden items-center gap-3">
+                        <img id="user-dp" class="w-11 h-11 rounded-full" src="" alt="User">
+                        <div>
+                            <p id="user-name" class="font-semibold text-[--premium-text-primary]"></p>
+                            <p class="text-xs text-green-500 dark:text-green-400 font-medium">Online</p>
+                        </div>
                     </div>
                 </div>
-                <div id="user-profile" class="hidden items-center gap-3">
-                    <img id="user-dp" class="w-11 h-11 rounded-full" src="" alt="User">
-                    <div>
-                        <p id="user-name" class="font-semibold text-white"></p>
-                        <p class="text-xs text-green-400 font-medium">Online</p>
-                    </div>
+                 <div class="mt-2 flex items-center justify-between">
+                    <span class="text-sm font-medium text-[--premium-text-secondary]">Theme</span>
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-[--premium-text-secondary]">
+                        <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                        <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+                    </button>
                 </div>
             </div>
         </aside>
@@ -152,91 +162,58 @@
         <main class="main-content flex-1 flex flex-col h-screen overflow-y-auto">
             <header class="header sticky top-0 z-30">
                 <div class="flex items-center justify-between p-4 mx-auto max-w-screen-2xl h-[var(--header-height)]">
-                     <button id="menuBtn" class="lg:hidden p-2 text-gray-400">
-                        <i data-lucide="menu" class="w-6 h-6"></i>
-                    </button>
-                    <h1 class="text-2xl font-bold text-white hidden lg:block">Inventory Dashboard</h1>
-                    <div class="flex-1"></div>
-                    <button id="addPartBtn" class="bg-blue-600 text-white font-semibold py-2.5 px-5 rounded-lg shadow-lg hover:bg-blue-500 transition-all duration-200 flex items-center gap-2 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed" disabled>
-                        <i data-lucide="plus" class="w-5 h-5"></i>
-                        <span class="hidden sm:inline">Add Component</span>
+                    <div class="flex items-center gap-2">
+                         <button id="menuBtn" class="lg:hidden p-2 text-[--premium-text-secondary]"><i data-lucide="menu" class="w-6 h-6"></i></button>
+                         <h1 class="text-2xl font-bold text-[--premium-text-primary] hidden lg:block">Inventory</h1>
+                    </div>
+                    <div class="flex-1 flex justify-center items-center">
+                         <div class="flex items-center gap-1 bg-[--premium-bg] p-1 rounded-lg border border-[--premium-border]">
+                            <button id="grid-view-btn" class="p-2 rounded-md bg-[--premium-surface] text-[--premium-accent]"><i data-lucide="layout-grid"></i></button>
+                            <button id="list-view-btn" class="p-2 rounded-md text-[--premium-text-secondary]"><i data-lucide="list"></i></button>
+                        </div>
+                    </div>
+                    <button id="addPartBtn" class="bg-indigo-600 dark:bg-blue-600 text-white font-semibold py-2.5 px-5 rounded-lg shadow-lg hover:bg-indigo-500 dark:hover:bg-blue-500 transition-all duration-200 flex items-center gap-2 disabled:bg-gray-200 dark:disabled:bg-gray-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed" disabled>
+                        <i data-lucide="plus" class="w-5 h-5"></i><span class="hidden sm:inline">Add Component</span>
                     </button>
                 </div>
             </header>
 
             <div id="app" class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8 w-full">
-                <div class="mb-8">
-                    <div class="relative">
-                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"></i>
-                        <input type="text" id="search" placeholder="Search by model, device, item name, or any spec..." class="w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 transition shadow-sm premium-input">
-                    </div>
-                </div>
-
-                <div id="auth-required-main" class="text-center py-16 card rounded-xl">
-                    <i data-lucide="lock" class="w-16 h-16 mx-auto text-gray-600"></i>
-                    <h3 class="mt-4 text-2xl font-bold text-white">Authentication Required</h3>
-                    <p class="mt-2 text-gray-400 mb-6">Please sign in to load and manage your component data.</p>
-                    <button id="signin-button-main" class="bg-blue-600 text-white font-semibold py-2.5 px-6 rounded-lg shadow-md hover:bg-blue-500 transition-all">
-                        Sign In with Google
-                    </button>
-                </div>
-
-                <!-- Skeleton Loader -->
-                <div id="skeleton-loader" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 hidden">
-                    <!-- Skeleton cards will be injected here -->
-                </div>
-
-                <div id="searchResults" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 hidden"></div>
-                 <div id="no-results" class="hidden text-center py-16 card rounded-xl">
-                    <i data-lucide="search-x" class="w-16 h-16 mx-auto text-gray-600"></i>
-                    <h3 class="mt-4 text-2xl font-bold text-white">No Components Found</h3>
-                    <p class="mt-2 text-gray-400">Your database is empty or your search returned no results.</p>
-                </div>
+                <div class="mb-8"><div class="relative"><i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[--premium-text-secondary]"></i><input type="text" id="search" placeholder="Search inventory..." class="w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[--premium-accent] transition shadow-sm premium-input"></div></div>
+                <div id="auth-required-main" class="text-center py-16 card rounded-xl"><i data-lucide="lock" class="w-16 h-16 mx-auto text-[--premium-text-secondary]"></i><h3 class="mt-4 text-2xl font-bold text-[--premium-text-primary]">Authentication Required</h3><p class="mt-2 text-[--premium-text-secondary] mb-6">Please sign in to load and manage your component data.</p><button id="signin-button-main" class="bg-indigo-600 dark:bg-blue-600 text-white font-semibold py-2.5 px-6 rounded-lg shadow-md hover:bg-indigo-500 dark:hover:bg-blue-500 transition-all">Sign In with Google</button></div>
+                <div id="skeleton-loader" class="hidden"></div>
+                <div id="searchResults" class="hidden"></div>
+                <div id="no-results" class="hidden text-center py-16 card rounded-xl"><i data-lucide="search-x" class="w-16 h-16 mx-auto text-[--premium-text-secondary]"></i><h3 class="mt-4 text-2xl font-bold text-[--premium-text-primary]">No Components Found</h3><p class="mt-2 text-[--premium-text-secondary]">Your database is empty or your search returned no results.</p></div>
             </div>
         </main>
     </div>
 
-    <!-- Premium Add/Edit Part Modal -->
+    <!-- Modal -->
     <div id="formModal" class="modal-backdrop hidden fixed inset-0 z-50 justify-center items-center p-4">
-        <div class="bg-gray-900 border border-gray-700 rounded-xl shadow-2xl w-full max-w-4xl m-4 max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center p-6 border-b border-gray-700">
-                <h2 class="text-2xl font-bold text-white">Add New Component</h2>
-                <button type="button" id="closeFormModalBtn" class="text-gray-500 hover:text-white transition-colors">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </div>
+        <div class="bg-[--premium-surface] border border-[--premium-border] rounded-xl shadow-2xl w-full max-w-4xl m-4 max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-6 border-b border-[--premium-border]"><h2 class="text-2xl font-bold text-[--premium-text-primary]">Add New Component</h2><button type="button" id="closeFormModalBtn" class="text-[--premium-text-secondary] hover:text-[--premium-text-primary] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
             <form id="partForm" class="p-6 space-y-6 overflow-y-auto">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div class="md:col-span-1"><label for="model" class="block text-sm font-medium text-gray-400">Model*</label><input type="text" id="model" required class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
-                    <div class="md:col-span-1"><label for="device" class="block text-sm font-medium text-gray-400">Device</label><select id="device" class="mt-1 block w-full rounded-lg shadow-sm premium-input"><option value="">(None)</option><option value="SWING DEVICE">Swing Device</option><option value="TRAVEL DEVICE">Travel Device</option></select></div>
-                    <div class="md:col-span-1"><label for="size" class="block text-sm font-medium text-gray-400">Size</label><select id="size" class="mt-1 block w-full rounded-lg shadow-sm premium-input"><option value="">(None)</option><option value="SMALL">Small</option><option value="MIDDLE">Middle</option><option value="BIG">Big</option></select></div>
-                    <div class="md:col-span-1"><label for="item-name-main" class="block text-sm font-medium text-gray-400">Item Name*</label><input type="text" id="item-name-main" required class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
-                    <div class="md:col-span-1"><label for="price" class="block text-sm font-medium text-gray-400">Price</label><input type="number" id="price" placeholder="e.g., 4500" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
-                    <div class="md:col-span-1"><label for="quantity" class="block text-sm font-medium text-gray-400">Quantity*</label><input type="number" id="quantity" required value="1" min="0" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div><label for="model" class="block text-sm font-medium text-[--premium-text-secondary]">Model*</label><input type="text" id="model" required class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
+                    <div><label for="device" class="block text-sm font-medium text-[--premium-text-secondary]">Device</label><select id="device" class="mt-1 block w-full rounded-lg shadow-sm premium-input"><option value="">(None)</option><option value="SWING DEVICE">Swing Device</option><option value="TRAVEL DEVICE">Travel Device</option></select></div>
+                    <div><label for="size" class="block text-sm font-medium text-[--premium-text-secondary]">Size</label><select id="size" class="mt-1 block w-full rounded-lg shadow-sm premium-input"><option value="">(None)</option><option value="SMALL">Small</option><option value="MIDDLE">Middle</option><option value="BIG">Big</option></select></div>
+                    <div><label for="item-name-main" class="block text-sm font-medium text-[--premium-text-secondary]">Item Name*</label><select id="item-name-main" required class="mt-1 block w-full rounded-lg shadow-sm premium-input"><option value="">Select item type...</option><option value="Planetary Gear">Planetary Gear</option><option value="Sun Gear">Sun Gear</option><option value="Ring Gear">Ring Gear</option><option value="Spline/Pinion Shaft">Spline/Pinion Shaft</option><option value="Track Motor Shaft">Track Motor Shaft</option><option value="Bearing">Bearing</option><option value="Bushes">Bushes</option></select></div>
+                    <div><label for="price" class="block text-sm font-medium text-[--premium-text-secondary]">Price</label><input type="number" id="price" placeholder="e.g., 4500" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
+                    <div><label for="quantity" class="block text-sm font-medium text-[--premium-text-secondary]">Quantity*</label><input type="number" id="quantity" required value="1" min="0" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div><label class="block text-sm font-medium text-gray-400">Image Links</label><div id="image-links-container" class="mt-1 space-y-2"><div class="flex items-center gap-2"><input type="url" name="image-link" placeholder="Paste an image link" class="block w-full rounded-lg shadow-sm premium-input"></div></div><button type="button" id="add-link-btn" class="mt-2 text-sm font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-1"><i data-lucide="plus-circle" class="w-4 h-4"></i> Add another link</button></div>
-                    <div><label for="note" class="block text-sm font-medium text-gray-400">Note</label><textarea id="note" rows="4" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></textarea></div>
+                    <div><label class="block text-sm font-medium text-[--premium-text-secondary]">Image Links</label><textarea id="image-links-input" name="image-link" placeholder="Paste one or more comma-separated Google Drive links here..." class="block w-full rounded-lg shadow-sm premium-input mt-1" rows="3"></textarea></div>
+                    <div><label for="note" class="block text-sm font-medium text-[--premium-text-secondary]">Note</label><textarea id="note" rows="3" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></textarea></div>
                 </div>
-                <div>
-                    <h3 class="text-lg font-semibold border-b border-gray-700 pb-2 mb-4 text-white">Specifications</h3>
-                    <label for="item-type-spec" class="block text-sm font-medium text-gray-400">Select Item Type for Specs</label>
-                    <select id="item-type-spec" class="mt-1 block w-full md:w-1/3 rounded-lg shadow-sm premium-input"><option value="">Select to add specs...</option><option value="Planetary Gear">Planetary Gear</option><option value="Sun Gear">Sun Gear</option><option value="Ring Gear">Ring Gear</option><option value="Spline/Pinion Shaft">Spline/Pinion Shaft</option><option value="Track Motor Shaft">Track Motor Shaft</option><option value="Bearing">Bearing</option><option value="Bushes">Bushes</option></select>
-                    <p id="spec-placeholder" class="text-gray-500 text-sm mt-4">No item type selected.</p>
-                    <div id="spec-fields" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4"></div>
-                </div>
+                <div id="spec-fields-container" class="hidden"><h3 class="text-lg font-semibold border-b border-[--premium-border] pb-2 mb-4 text-[--premium-text-primary]">Specifications</h3><div id="spec-fields" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4"></div></div>
             </form>
-            <div class="mt-auto p-6 border-t border-gray-700 bg-black/20 flex justify-end gap-3">
-                <button type="button" id="cancelBtn" class="bg-gray-700 py-2 px-4 border border-gray-600 rounded-lg shadow-sm text-sm font-semibold text-white hover:bg-gray-600 transition-colors">Cancel</button>
-                <button type="submit" form="partForm" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-blue-500 transition-colors">Save Component</button>
-            </div>
+            <div class="mt-auto p-6 border-t border-[--premium-border] bg-black/20 flex justify-end gap-3"><button type="button" id="cancelBtn" class="bg-gray-200 dark:bg-gray-700 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-sm font-semibold text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Cancel</button><button type="submit" form="partForm" class="bg-indigo-600 dark:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-500 dark:hover:bg-blue-500 transition-colors">Save Component</button></div>
         </div>
     </div>
     
     <script src="https://apis.google.com/js/api.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-
         const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
         const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com';
         const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
@@ -248,8 +225,10 @@
         let gapiInited = false;
         let gisInited = false;
         let tokenClient;
+        let currentLayout = 'grid';
 
         const dom = {
+            html: document.documentElement,
             addPartBtn: document.getElementById('addPartBtn'),
             searchResults: document.getElementById('searchResults'),
             noResults: document.getElementById('no-results'),
@@ -261,25 +240,27 @@
             userName: document.getElementById('user-name'),
             signInButtonMain: document.getElementById('signin-button-main'),
             partForm: document.getElementById('partForm'),
-            itemTypeSpecSelect: document.getElementById('item-type-spec'),
+            itemNameSelect: document.getElementById('item-name-main'),
+            specFieldsContainer: document.getElementById('spec-fields-container'),
             specFields: document.getElementById('spec-fields'),
-            specPlaceholder: document.getElementById('spec-placeholder'),
             search: document.getElementById('search'),
             formModal: document.getElementById('formModal'),
             closeFormModalBtn: document.getElementById('closeFormModalBtn'),
             cancelBtn: document.getElementById('cancelBtn'),
-            addLinkBtn: document.getElementById('add-link-btn'),
-            imageLinksContainer: document.getElementById('image-links-container'),
+            imageLinksInput: document.getElementById('image-links-input'),
             skeletonLoader: document.getElementById('skeleton-loader'),
             menuBtn: document.getElementById('menuBtn'),
             sidebar: document.querySelector('.sidebar'),
+            gridViewBtn: document.getElementById('grid-view-btn'),
+            listViewBtn: document.getElementById('list-view-btn'),
+            themeToggle: document.getElementById('theme-toggle'),
         };
 
-        const COLUMN_HEADERS = [
-            'id', 'model', 'device', 'size', 'itemName', 'price', 'quantity', 'imageLinks', 'note', 'spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_width', 'spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_splineOd', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'
-        ];
+        const COLUMN_HEADERS = ['id', 'model', 'device', 'size', 'itemName', 'price', 'quantity', 'imageLinks', 'note', 'spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_width', 'spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_splineOd', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'];
         const specDefinitions = { 'Planetary Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeeth'], 'Sun Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd'], 'Ring Gear': ['spec_teeth', 'spec_outerDiameter', 'spec_innerDiameter'], 'Spline/Pinion Shaft': ['spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_length', 'spec_splineOd'], 'Track Motor Shaft': ['spec_length', 'spec_outerDiameter', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'], 'Bearing': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_width'], 'Bushes': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length'], };
         
+        // --- Initial Setup ---
+        initTheme();
         gapi.load('client', initializeGapiClient);
         const gisScript = document.createElement('script');
         gisScript.src = 'https://accounts.google.com/gsi/client';
@@ -288,60 +269,54 @@
         gisScript.onload = initializeGis;
         document.body.appendChild(gisScript);
 
+        // --- Event Listeners ---
+        dom.partForm.addEventListener('submit', addComponent);
+        dom.search.addEventListener('input', (e) => renderItems(allItems.filter(item => Object.values(item).join(' ').toLowerCase().includes(e.target.value.toLowerCase()))));
+        dom.addPartBtn.addEventListener('click', () => { dom.formModal.classList.remove('hidden'); dom.formModal.classList.add('flex'); });
+        dom.closeFormModalBtn.addEventListener('click', closeFormModal);
+        dom.cancelBtn.addEventListener('click', closeFormModal);
+        dom.menuBtn.addEventListener('click', () => dom.sidebar.classList.toggle('open'));
+        dom.itemNameSelect.addEventListener('change', updateSpecFields);
+        dom.gridViewBtn.addEventListener('click', () => switchLayout('grid'));
+        dom.listViewBtn.addEventListener('click', () => switchLayout('list'));
+        dom.themeToggle.addEventListener('click', toggleTheme);
+        
+        // --- Core Functions ---
         async function initializeGapiClient() {
             await gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS });
-            gapiInited = true;
-            maybeEnableButtons();
+            gapiInited = true; maybeEnableButtons();
         }
-
         function initializeGis() {
             tokenClient = google.accounts.oauth2.initTokenClient({ client_id: CLIENT_ID, scope: SCOPES, callback: handleAuthResponse });
-            gisInited = true;
-            maybeEnableButtons();
+            gisInited = true; maybeEnableButtons();
         }
-
         function maybeEnableButtons() {
             if (gapiInited && gisInited) {
                 dom.userProfileArea.onclick = handleAuthClick;
                 dom.signInButtonMain.onclick = handleAuthClick;
             }
         }
-
         function handleAuthResponse(resp) {
             if (resp.error !== undefined) {
                 Swal.fire({ title: 'Authentication Error', text: 'Could not sign in. Please try again.', icon: 'error', background: 'var(--premium-surface)', color: 'var(--premium-text-primary)' });
-                updateAuthStatus(false);
-                return;
+                updateAuthStatus(false); return;
             }
             updateAuthStatus(true);
         }
-
         function handleAuthClick() {
             if (gapi.client.getToken() === null) {
                 tokenClient?.requestAccessToken({ prompt: 'consent' });
             } else {
-                Swal.fire({
-                    title: 'Are you sure you want to sign out?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, sign out',
-                    background: 'var(--premium-surface)',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        gapi.client.setToken('');
-                        updateAuthStatus(false);
-                    }
-                });
+                Swal.fire({ title: 'Sign Out', text: 'Are you sure you want to sign out?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, sign out', background: 'var(--premium-surface)'})
+                .then((result) => { if (result.isConfirmed) { gapi.client.setToken(''); updateAuthStatus(false); } });
             }
         }
-
         async function updateAuthStatus(isSignedIn) {
             dom.addPartBtn.disabled = !isSignedIn;
             dom.authRequiredMain.classList.toggle('hidden', isSignedIn);
             dom.authRequiredProfile.classList.toggle('hidden', isSignedIn);
             dom.userProfile.classList.toggle('hidden', !isSignedIn);
             dom.userProfile.classList.toggle('flex', isSignedIn);
-            
             if (isSignedIn) {
                 showSkeletonLoader(true);
                 try {
@@ -360,22 +335,11 @@
                 allItems = [];
             }
         }
-
         async function listComponents() {
             try {
                 const response = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: RANGE });
                 const values = response.result.values;
-                if (values && values.length > 1) {
-                    const headers = values[0];
-                    const dataRows = values.slice(1);
-                    allItems = dataRows.map(row => {
-                        const item = {};
-                        headers.forEach((header, index) => { item[header] = row[index]; });
-                        return item;
-                    }).filter(item => item.id && item.id.trim() !== '');
-                } else {
-                    allItems = [];
-                }
+                allItems = (values && values.length > 1) ? values.slice(1).map(row => values[0].reduce((obj, header, index) => ({...obj, [header]: row[index]}), {})).filter(item => item.id && item.id.trim() !== '') : [];
             } catch (err) {
                 Swal.fire({ title: 'Data Loading Error', text: `Could not load data. Check Sheet ID and permissions. Error: ${err.result.error.message}`, icon: 'error', background: 'var(--premium-surface)', color: 'var(--premium-text-primary)' });
                 updateAuthStatus(false);
@@ -384,24 +348,11 @@
                 renderItems(allItems);
             }
         }
-
         async function addComponent(e) {
             e.preventDefault();
-            const imageLinks = Array.from(dom.partForm.querySelectorAll('input[name="image-link"]')).map(input => input.value).filter(Boolean);
-            const newItem = {
-                id: Date.now(),
-                model: dom.partForm.querySelector('#model').value,
-                device: dom.partForm.querySelector('#device').value,
-                size: dom.partForm.querySelector('#size').value,
-                itemName: dom.partForm.querySelector('#item-name-main').value,
-                price: dom.partForm.querySelector('#price').value,
-                quantity: dom.partForm.querySelector('#quantity').value,
-                imageLinks: imageLinks.join(','),
-                note: dom.partForm.querySelector('#note').value,
-            };
+            const newItem = { id: Date.now(), model: dom.partForm.querySelector('#model').value, device: dom.partForm.querySelector('#device').value, size: dom.partForm.querySelector('#size').value, itemName: dom.partForm.querySelector('#item-name-main').value, price: dom.partForm.querySelector('#price').value, quantity: dom.partForm.querySelector('#quantity').value, imageLinks: dom.imageLinksInput.value, note: dom.partForm.querySelector('#note').value };
             dom.partForm.querySelectorAll('#spec-fields input').forEach(input => { newItem[input.name.replace(/-/g, '_')] = input.value; });
             const newRow = COLUMN_HEADERS.map(header => newItem[header] || "");
-
             try {
                 await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SPREADSHEET_ID, range: RANGE, valueInputOption: 'USER_ENTERED', resource: { values: [newRow] } });
                 Swal.fire({ title: 'Success!', text: 'Component added successfully.', icon: 'success', background: 'var(--premium-surface)', color: 'var(--premium-text-primary)' });
@@ -411,115 +362,136 @@
                 Swal.fire({ title: 'Save Error', text: `Could not save the component. Error: ${err.result.error.message}`, icon: 'error', background: 'var(--premium-surface)', color: 'var(--premium-text-primary)' });
             }
         }
-        dom.partForm.addEventListener('submit', addComponent);
-
         function renderItems(items) {
             dom.searchResults.innerHTML = '';
             dom.noResults.classList.toggle('hidden', items.length > 0 || !gapi.client.getToken());
             dom.searchResults.classList.toggle('hidden', items.length === 0);
+            if (items.length === 0) return;
+            
+            if (currentLayout === 'grid') {
+                dom.searchResults.className = 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6';
+                items.forEach(item => dom.searchResults.insertAdjacentHTML('beforeend', createGridCard(item)));
+            } else {
+                dom.searchResults.className = 'space-y-3';
+                items.forEach(item => dom.searchResults.insertAdjacentHTML('beforeend', createListCard(item)));
+            }
+            lucide.createIcons();
+            initGalleries();
+        }
 
-            items.forEach(item => {
-                const image = (item.imageLinks && item.imageLinks.split(',')[0]) || `https://placehold.co/600x400/${'161b22'}/${'8b949e'}?text=${encodeURIComponent(item.itemName || 'No Image')}`;
-                const quantity = parseInt(item.quantity, 10);
-                const statusColor = quantity > 10 ? 'bg-green-400/10 text-green-300' : quantity > 0 ? 'bg-yellow-400/10 text-yellow-300' : 'bg-red-400/10 text-red-300';
-                const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
-
-                const cardHtml = `
-                    <div class="card rounded-xl overflow-hidden flex flex-col group">
-                        <div class="relative">
-                            <img src="${image}" alt="${item.itemName}" class="w-full h-56 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/${'161b22'}/${'8b949e'}?text=Invalid+Image';">
+        // --- UI & Layout ---
+        function createGridCard(item) {
+            const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
+            const firstImage = getDriveThumbnail(images[0]) || `https://placehold.co/600x400/${'161b22'}/${'8b949e'}?text=${encodeURIComponent(item.itemName || 'No Image')}`;
+            const quantity = parseInt(item.quantity, 10);
+            const statusColor = quantity > 10 ? 'bg-green-400/10 text-green-300' : quantity > 0 ? 'bg-yellow-400/10 text-yellow-300' : 'bg-red-400/10 text-red-300';
+            const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
+            return `<div class="card rounded-xl overflow-hidden flex flex-col group">
+                        <div class="relative image-gallery" data-images="${images.join(',')}">
+                            <img src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-56 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/${'161b22'}/${'8b949e'}?text=Invalid+Image';">
+                            ${images.length > 1 ? `<button class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white" data-direction="-1"><i data-lucide="chevron-left"></i></button><button class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
                             <div class="absolute top-4 right-4 ${statusColor} text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm">${statusText}</div>
                         </div>
-                        <div class="p-5 flex-grow flex flex-col">
-                            <h3 class="text-lg font-bold text-white leading-tight">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
-                            <p class="text-sm text-gray-400 mt-1">Price: ₹${item.price || 'N/A'}</p>
-                            <div class="mt-auto pt-4 text-right">
-                                <a href="#" class="text-sm font-semibold text-blue-400 hover:text-blue-300">View Details &rarr;</a>
-                            </div>
+                        <div class="p-5 flex-grow flex flex-col"><h3 class="text-lg font-bold text-[--premium-text-primary] leading-tight">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3><p class="text-sm text-[--premium-text-secondary] mt-1">Price: ₹${item.price || 'N/A'}</p><div class="mt-auto pt-4 text-right"><a href="#" class="text-sm font-semibold text-[--premium-accent] hover:text-[--premium-accent-hover]">View Details &rarr;</a></div></div>
+                    </div>`;
+        }
+        function createListCard(item) {
+            const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://placehold.co/100x100/${'161b22'}/${'8b949e'}?text=Img`;
+            const quantity = parseInt(item.quantity, 10);
+            const statusColor = quantity > 10 ? 'text-green-400' : quantity > 0 ? 'text-yellow-400' : 'text-red-400';
+            return `<div class="list-item rounded-xl p-4 flex items-center gap-4">
+                        <img src="${image}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0" onerror="this.onerror=null;this.src='https://placehold.co/100x100/${'161b22'}/${'8b949e'}?text=Err';">
+                        <div class="flex-1 grid grid-cols-5 gap-4 items-center">
+                            <h3 class="col-span-2 font-semibold text-[--premium-text-primary]">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
+                            <p class="text-[--premium-text-secondary]">₹${item.price || 'N/A'}</p>
+                            <p class="${statusColor} font-medium">${quantity > 0 ? `${quantity} in Stock` : 'Out of Stock'}</p>
+                            <div class="text-right"><a href="#" class="text-sm font-semibold text-[--premium-accent] hover:text-[--premium-accent-hover]">Details</a></div>
                         </div>
                     </div>`;
-                dom.searchResults.insertAdjacentHTML('beforeend', cardHtml);
-            });
-            lucide.createIcons();
         }
-
-        dom.search.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const filteredData = allItems.filter(item => Object.values(item).join(' ').toLowerCase().includes(searchTerm));
-            renderItems(filteredData);
-        });
-
-        function showSkeletonLoader(show) {
-            if (show) {
-                dom.skeletonLoader.classList.remove('hidden');
-                dom.searchResults.classList.add('hidden');
-                dom.noResults.classList.add('hidden');
-                let skeletonHtml = '';
-                for(let i = 0; i < 8; i++) {
-                    skeletonHtml += `
-                        <div class="skeleton-card rounded-xl p-4 space-y-4">
-                            <div class="h-48 rounded bg-gray-800 skeleton-animate"></div>
-                            <div class="space-y-2">
-                                <div class="h-6 w-3/4 rounded bg-gray-800 skeleton-animate"></div>
-                                <div class="h-4 w-1/2 rounded bg-gray-800 skeleton-animate"></div>
-                            </div>
-                        </div>`;
-                }
-                dom.skeletonLoader.innerHTML = skeletonHtml;
+        function switchLayout(layout) {
+            currentLayout = layout;
+            if (layout === 'grid') {
+                dom.gridViewBtn.classList.add('bg-[--premium-surface]', 'text-[--premium-accent]');
+                dom.listViewBtn.classList.remove('bg-[--premium-surface]', 'text-[--premium-accent]');
             } else {
-                dom.skeletonLoader.classList.add('hidden');
+                dom.listViewBtn.classList.add('bg-[--premium-surface]', 'text-[--premium-accent]');
+                dom.gridViewBtn.classList.remove('bg-[--premium-surface]', 'text-[--premium-accent]');
+            }
+            renderItems(allItems.filter(item => Object.values(item).join(' ').toLowerCase().includes(dom.search.value.toLowerCase())));
+        }
+        function showSkeletonLoader(show) {
+            dom.skeletonLoader.classList.toggle('hidden', !show);
+            dom.searchResults.classList.add('hidden');
+            dom.noResults.classList.add('hidden');
+            if (show) {
+                let skeletonHtml = '';
+                for(let i = 0; i < 8; i++) { skeletonHtml += `<div class="skeleton-card rounded-xl p-4 space-y-4"><div class="h-48 rounded bg-gray-800 skeleton-animate"></div><div class="space-y-2"><div class="h-6 w-3/4 rounded bg-gray-800 skeleton-animate"></div><div class="h-4 w-1/2 rounded bg-gray-800 skeleton-animate"></div></div></div>`; }
+                dom.skeletonLoader.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">${skeletonHtml}</div>`;
             }
         }
-
-        function openFormModal() { dom.formModal.classList.remove('hidden'); dom.formModal.classList.add('flex'); }
-        function closeFormModal() { 
-            dom.formModal.classList.add('hidden'); 
-            dom.formModal.classList.remove('flex');
-            dom.partForm.reset();
-            dom.specFields.innerHTML = '';
-            dom.specPlaceholder.style.display = 'block';
-            dom.imageLinksContainer.innerHTML = `<div class="flex items-center gap-2"><input type="url" name="image-link" placeholder="Paste an image link" class="block w-full rounded-lg shadow-sm premium-input"></div>`;
+        function initTheme() {
+            if (localStorage.getItem('theme') === 'light') {
+                dom.html.classList.remove('dark');
+            } else {
+                dom.html.classList.add('dark');
+            }
         }
-        dom.addPartBtn.addEventListener('click', openFormModal);
-        dom.closeFormModalBtn.addEventListener('click', closeFormModal);
-        dom.cancelBtn.addEventListener('click', closeFormModal);
-        dom.addLinkBtn.addEventListener('click', addImageLinkInput);
-        dom.menuBtn.addEventListener('click', () => dom.sidebar.classList.toggle('open'));
-
-        dom.itemTypeSpecSelect.addEventListener('change', (e) => {
-            const selectedType = e.target.value;
+        function toggleTheme() {
+            dom.html.classList.toggle('dark');
+            localStorage.setItem('theme', dom.html.classList.contains('dark') ? 'dark' : 'light');
+        }
+        function getDriveThumbnail(url) {
+            if (!url) return null;
+            const match = url.match(/file\/d\/([a-zA-Z0-9_-]+)/);
+            return match ? `https://drive.google.com/thumbnail?id=${match[1]}` : url;
+        }
+        function initGalleries() {
+            document.querySelectorAll('.image-gallery').forEach(gallery => {
+                const images = (gallery.dataset.images || '').split(',').map(link => link.trim()).filter(Boolean);
+                if (images.length <= 1) return;
+                let currentIndex = 0;
+                const imgElement = gallery.querySelector('.gallery-image');
+                gallery.querySelectorAll('.gallery-arrow').forEach(arrow => {
+                    arrow.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const direction = parseInt(e.currentTarget.dataset.direction);
+                        currentIndex = (currentIndex + direction + images.length) % images.length;
+                        imgElement.src = getDriveThumbnail(images[currentIndex]);
+                    });
+                });
+            });
+        }
+        
+        // --- Modal & Form ---
+        function closeFormModal() { 
+            dom.formModal.classList.add('hidden'); dom.formModal.classList.remove('flex');
+            dom.partForm.reset();
+            dom.specFieldsContainer.classList.add('hidden');
+            dom.specFields.innerHTML = '';
+        }
+        function updateSpecFields() {
+            const selectedType = dom.itemNameSelect.value;
             dom.specFields.innerHTML = '';
             if (selectedType && specDefinitions[selectedType]) {
-                dom.specPlaceholder.style.display = 'none';
+                dom.specFieldsContainer.classList.remove('hidden');
                 specDefinitions[selectedType].forEach(specName => { dom.specFields.appendChild(createSpecInput(specName)); });
             } else {
-                dom.specPlaceholder.style.display = 'block';
+                dom.specFieldsContainer.classList.add('hidden');
             }
-        });
-
+        }
         function createSpecInput(specName) {
             const id = specName.replace(/_/g, '-');
             const wrapper = document.createElement('div');
             const label = document.createElement('label');
             label.htmlFor = id;
-            label.className = 'block text-sm font-medium text-gray-400';
+            label.className = 'block text-sm font-medium text-[--premium-text-secondary]';
             label.textContent = specName.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
             const input = document.createElement('input');
-            input.type = 'text';
-            input.id = id;
-            input.name = specName;
+            input.type = 'text'; input.id = id; input.name = specName;
             input.className = 'mt-1 block w-full rounded-lg shadow-sm premium-input';
-            wrapper.appendChild(label);
-            wrapper.appendChild(input);
+            wrapper.appendChild(label); wrapper.appendChild(input);
             return wrapper;
-        }
-
-        function addImageLinkInput() {
-            const div = document.createElement('div');
-            div.className = 'flex items-center gap-2';
-            div.innerHTML = `<input type="url" name="image-link" placeholder="Paste another image link" class="block w-full rounded-lg shadow-sm premium-input"><button type="button" class="text-red-500 hover:text-red-400 p-1 flex-shrink-0" onclick="this.parentElement.remove()"><i data-lucide="minus-circle" class="w-5 h-5"></i></button>`;
-            dom.imageLinksContainer.appendChild(div);
-            lucide.createIcons();
         }
 
         lucide.createIcons();
