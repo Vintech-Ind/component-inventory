@@ -245,9 +245,9 @@
         const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
         const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
-        // IMPORTANT: Ask the user for this ID.
-        let SPREADSHEET_ID = ''; // Will be prompted for
-        const RANGE = 'Sheet1!A:AB'; // Assumes data is in Sheet1, columns A to AB
+        // --- FIXED SPREADSHEET ID ---
+        const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ'; 
+        const RANGE = 'Sheet1!A:AB'; 
 
         // --- State ---
         let allItems = [];
@@ -350,14 +350,12 @@
         // --- Authentication ---
         function handleAuthClick() {
             if (gapi.client.getToken() === null) {
-                // Prompt the user to grant access to the required scopes.
                 if (tokenClient) {
                     tokenClient.requestAccessToken({ prompt: 'consent' });
                 } else {
                     alert('Authentication library is not ready. Please wait a moment and try again.');
                 }
             } else {
-                // Sign out the user.
                 gapi.client.setToken('');
                 updateAuthStatus(false);
             }
@@ -371,17 +369,9 @@
                 authRequiredDiv.classList.add('hidden');
                 searchResultsContainer.classList.remove('hidden');
                 
-                if (!SPREADSHEET_ID) {
-                    SPREADSHEET_ID = prompt("Please enter your Google Sheet ID:", "");
-                    if (SPREADSHEET_ID) {
-                        listComponents();
-                    } else {
-                        alert("Sheet ID is required to load data.");
-                        updateAuthStatus(false); // Revert auth status if no ID is given
-                    }
-                } else {
-                    listComponents();
-                }
+                // --- REMOVED PROMPT: Directly load components ---
+                listComponents();
+
             } else {
                 authIndicator.classList.remove('bg-green-500');
                 authIndicator.classList.add('bg-red-500');
@@ -395,6 +385,10 @@
 
         // --- Data Fetching (Read) ---
         async function listComponents() {
+            if (!SPREADSHEET_ID) {
+                alert("Error: Spreadsheet ID is not set in the code.");
+                return;
+            }
             try {
                 const response = await gapi.client.sheets.spreadsheets.values.get({
                     spreadsheetId: SPREADSHEET_ID,
@@ -430,12 +424,11 @@
             e.preventDefault();
             const form = e.target;
             
-            // Collect image links
             const imageLinkInputs = document.querySelectorAll('input[name="image-link"]');
             const imageLinks = Array.from(imageLinkInputs).map(input => input.value).filter(Boolean);
 
             const newItem = {
-                id: Date.now(), // Simple unique ID
+                id: Date.now(),
                 itemName: form.querySelector('#item-name').value,
                 model: form.querySelector('#model').value,
                 device: form.querySelector('#device').value,
@@ -445,14 +438,11 @@
                 note: form.querySelector('#note').value,
             };
 
-            // Collect dynamic spec fields
             const specInputs = form.querySelectorAll('#spec-fields input');
             specInputs.forEach(input => {
-                // Use the input's name attribute which corresponds to the column header
                 newItem[input.name.replace(/-/g, '_')] = input.value;
             });
             
-            // Format the new item into a row array in the correct column order
             const newRow = COLUMN_HEADERS.map(header => newItem[header] || "");
 
             try {
@@ -467,7 +457,7 @@
                 
                 alert('Component added successfully!');
                 closeFormModal();
-                listComponents(); // Refresh the list
+                listComponents(); 
             } catch (err) {
                 alert('Error adding component: ' + err.result.error.message);
                 console.error(err);
@@ -487,11 +477,10 @@
                 const availabilityColors = { 'In Stock': 'bg-green-100 text-green-800', 'On Order': 'bg-amber-100 text-amber-800', 'Out of Stock': 'bg-red-100 text-red-800' };
                 const image = (item.imageLinks && item.imageLinks.split(',')[0]) || 'https://placehold.co/600x400/e0e7ff/3730a3?text=No+Image';
                 
-                // Build specs string from individual spec columns
                 let specsHtml = '';
                 let specCount = 0;
                 for (const key in item) {
-                    if (key.startsWith('spec_') && item[key] && specCount < 4) { // Show up to 4 specs
+                    if (key.startsWith('spec_') && item[key] && specCount < 4) {
                         const label = key.replace('spec_', '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
                         specsHtml += `<p class="text-slate-500">${label}:</p><p class="font-medium text-slate-700">${item[key]}</p>`;
                         specCount++;
@@ -556,7 +545,7 @@
             const input = document.createElement('input');
             input.type = 'text';
             input.id = id;
-            input.name = specName; // Use the underscore version for matching with headers
+            input.name = specName;
             input.className = 'mt-1 block w-full border-slate-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500';
             wrapper.appendChild(label);
             wrapper.appendChild(input);
