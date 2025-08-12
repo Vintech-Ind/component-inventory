@@ -301,6 +301,8 @@
                 Swal.fire({ title: 'Authentication Error', text: 'Could not sign in. Please try again.', icon: 'error', background: 'var(--premium-surface)', color: 'var(--premium-text-primary)' });
                 updateAuthStatus(false); return;
             }
+            // *** FIX: Explicitly set the token on the gapi client ***
+            gapi.client.setToken(resp);
             updateAuthStatus(true);
         }
         function handleAuthClick() {
@@ -308,7 +310,7 @@
                 tokenClient?.requestAccessToken({ prompt: 'consent' });
             } else {
                 Swal.fire({ title: 'Sign Out', text: 'Are you sure you want to sign out?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, sign out', background: 'var(--premium-surface)'})
-                .then((result) => { if (result.isConfirmed) { gapi.client.setToken(''); updateAuthStatus(false); } });
+                .then((result) => { if (result.isConfirmed) { gapi.client.setToken(null); updateAuthStatus(false); } });
             }
         }
         async function updateAuthStatus(isSignedIn) {
@@ -382,13 +384,13 @@
         // --- UI & Layout ---
         function createGridCard(item) {
             const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
-            const firstImage = getDriveThumbnail(images[0]) || `https://placehold.co/600x400/${'161b22'}/${'8b949e'}?text=${encodeURIComponent(item.itemName || 'No Image')}`;
+            const firstImage = getDriveThumbnail(images[0]) || `https://placehold.co/600x400/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=${encodeURIComponent(item.itemName || 'No Image')}`;
             const quantity = parseInt(item.quantity, 10);
             const statusColor = quantity > 10 ? 'bg-green-400/10 text-green-300' : quantity > 0 ? 'bg-yellow-400/10 text-yellow-300' : 'bg-red-400/10 text-red-300';
             const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
             return `<div class="card rounded-xl overflow-hidden flex flex-col group">
                         <div class="relative image-gallery" data-images="${images.join(',')}">
-                            <img src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-56 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/${'161b22'}/${'8b949e'}?text=Invalid+Image';">
+                            <img src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-56 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=Invalid+Image';">
                             ${images.length > 1 ? `<button class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white" data-direction="-1"><i data-lucide="chevron-left"></i></button><button class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
                             <div class="absolute top-4 right-4 ${statusColor} text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm">${statusText}</div>
                         </div>
@@ -396,11 +398,11 @@
                     </div>`;
         }
         function createListCard(item) {
-            const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://placehold.co/100x100/${'161b22'}/${'8b949e'}?text=Img`;
+            const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://placehold.co/100x100/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=Img`;
             const quantity = parseInt(item.quantity, 10);
-            const statusColor = quantity > 10 ? 'text-green-400' : quantity > 0 ? 'text-yellow-400' : 'text-red-400';
+            const statusColor = quantity > 10 ? 'text-green-500 dark:text-green-400' : quantity > 0 ? 'text-yellow-500 dark:text-yellow-400' : 'text-red-500 dark:text-red-400';
             return `<div class="list-item rounded-xl p-4 flex items-center gap-4">
-                        <img src="${image}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0" onerror="this.onerror=null;this.src='https://placehold.co/100x100/${'161b22'}/${'8b949e'}?text=Err';">
+                        <img src="${image}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0" onerror="this.onerror=null;this.src='https://placehold.co/100x100/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=Err';">
                         <div class="flex-1 grid grid-cols-5 gap-4 items-center">
                             <h3 class="col-span-2 font-semibold text-[--premium-text-primary]">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
                             <p class="text-[--premium-text-secondary]">₹${item.price || 'N/A'}</p>
@@ -426,7 +428,7 @@
             dom.noResults.classList.add('hidden');
             if (show) {
                 let skeletonHtml = '';
-                for(let i = 0; i < 8; i++) { skeletonHtml += `<div class="skeleton-card rounded-xl p-4 space-y-4"><div class="h-48 rounded bg-gray-800 skeleton-animate"></div><div class="space-y-2"><div class="h-6 w-3/4 rounded bg-gray-800 skeleton-animate"></div><div class="h-4 w-1/2 rounded bg-gray-800 skeleton-animate"></div></div></div>`; }
+                for(let i = 0; i < 8; i++) { skeletonHtml += `<div class="skeleton-card rounded-xl p-4 space-y-4"><div class="h-48 rounded bg-[--premium-border] skeleton-animate"></div><div class="space-y-2"><div class="h-6 w-3/4 rounded bg-[--premium-border] skeleton-animate"></div><div class="h-4 w-1/2 rounded bg-[--premium-border] skeleton-animate"></div></div></div>`; }
                 dom.skeletonLoader.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">${skeletonHtml}</div>`;
             }
         }
