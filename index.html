@@ -745,6 +745,11 @@
             if (savedLayout) {
                 switchLayout(savedLayout);
             }
+            const analyticsCollapsed = localStorage.getItem('analyticsCollapsed') === 'true';
+            if (analyticsCollapsed) {
+                dom.analyticsWidgets.classList.add('collapsed');
+                dom.analyticsToggleIcon.classList.add('collapsed');
+            }
         }
         function toggleTheme() {
             dom.html.classList.toggle('dark');
