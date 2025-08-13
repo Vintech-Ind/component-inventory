@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>V Industries | Component Database</title>
+    <title>Vinayaka Industries | Component Database</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -431,6 +431,7 @@
             if (gapiInited && gisInited) {
                 dom.userProfileArea.onclick = handleAuthClick;
                 dom.signInButtonMain.onclick = handleAuthClick;
+                lucide.createIcons();
             }
         }
         function handleAuthResponse(resp) {
@@ -622,7 +623,7 @@
             renderItems();
         }
         function renderItems() {
-            if (!gapiInited || !gapi.client) return; // FIX: Guard against premature execution
+            if (!gapiInited || !gapi.client || !gapi.client.getToken) return; // FIX: Guard against premature execution
             dom.searchResults.innerHTML = '';
             dom.noResults.classList.toggle('hidden', filteredItems.length > 0 || !gapi.client.getToken());
             dom.searchResults.classList.toggle('hidden', filteredItems.length === 0);
