@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vinayaka Industries | Component Database</title>
+    <title>Industries | Component Database</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -318,7 +318,7 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
-        const CLIENT_ID = '1088294326380-3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
+        const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com';
         const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
         const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile";
         const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ'; 
@@ -633,7 +633,7 @@
             renderItems();
         }
         function renderItems() {
-            if (!gapiInited || !gapi.client || (gapi.client.getToken && !gapi.client.getToken())) { // FIX: Guard against premature execution
+            if (!gapiInited || !gapi.client || (typeof gapi.client.getToken !== 'function')) { // FIX: Guard against premature execution
                 dom.searchResults.innerHTML = '';
                 dom.noResults.classList.toggle('hidden', true);
                 dom.searchResults.classList.toggle('hidden', true);
