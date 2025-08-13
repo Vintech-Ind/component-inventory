@@ -127,6 +127,26 @@
         
         .card-enter { opacity: 0; transform: translateY(20px); }
         .card-enter-active { opacity: 1; transform: translateY(0); }
+        
+        .collapsible-content {
+            max-height: 500px;
+            transition: max-height 0.5s ease-in-out, margin-top 0.5s ease-in-out, opacity 0.3s ease-in-out 0.1s;
+            overflow: hidden;
+            opacity: 1;
+        }
+        .collapsible-content.collapsed {
+            max-height: 0;
+            margin-top: 0 !important;
+            opacity: 0;
+            transition: max-height 0.5s ease-in-out, margin-top 0.5s ease-in-out, opacity 0.2s ease-in-out;
+        }
+        #analytics-toggle-icon {
+            transition: transform 0.3s ease;
+        }
+        #analytics-toggle-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+
 
         @media (max-width: 1024px) {
             .main-content { padding-left: 1rem; }
@@ -217,12 +237,18 @@
             <div id="app" class="max-w-screen-2xl w-full p-4 sm:p-6 lg:p-8">
                 <!-- Dashboard View -->
                 <div id="dashboard-view">
-                    <!-- Analytics Widgets -->
-                    <div id="analytics-widgets" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-                        <div class="glass-card p-6 rounded-xl"><p class="text-sm font-medium text-[--premium-text-secondary]">Total Components</p><p id="total-components" class="text-3xl font-bold text-[--premium-text-primary] mt-2">0</p></div>
-                        <div class="glass-card p-6 rounded-xl"><p class="text-sm font-medium text-[--premium-text-secondary]">Total Inventory Value</p><p id="total-value" class="text-3xl font-bold text-[--premium-text-primary] mt-2">₹0</p></div>
-                        <div class="glass-card p-6 rounded-xl"><p class="text-sm font-medium text-[--premium-text-secondary]">Items Low on Stock</p><p id="low-stock" class="text-3xl font-bold text-red-400 mt-2">0</p></div>
-                        <div class="glass-card p-6 rounded-xl"><p class="text-sm font-medium text-[--premium-text-secondary]">Most Common Device</p><p id="common-device" class="text-3xl font-bold text-[--premium-text-primary] mt-2">-</p></div>
+                    <!-- Analytics Section -->
+                    <div class="mb-8">
+                        <div id="analytics-toggle" class="flex justify-between items-center cursor-pointer mb-4">
+                            <h2 class="text-2xl font-bold text-[--premium-text-primary]">Analytics Overview</h2>
+                            <i id="analytics-toggle-icon" data-lucide="chevron-down" class="text-[--premium-text-secondary]"></i>
+                        </div>
+                        <div id="analytics-widgets" class="collapsible-content grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                            <div class="glass-card p-6 rounded-xl"><p class="text-sm font-medium text-[--premium-text-secondary]">Total Components</p><p id="total-components" class="text-3xl font-bold text-[--premium-text-primary] mt-2">0</p></div>
+                            <div class="glass-card p-6 rounded-xl"><p class="text-sm font-medium text-[--premium-text-secondary]">Total Inventory Value</p><p id="total-value" class="text-3xl font-bold text-[--premium-text-primary] mt-2">₹0</p></div>
+                            <div class="glass-card p-6 rounded-xl"><p class="text-sm font-medium text-[--premium-text-secondary]">Items Low on Stock</p><p id="low-stock" class="text-3xl font-bold text-red-400 mt-2">0</p></div>
+                            <div class="glass-card p-6 rounded-xl"><p class="text-sm font-medium text-[--premium-text-secondary]">Most Common Device</p><p id="common-device" class="text-3xl font-bold text-[--premium-text-primary] mt-2">-</p></div>
+                        </div>
                     </div>
 
                     <!-- Filters and Search -->
@@ -312,7 +338,7 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
-        const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com';
+        const CLIENT_ID = '1088294326380-3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
         const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
         const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile";
         const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ'; 
@@ -377,6 +403,9 @@
             dashboardView: document.getElementById('dashboard-view'),
             reportsView: document.getElementById('reports-view'),
             layoutSwitcher: document.getElementById('layout-switcher'),
+            analyticsToggle: document.getElementById('analytics-toggle'),
+            analyticsWidgets: document.getElementById('analytics-widgets'),
+            analyticsToggleIcon: document.getElementById('analytics-toggle-icon'),
         };
 
         const COLUMN_HEADERS = ['id', 'model', 'device', 'size', 'itemName', 'price', 'quantity', 'imageLinks', 'note', 'spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_width', 'spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_splineOd', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'];
@@ -416,6 +445,7 @@
         dom.paginationControls.addEventListener('click', handlePaginationClick);
         dom.navDashboard.addEventListener('click', (e) => { e.preventDefault(); switchView('dashboard'); });
         dom.navReports.addEventListener('click', (e) => { e.preventDefault(); switchView('reports'); });
+        dom.analyticsToggle.addEventListener('click', toggleAnalytics);
 
 
         // --- Core Functions ---
@@ -1073,7 +1103,12 @@
                 options: { plugins: { legend: { position: 'right', labels: { color: 'var(--premium-text-secondary)' } } } }
             });
         }
-
+        
+        function toggleAnalytics() {
+            const isCollapsed = dom.analyticsWidgets.classList.toggle('collapsed');
+            dom.analyticsToggleIcon.classList.toggle('collapsed', isCollapsed);
+            localStorage.setItem('analyticsCollapsed', isCollapsed);
+        }
 
         lucide.createIcons();
     });
