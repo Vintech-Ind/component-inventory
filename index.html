@@ -1,1122 +1,901 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vin Industries | Component Database</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vinayaka Industries | Component Database</title>
 
-    <style>
-        :root {
-            --sidebar-width: 280px;
-            --header-height: 80px;
-        }
-        
-        html.dark {
-            --premium-bg-start: #0f0c29;
-            --premium-bg-mid: #302b63;
-            --premium-bg-end: #24243e;
-            --premium-surface: rgba(30, 36, 42, 0.75);
-            --premium-border: rgba(255, 255, 255, 0.1);
-            --premium-border-hover: rgba(255, 255, 255, 0.2);
-            --premium-text-primary: #f0f6fc;
-            --premium-text-secondary: #8b949e;
-            --premium-accent: #6366f1; /* Electric Indigo */
-            --premium-accent-glow: rgba(99, 102, 241, 0.5);
-        }
-        
-        html:not(.dark) {
-            --premium-bg-start: #e0eafc;
-            --premium-bg-mid: #cfdef3;
-            --premium-bg-end: #e0eafc;
-            --premium-surface: rgba(255, 255, 255, 0.7);
-            --premium-border: rgba(0, 0, 0, 0.1);
-            --premium-border-hover: rgba(0, 0, 0, 0.2);
-            --premium-text-primary: #1f2937;
-            --premium-text-secondary: #6b7280;
-            --premium-accent: #4f46e5;
-            --premium-accent-glow: rgba(79, 70, 229, 0.5);
-        }
+  <!-- Tailwind & Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        @keyframes gradient-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(-45deg, var(--premium-bg-start), var(--premium-bg-mid), var(--premium-bg-end));
-            background-size: 400% 400%;
-            animation: gradient-animation 15s ease infinite;
-            color: var(--premium-text-primary);
-        }
-        .main-content {
-            transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            padding-left: calc(var(--sidebar-width) + 2rem);
-        }
-        
-        /* Floating Glass Sidebar */
-        .sidebar {
-            background: var(--premium-surface);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--premium-border);
-            border-radius: 1.5rem;
-            margin: 1rem;
-            height: calc(100vh - 2rem);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .sidebar-nav-link.active {
-            background-color: var(--premium-accent);
-            color: white;
-            box-shadow: 0 0 20px var(--premium-accent-glow);
-        }
-
-        /* Glass Cards */
-        .glass-card {
-            background: var(--premium-surface);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--premium-border);
-            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
-                        box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
-                        border-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        .glass-card:hover {
-            transform: scale(1.03) translateY(-5px);
-            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.3);
-            border-color: var(--premium-border-hover);
-        }
-        
-        .premium-input, .premium-select {
-            background-color: rgba(0,0,0,0.2);
-            border-color: var(--premium-border);
-            color: var(--premium-text-primary);
-        }
-        html:not(.dark) .premium-input, html:not(.dark) .premium-select {
-             background-color: rgba(255,255,255,0.5);
-        }
-        .premium-input:focus, .premium-select:focus {
-            --tw-ring-color: var(--premium-accent);
-            border-color: var(--premium-accent);
-            background-color: rgba(0,0,0,0.3);
-        }
-        html:not(.dark) .premium-input:focus, html:not(.dark) .premium-select:focus {
-             background-color: rgba(255,255,255,0.7);
-        }
-
-        /* Other styles from previous version adapted for the new theme */
-        .swal2-popup { font-family: 'Inter', sans-serif; background-color: var(--premium-surface) !important; color: var(--premium-text-primary) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-        .swal2-title { color: var(--premium-text-primary) !important; }
-        .swal2-confirm { background-color: var(--premium-accent) !important; }
-        .image-gallery .gallery-arrow { opacity: 0; transition: opacity 0.2s ease-in-out; }
-        .image-gallery:hover .gallery-arrow { opacity: 1; }
-        
-        .detail-modal {
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        
-        .card-enter { opacity: 0; transform: translateY(20px); }
-        .card-enter-active { opacity: 1; transform: translateY(0); }
-        
-        .collapsible-content {
-            max-height: 500px;
-            transition: max-height 0.5s ease-in-out, margin-top 0.5s ease-in-out, opacity 0.3s ease-in-out 0.1s;
-            overflow: hidden;
-            opacity: 1;
-        }
-        .collapsible-content.collapsed {
-            max-height: 0;
-            margin-top: 0 !important;
-            opacity: 0;
-            transition: max-height 0.5s ease-in-out, margin-top 0.5s ease-in-out, opacity 0.2s ease-in-out;
-        }
-        #analytics-toggle-icon {
-            transition: transform 0.3s ease;
-        }
-        #analytics-toggle-icon.collapsed {
-            transform: rotate(-90deg);
-        }
-
-
-        @media (max-width: 1024px) {
-            .main-content { padding-left: 1rem; }
-            .sidebar { transform: translateX(-110%); }
-            .sidebar.open { transform: translateX(0); }
-        }
-    </style>
+  <style>
+    :root { --sidebar-width: 280px; --header-height: 80px; }
+    html.dark {
+      --premium-bg-start:#0f0c29; --premium-bg-mid:#302b63; --premium-bg-end:#24243e;
+      --premium-surface:rgba(30,36,42,.75); --premium-border:rgba(255,255,255,.1);
+      --premium-border-hover:rgba(255,255,255,.2); --premium-text-primary:#f0f6fc;
+      --premium-text-secondary:#8b949e; --premium-accent:#6366f1; --premium-accent-glow:rgba(99,102,241,.5);
+    }
+    html:not(.dark){
+      --premium-bg-start:#e0eafc; --premium-bg-mid:#cfdef3; --premium-bg-end:#e0eafc;
+      --premium-surface:rgba(255,255,255,.7); --premium-border:rgba(0,0,0,.1);
+      --premium-border-hover:rgba(0,0,0,.2); --premium-text-primary:#1f2937;
+      --premium-text-secondary:#6b7280; --premium-accent:#4f46e5; --premium-accent-glow:rgba(79,70,229,.5);
+    }
+    @keyframes gradient-animation{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:'Inter',sans-serif;
+      background:linear-gradient(-45deg,var(--premium-bg-start),var(--premium-bg-mid),var(--premium-bg-end));
+      background-size:400% 400%; animation:gradient-animation 15s ease infinite;
+      color:var(--premium-text-primary);
+    }
+    .main-content{transition:padding-left .3s cubic-bezier(.4,0,.2,1); padding-left:calc(var(--sidebar-width) + 2rem)}
+    .sidebar{background:var(--premium-surface); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid var(--premium-border); border-radius:1.5rem; margin:1rem; height:calc(100vh - 2rem); transition:transform .3s cubic-bezier(.4,0,.2,1)}
+    .sidebar-nav-link.active{background-color:var(--premium-accent); color:#fff; box-shadow:0 0 20px var(--premium-accent-glow)}
+    .glass-card{background:var(--premium-surface); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid var(--premium-border); transition:transform .3s cubic-bezier(.25,.46,.45,.94), box-shadow .3s cubic-bezier(.25,.46,.45,.94), border-color .3s cubic-bezier(.25,.46,.45,.94)}
+    .glass-card:hover{transform:scale(1.03) translateY(-5px); box-shadow:0 15px 35px -10px rgba(0,0,0,.3); border-color:var(--premium-border-hover)}
+    .premium-input,.premium-select{background-color:rgba(0,0,0,.2); border-color:var(--premium-border); color:var(--premium-text-primary)}
+    html:not(.dark) .premium-input, html:not(.dark) .premium-select{background-color:rgba(255,255,255,.5)}
+    .premium-input:focus,.premium-select:focus{--tw-ring-color:var(--premium-accent); border-color:var(--premium-accent); background-color:rgba(0,0,0,.3)}
+    html:not(.dark) .premium-input:focus, html:not(.dark) .premium-select:focus{background-color:rgba(255,255,255,.7)}
+    .swal2-popup{font-family:'Inter',sans-serif; background-color:var(--premium-surface)!important; color:var(--premium-text-primary)!important; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px)}
+    .swal2-title{color:var(--premium-text-primary)!important}
+    .swal2-confirm{background-color:var(--premium-accent)!important}
+    .image-gallery .gallery-arrow{opacity:0; transition:opacity .2s}
+    .image-gallery:hover .gallery-arrow{opacity:1}
+    .detail-modal{transition:opacity .3s ease, transform .3s ease}
+    .card-enter{opacity:0; transform:translateY(20px)}
+    .card-enter-active{opacity:1; transform:translateY(0)}
+    .collapsible-content{max-height:500px; transition:max-height .5s, margin-top .5s, opacity .3s .1s; overflow:hidden; opacity:1}
+    .collapsible-content.collapsed{max-height:0; margin-top:0!important; opacity:0; transition:max-height .5s, margin-top .5s, opacity .2s}
+    #analytics-toggle-icon{transition:transform .3s}
+    #analytics-toggle-icon.collapsed{transform:rotate(-90deg)}
+    @media (max-width:1024px){ .main-content{padding-left:1rem} .sidebar{transform:translateX(-110%)} .sidebar.open{transform:translateX(0)} }
+  </style>
 </head>
 <body class="antialiased">
 
-    <div id="login-view" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-8">
-        <div class="text-center">
-            <div class="inline-block bg-indigo-500 p-4 rounded-2xl shadow-inner mb-6">
-                <i data-lucide="gem" class="w-12 h-12 text-white"></i>
+  <!-- LOGIN VIEW -->
+  <div id="login-view" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-8">
+    <div class="text-center">
+      <div class="inline-block bg-indigo-500 p-4 rounded-2xl shadow-inner mb-6">
+        <i data-lucide="gem" class="w-12 h-12 text-white"></i>
+      </div>
+      <h1 class="text-4xl font-bold text-[--premium-text-primary]">Welcome to Vinayaka DB</h1>
+      <p class="text-lg text-[--premium-text-secondary] mt-2 mb-8">Your intelligent component inventory.</p>
+      <button id="signin-button-main" class="bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-indigo-500 transition-all">
+        Sign In with Google
+      </button>
+      <p id="auth-warning" class="mt-4 text-sm text-red-300 hidden"></p>
+    </div>
+  </div>
+
+  <!-- APP WRAPPER -->
+  <div id="app-wrapper" class="relative min-h-screen hidden">
+    <!-- Sidebar -->
+    <aside class="sidebar fixed top-0 left-0 w-[var(--sidebar-width)] z-40 flex flex-col">
+      <div class="flex items-center gap-4 p-5 h-[var(--header-height)]">
+        <div class="bg-indigo-500 p-2.5 rounded-lg shadow-inner"><i data-lucide="gem" class="w-6 h-6 text-white"></i></div>
+        <h1 class="text-xl font-bold text-[--premium-text-primary]">Vinayaka DB</h1>
+      </div>
+      <nav class="flex-1 px-4 py-6 space-y-2">
+        <a href="#" id="nav-dashboard" class="sidebar-nav-link active flex items-center gap-3 px-3 py-2.5 font-semibold rounded-lg">
+          <i data-lucide="layout-grid" class="w-5 h-5"></i><span>Dashboard</span>
+        </a>
+        <a href="#" id="nav-reports" class="sidebar-nav-link flex items-center gap-3 px-3 py-2.5 text-[--premium-text-secondary] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[--premium-text-primary] rounded-lg font-medium transition-colors">
+          <i data-lucide="bar-chart-2" class="w-5 h-5"></i><span>Reports</span>
+        </a>
+        <a href="#" id="imageNamerBtn" class="sidebar-nav-link flex items-center gap-3 px-3 py-2.5 text-[--premium-text-secondary] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[--premium-text-primary] rounded-lg font-medium transition-colors">
+          <i data-lucide="tag" class="w-5 h-5"></i><span>Image Namer</span>
+        </a>
+      </nav>
+      <div class="p-4 border-t border-t-[--premium-border]">
+        <div id="user-profile-area" class="p-2 rounded-lg cursor-pointer group hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+          <div id="auth-required-profile" class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-full bg-black/20 flex items-center justify-center border border-dashed border-[--premium-border]"><i data-lucide="user-x" class="text-[--premium-text-secondary]"></i></div>
+            <div>
+              <p class="font-semibold text-[--premium-text-secondary]">Not Signed In</p>
+              <p class="text-xs text-gray-500 group-hover:text-[--premium-accent] transition-colors">Click to sign in</p>
             </div>
-            <h1 class="text-4xl font-bold text-[--premium-text-primary]">Welcome to Vinayaka DB</h1>
-            <p class="text-lg text-[--premium-text-secondary] mt-2 mb-8">Your intelligent component inventory.</p>
-            <button id="signin-button-main" class="bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-indigo-500 transition-all">
-                Sign In with Google
-            </button>
+          </div>
+          <div id="user-profile" class="hidden items-center gap-3">
+            <img id="user-dp" class="w-11 h-11 rounded-full" src="" alt="User"/>
+            <div>
+              <p id="user-name" class="font-semibold text-[--premium-text-primary]"></p>
+              <p id="user-role" class="text-xs text-green-400 font-medium">Online</p>
+            </div>
+          </div>
         </div>
-    </div>
-
-    <div id="app-wrapper" class="relative min-h-screen hidden">
-        <!-- Sidebar -->
-        <aside class="sidebar fixed top-0 left-0 w-[var(--sidebar-width)] z-40 flex flex-col">
-            <div class="flex items-center gap-4 p-5 h-[var(--header-height)]">
-                <div class="bg-indigo-500 p-2.5 rounded-lg shadow-inner"><i data-lucide="gem" class="w-6 h-6 text-white"></i></div>
-                <h1 class="text-xl font-bold text-[--premium-text-primary]">Vinayaka DB</h1>
-            </div>
-            
-            <nav class="flex-1 px-4 py-6 space-y-2">
-                <a href="#" id="nav-dashboard" class="sidebar-nav-link active flex items-center gap-3 px-3 py-2.5 font-semibold rounded-lg">
-                    <i data-lucide="layout-grid" class="w-5 h-5"></i><span>Dashboard</span>
-                </a>
-                <a href="#" id="nav-reports" class="sidebar-nav-link flex items-center gap-3 px-3 py-2.5 text-[--premium-text-secondary] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[--premium-text-primary] rounded-lg font-medium transition-colors">
-                    <i data-lucide="bar-chart-2" class="w-5 h-5"></i><span>Reports</span>
-                </a>
-                <a href="#" id="imageNamerBtn" class="sidebar-nav-link flex items-center gap-3 px-3 py-2.5 text-[--premium-text-secondary] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[--premium-text-primary] rounded-lg font-medium transition-colors">
-                    <i data-lucide="tag" class="w-5 h-5"></i><span>Image Namer</span>
-                </a>
-            </nav>
-
-            <div class="p-4 border-t border-t-[--premium-border]">
-                <div id="user-profile-area" class="p-2 rounded-lg cursor-pointer group hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                    <div id="auth-required-profile" class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-full bg-black/20 flex items-center justify-center border border-dashed border-[--premium-border]"><i data-lucide="user-x" class="text-[--premium-text-secondary]"></i></div>
-                        <div>
-                            <p class="font-semibold text-[--premium-text-secondary]">Not Signed In</p>
-                            <p class="text-xs text-gray-500 group-hover:text-[--premium-accent] transition-colors">Click to sign in</p>
-                        </div>
-                    </div>
-                    <div id="user-profile" class="hidden items-center gap-3">
-                        <img id="user-dp" class="w-11 h-11 rounded-full" src="" alt="User">
-                        <div>
-                            <p id="user-name" class="font-semibold text-[--premium-text-primary]"></p>
-                            <p id="user-role" class="text-xs text-green-400 font-medium">Online</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-2 flex items-center justify-between p-2">
-                    <span class="text-sm font-medium text-[--premium-text-secondary]">Theme</span>
-                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-[--premium-text-secondary] transition-colors">
-                        <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
-                        <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
-                    </button>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content flex-1 flex flex-col min-h-screen">
-            <header class="sticky top-0 z-30 h-[var(--header-height)] flex items-center justify-between p-4 lg:p-8">
-                <div class="flex items-center gap-2">
-                     <button id="menuBtn" class="lg:hidden p-2 text-[--premium-text-secondary]"><i data-lucide="menu" class="w-6 h-6"></i></button>
-                </div>
-                <div class="flex items-center gap-4">
-                     <div id="layout-switcher" class="flex items-center gap-1 bg-black/20 p-1 rounded-lg border border-[--premium-border]">
-                        <button id="grid-view-btn" class="p-2 rounded-md bg-[--premium-surface] text-[--premium-accent]"><i data-lucide="layout-grid"></i></button>
-                        <button id="list-view-btn" class="p-2 rounded-md text-[--premium-text-secondary]"><i data-lucide="list"></i></button>
-                    </div>
-                    <button id="addPartBtn" class="bg-indigo-600 text-white font-semibold py-2.5 px-5 rounded-lg shadow-lg hover:bg-indigo-500 transition-all duration-200 flex items-center gap-2 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed" disabled>
-                        <i data-lucide="plus" class="w-5 h-5"></i><span class="hidden sm:inline">Add Component</span>
-                    </button>
-                </div>
-            </header>
-
-            <div id="app" class="max-w-screen-2xl w-full p-4 sm:p-6 lg:p-8">
-                <!-- Dashboard View -->
-                <div id="dashboard-view">
-                    <!-- Analytics Section -->
-                    <div class="mb-8">
-                        <div id="analytics-toggle" class="flex justify-between items-center cursor-pointer mb-4">
-                            <h2 class="text-2xl font-bold text-[--premium-text-primary]">Analytics Overview</h2>
-                            <i id="analytics-toggle-icon" data-lucide="chevron-down" class="text-[--premium-text-secondary]"></i>
-                        </div>
-                        <div id="analytics-widgets" class="collapsible-content grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-                            <div class="glass-card p-6 rounded-xl"><p class="text-sm font-medium text-[--premium-text-secondary]">Total Components</p><p id="total-components" class="text-3xl font-bold text-[--premium-text-primary] mt-2">0</p></div>
-                            <div class="glass-card p-6 rounded-xl"><p class="text-sm font-medium text-[--premium-text-secondary]">Total Inventory Value</p><p id="total-value" class="text-3xl font-bold text-[--premium-text-primary] mt-2">₹0</p></div>
-                            <div class="glass-card p-6 rounded-xl"><p class="text-sm font-medium text-[--premium-text-secondary]">Items Low on Stock</p><p id="low-stock" class="text-3xl font-bold text-red-400 mt-2">0</p></div>
-                            <div class="glass-card p-6 rounded-xl"><p class="text-sm font-medium text-[--premium-text-secondary]">Most Common Device</p><p id="common-device" class="text-3xl font-bold text-[--premium-text-primary] mt-2">-</p></div>
-                        </div>
-                    </div>
-
-                    <!-- Filters and Search -->
-                    <div class="glass-card rounded-xl p-4 mb-8">
-                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                            <div class="md:col-span-2"><div class="relative"><i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[--premium-text-secondary]"></i><input type="text" id="search" placeholder="Search inventory..." class="w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[--premium-accent] transition shadow-sm premium-input"></div></div>
-                            <div><select id="filter-device" class="premium-select w-full py-3 px-4 rounded-lg"><option value="">All Devices</option></select></div>
-                            <div><select id="filter-size" class="premium-select w-full py-3 px-4 rounded-lg"><option value="">All Sizes</option></select></div>
-                            <div><select id="sort-by" class="premium-select w-full py-3 px-4 rounded-lg"><option value="model-asc">Sort by Model (A-Z)</option><option value="price-desc">Sort by Price (High-Low)</option><option value="quantity-asc">Sort by Quantity (Low-High)</option></select></div>
-                        </div>
-                    </div>
-                
-                    <div id="skeleton-loader" class="hidden"></div>
-                    <div id="searchResults" class="hidden"></div>
-                    <div id="no-results" class="hidden text-center py-16 glass-card rounded-xl"><i data-lucide="search-x" class="w-16 h-16 mx-auto text-[--premium-text-secondary]"></i><h3 class="mt-4 text-2xl font-bold text-[--premium-text-primary]">No Components Found</h3><p class="mt-2 text-[--premium-text-secondary]">Your database is empty or your search returned no results.</p></div>
-                
-                    <!-- Pagination -->
-                    <div id="pagination-controls" class="flex justify-center items-center gap-4 mt-8"></div>
-                </div>
-
-                <!-- Reports View -->
-                <div id="reports-view" class="hidden space-y-8">
-                    <h2 class="text-3xl font-bold text-[--premium-text-primary]">Sales & Inventory Reports</h2>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="glass-card p-6 rounded-xl"><h3 class="font-semibold text-[--premium-text-primary] mb-4">Monthly Revenue</h3><canvas id="revenue-chart"></canvas></div>
-                        <div class="glass-card p-6 rounded-xl"><h3 class="font-semibold text-[--premium-text-primary] mb-4">Best Selling Items (by Quantity)</h3><canvas id="bestsellers-chart"></canvas></div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Add/Edit Modal -->
-    <div id="formModal" class="modal-backdrop hidden fixed inset-0 z-50 justify-center items-center p-4">
-        <div class="glass-card border border-[--premium-border] rounded-xl shadow-2xl w-full max-w-4xl m-4 max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center p-6 border-b border-[--premium-border]"><h2 id="form-title" class="text-2xl font-bold text-[--premium-text-primary]">Add New Component</h2><button type="button" id="closeFormModalBtn" class="text-[--premium-text-secondary] hover:text-[--premium-text-primary] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
-            <form id="partForm" class="p-6 space-y-6 overflow-y-auto">
-                <input type="hidden" id="edit-id">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div><label for="model" class="block text-sm font-medium text-[--premium-text-secondary]">Model*</label><input type="text" id="model" required class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
-                    <div><label for="device" class="block text-sm font-medium text-[--premium-text-secondary]">Device</label><select id="device" class="mt-1 block w-full rounded-lg shadow-sm premium-input"><option value="">(None)</option><option value="SWING DEVICE">Swing Device</option><option value="TRAVEL DEVICE">Travel Device</option></select></div>
-                    <div><label for="size" class="block text-sm font-medium text-[--premium-text-secondary]">Size</label><select id="size" class="mt-1 block w-full rounded-lg shadow-sm premium-input"><option value="">(None)</option><option value="SMALL">Small</option><option value="MIDDLE">Middle</option><option value="BIG">Big</option></select></div>
-                    <div><label for="item-name-main" class="block text-sm font-medium text-[--premium-text-secondary]">Item Name*</label><select id="item-name-main" required class="mt-1 block w-full rounded-lg shadow-sm premium-input"><option value="">Select item type...</option><option value="Planetary Gear">Planetary Gear</option><option value="Sun Gear">Sun Gear</option><option value="Ring Gear">Ring Gear</option><option value="Spline/Pinion Shaft">Spline/Pinion Shaft</option><option value="Track Motor Shaft">Track Motor Shaft</option><option value="Bearing">Bearing</option><option value="Bushes">Bushes</option></select></div>
-                    <div><label for="price" class="block text-sm font-medium text-[--premium-text-secondary]">Price</label><input type="number" id="price" placeholder="e.g., 4500" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
-                    <div><label for="quantity" class="block text-sm font-medium text-[--premium-text-secondary]">Quantity*</label><input type="number" id="quantity" required value="1" min="0" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div><label class="block text-sm font-medium text-[--premium-text-secondary]">Image Links</label><textarea id="image-links-input" name="image-link" placeholder="Paste one or more comma-separated Google Drive links here..." class="block w-full rounded-lg shadow-sm premium-input mt-1" rows="3"></textarea></div>
-                    <div><label for="note" class="block text-sm font-medium text-[--premium-text-secondary]">Note</label><textarea id="note" rows="3" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></textarea></div>
-                </div>
-                <div id="spec-fields-container" class="hidden"><h3 class="text-lg font-semibold border-b border-[--premium-border] pb-2 mb-4 text-[--premium-text-primary]">Specifications</h3><div id="spec-fields" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4"></div></div>
-            </form>
-            <div class="mt-auto p-6 border-t border-[--premium-border] bg-black/20 flex justify-end gap-3"><button type="button" id="cancelBtn" class="bg-gray-700 py-2 px-4 border border-gray-600 rounded-lg shadow-sm text-sm font-semibold text-white hover:bg-gray-600 transition-colors">Cancel</button><button type="submit" form="partForm" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-500 transition-colors">Save Component</button></div>
+        <div class="mt-2 flex items-center justify-between p-2">
+          <span class="text-sm font-medium text-[--premium-text-secondary]">Theme</span>
+          <button id="theme-toggle" class="p-2 rounded-full hover:bg-black/5 dark:hover:bg_white/5 text-[--premium-text-secondary] transition-colors">
+            <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+            <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+          </button>
         </div>
-    </div>
+      </div>
+    </aside>
 
-    <!-- Detail Modal -->
-    <div id="detail-modal" class="detail-modal fixed inset-0 z-50 justify-center items-center p-4 hidden opacity-0 scale-95">
-        <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" id="detail-backdrop"></div>
-        <div class="relative glass-card w-full max-w-6xl max-h-[90vh] rounded-2xl border border-[--premium-border] flex flex-col">
-            <div class="flex justify-between items-center p-4 border-b border-[--premium-border] flex-shrink-0">
-                <h2 class="text-xl font-bold text-[--premium-text-primary]">Component Details</h2>
-                <button id="detail-close-btn" class="p-2 text-[--premium-text-secondary] hover:text-[--premium-text-primary] rounded-full hover:bg-white/5"><i data-lucide="x"></i></button>
-            </div>
-            <div id="detail-content" class="grid md:grid-cols-2 gap-6 p-6 overflow-y-auto">
-                <!-- Content will be injected here -->
-            </div>
+    <!-- Main Content -->
+    <main class="main-content flex-1 flex flex-col min-h-screen">
+      <header class="sticky top-0 z-30 h-[var(--header-height)] flex items-center justify-between p-4 lg:p-8">
+        <div class="flex items-center gap-2">
+          <button id="menuBtn" class="lg:hidden p-2 text-[--premium-text-secondary]"><i data-lucide="menu" class="w-6 h-6"></i></button>
         </div>
-    </div>
-    
-    <!-- Image Namer Modal -->
-    <div id="imageNamerModal" class="modal-backdrop hidden fixed inset-0 z-50 justify-center items-center p-4">
-        <div class="glass-card border border-[--premium-border] rounded-xl shadow-2xl w-full max-w-lg m-4">
-            <div class="flex justify-between items-center p-6 border-b border-[--premium-border]"><h2 class="text-2xl font-bold text-[--premium-text-primary]">Image Name Generator</h2><button type="button" id="closeNamerModalBtn" class="text-[--premium-text-secondary] hover:text-[--premium-text-primary] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
-            <form id="imageNamerForm" class="p-6 space-y-4">
-                <div><label for="namer-model" class="block text-sm font-medium text-[--premium-text-secondary]">Model*</label><input type="text" id="namer-model" required placeholder="e.g., EX 200" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
-                <div><label for="namer-device" class="block text-sm font-medium text-[--premium-text-secondary]">Device*</label><input type="text" id="namer-device" required placeholder="e.g., Travel Device" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
-                <div><label for="namer-part-name" class="block text-sm font-medium text-[--premium-text-secondary]">Part Name*</label><input type="text" id="namer-part-name" required placeholder="e.g., Shaft" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
-                <div><label for="namer-image-count" class="block text-sm font-medium text-[--premium-text-secondary]">Number of Images*</label><input type="number" id="namer-image-count" required value="1" min="1" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
-                <div class="pt-4"><h3 class="text-lg font-semibold mb-2 text-[--premium-text-primary]">Generated Names</h3><div id="generated-names-output" class="p-3 bg-black/20 rounded-lg space-y-2 text-sm font-mono h-32 overflow-y-auto"></div></div>
-                <div class="flex justify-end"><button type="submit" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-500">Generate</button></div>
-            </form>
+        <div class="flex items-center gap-4">
+          <div id="layout-switcher" class="flex items-center gap-1 bg-black/20 p-1 rounded-lg border border-[--premium-border]">
+            <button id="grid-view-btn" class="p-2 rounded-md bg-[--premium-surface] text-[--premium-accent]"><i data-lucide="layout-grid"></i></button>
+            <button id="list-view-btn" class="p-2 rounded-md text-[--premium-text-secondary]"><i data-lucide="list"></i></button>
+          </div>
+          <button id="addPartBtn" class="bg-indigo-600 text-white font-semibold py-2.5 px-5 rounded-lg shadow-lg hover:bg-indigo-500 transition-all duration-200 flex items-center gap-2 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed" disabled>
+            <i data-lucide="plus" class="w-5 h-5"></i><span class="hidden sm:inline">Add Component</span>
+          </button>
         </div>
+      </header>
+
+      <div id="app" class="max-w-screen-2xl w-full p-4 sm:p-6 lg:p-8">
+        <!-- Dashboard View -->
+        <div id="dashboard-view">
+          <!-- Analytics Section -->
+          <div class="mb-8">
+            <div id="analytics-toggle" class="flex justify-between items-center cursor-pointer mb-4">
+              <h2 class="text-2xl font-bold text-[--premium-text-primary]">Analytics Overview</h2>
+              <i id="analytics-toggle-icon" data-lucide="chevron-down" class="text-[--premium-text-secondary]"></i>
+            </div>
+            <div id="analytics-widgets" class="collapsible-content grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+              <div class="glass-card p-6 rounded-xl"><p class="text-sm font-medium text-[--premium-text-secondary]">Total Components</p><p id="total-components" class="text-3xl font-bold text-[--premium-text-primary] mt-2">0</p></div>
+              <div class="glass-card p-6 rounded-xl"><p class="text-sm font-medium text-[--premium-text-secondary]">Total Inventory Value</p><p id="total-value" class="text-3xl font-bold text-[--premium-text-primary] mt-2">₹0</p></div>
+              <div class="glass-card p-6 rounded-xl"><p class="text-sm font-medium text-[--premium-text-secondary]">Items Low on Stock</p><p id="low-stock" class="text-3xl font-bold text-red-400 mt-2">0</p></div>
+              <div class="glass-card p-6 rounded-xl"><p class="text-sm font-medium text-[--premium-text-secondary]">Most Common Device</p><p id="common-device" class="text-3xl font-bold text-[--premium-text-primary] mt-2">-</p></div>
+            </div>
+          </div>
+
+          <!-- Filters and Search -->
+          <div class="glass-card rounded-xl p-4 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div class="md:col-span-2">
+                <div class="relative">
+                  <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[--premium-text-secondary]"></i>
+                  <input id="search" type="text" placeholder="Search inventory..." class="w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[--premium-accent] transition shadow-sm premium-input"/>
+                </div>
+              </div>
+              <div><select id="filter-device" class="premium-select w-full py-3 px-4 rounded-lg"><option value="">All Devices</option></select></div>
+              <div><select id="filter-size" class="premium-select w-full py-3 px-4 rounded-lg"><option value="">All Sizes</option></select></div>
+              <div>
+                <select id="sort-by" class="premium-select w-full py-3 px-4 rounded-lg">
+                  <option value="model-asc">Sort by Model (A-Z)</option>
+                  <option value="price-desc">Sort by Price (High-Low)</option>
+                  <option value="quantity-asc">Sort by Quantity (Low-High)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div id="skeleton-loader" class="hidden"></div>
+          <div id="searchResults" class="hidden"></div>
+          <div id="no-results" class="hidden text-center py-16 glass-card rounded-xl">
+            <i data-lucide="search-x" class="w-16 h-16 mx-auto text-[--premium-text-secondary]"></i>
+            <h3 class="mt-4 text-2xl font-bold text-[--premium-text-primary]">No Components Found</h3>
+            <p class="mt-2 text-[--premium-text-secondary]">Your database is empty or your search returned no results.</p>
+          </div>
+
+          <!-- Pagination -->
+          <div id="pagination-controls" class="flex justify-center items-center gap-4 mt-8"></div>
+        </div>
+
+        <!-- Reports View -->
+        <div id="reports-view" class="hidden space-y-8">
+          <h2 class="text-3xl font-bold text-[--premium-text-primary]">Sales & Inventory Reports</h2>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="glass-card p-6 rounded-xl">
+              <h3 class="font-semibold text-[--premium-text-primary] mb-4">Monthly Revenue</h3>
+              <canvas id="revenue-chart"></canvas>
+            </div>
+            <div class="glass-card p-6 rounded-xl">
+              <h3 class="font-semibold text-[--premium-text-primary] mb-4">Best Selling Items (by Quantity)</h3>
+              <canvas id="bestsellers-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div id="formModal" class="modal-backdrop hidden fixed inset-0 z-50 justify-center items-center p-4">
+    <div class="glass-card border border-[--premium-border] rounded-xl shadow-2xl w-full max-w-4xl m-4 max-h-[90vh] flex flex-col">
+      <div class="flex justify-between items-center p-6 border-b border-[--premium-border]">
+        <h2 id="form-title" class="text-2xl font-bold text-[--premium-text-primary]">Add New Component</h2>
+        <button type="button" id="closeFormModalBtn" class="text-[--premium-text-secondary] hover:text-[--premium-text-primary] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
+      </div>
+      <form id="partForm" class="p-6 space-y-6 overflow-y-auto">
+        <input type="hidden" id="edit-id"/>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div><label for="model" class="block text-sm font-medium text-[--premium-text-secondary]">Model*</label><input type="text" id="model" required class="mt-1 block w-full rounded-lg shadow-sm premium-input"/></div>
+          <div><label for="device" class="block text-sm font-medium text-[--premium-text-secondary]">Device</label><select id="device" class="mt-1 block w-full rounded-lg shadow-sm premium-input"><option value="">(None)</option><option value="SWING DEVICE">Swing Device</option><option value="TRAVEL DEVICE">Travel Device</option></select></div>
+          <div><label for="size" class="block text-sm font-medium text-[--premium-text-secondary]">Size</label><select id="size" class="mt-1 block w-full rounded-lg shadow-sm premium-input"><option value="">(None)</option><option value="SMALL">Small</option><option value="MIDDLE">Middle</option><option value="BIG">Big</option></select></div>
+          <div><label for="item-name-main" class="block text-sm font-medium text-[--premium-text-secondary]">Item Name*</label><select id="item-name-main" required class="mt-1 block w-full rounded-lg shadow-sm premium-input"><option value="">Select item type...</option><option value="Planetary Gear">Planetary Gear</option><option value="Sun Gear">Sun Gear</option><option value="Ring Gear">Ring Gear</option><option value="Spline/Pinion Shaft">Spline/Pinion Shaft</option><option value="Track Motor Shaft">Track Motor Shaft</option><option value="Bearing">Bearing</option><option value="Bushes">Bushes</option></select></div>
+          <div><label for="price" class="block text-sm font-medium text-[--premium-text-secondary]">Price</label><input type="number" id="price" placeholder="e.g., 4500" class="mt-1 block w-full rounded-lg shadow-sm premium-input"/></div>
+          <div><label for="quantity" class="block text-sm font-medium text-[--premium-text-secondary]">Quantity*</label><input type="number" id="quantity" required value="1" min="0" class="mt-1 block w-full rounded-lg shadow-sm premium-input"/></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div><label class="block text-sm font-medium text-[--premium-text-secondary]">Image Links</label><textarea id="image-links-input" name="image-link" placeholder="Paste one or more comma-separated Google Drive links here..." class="block w-full rounded-lg shadow-sm premium-input mt-1" rows="3"></textarea></div>
+          <div><label for="note" class="block text-sm font-medium text-[--premium-text-secondary]">Note</label><textarea id="note" rows="3" class="mt-1 block w-full rounded-lg shadow-sm premium-input"></textarea></div>
+        </div>
+        <div id="spec-fields-container" class="hidden">
+          <h3 class="text-lg font-semibold border-b border-[--premium-border] pb-2 mb-4 text-[--premium-text-primary]">Specifications</h3>
+          <div id="spec-fields" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4"></div>
+        </div>
+      </form>
+      <div class="mt-auto p-6 border-t border-[--premium-border] bg-black/20 flex justify-end gap-3">
+        <button type="button" id="cancelBtn" class="bg-gray-700 py-2 px-4 border border-gray-600 rounded-lg shadow-sm text-sm font-semibold text-white hover:bg-gray-600 transition-colors">Cancel</button>
+        <button type="submit" form="partForm" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-500 transition-colors">Save Component</button>
+      </div>
     </div>
-    
-    <script src="https://apis.google.com/js/api.js"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
-        const CLIENT_ID = '1088294326380-3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
-        const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
-        const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile";
-        const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ'; 
-        const INVENTORY_RANGE = 'Sheet1!A:AC';
-        const SALES_RANGE = 'SalesLog!A:D';
+  </div>
 
-        let allItems = [];
-        let allSales = [];
-        let filteredItems = [];
-        let gapiInited = false;
-        let gisInited = false;
-        let tokenClient;
-        let currentLayout = 'grid';
-        let currentPage = 1;
-        const ITEMS_PER_PAGE = 10;
-        let revenueChart, bestsellersChart;
+  <!-- Detail Modal -->
+  <div id="detail-modal" class="detail-modal fixed inset-0 z-50 justify-center items-center p-4 hidden opacity-0 scale-95">
+    <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" id="detail-backdrop"></div>
+    <div class="relative glass-card w-full max-w-6xl max-h-[90vh] rounded-2xl border border-[--premium-border] flex flex-col">
+      <div class="flex justify-between items-center p-4 border-b border-[--premium-border] flex-shrink-0">
+        <h2 class="text-xl font-bold text-[--premium-text-primary]">Component Details</h2>
+        <button id="detail-close-btn" class="p-2 text-[--premium-text-secondary] hover:text-[--premium-text-primary] rounded-full hover:bg-white/5"><i data-lucide="x"></i></button>
+      </div>
+      <div id="detail-content" class="grid md:grid-cols-2 gap-6 p-6 overflow-y-auto"></div>
+    </div>
+  </div>
 
-        const dom = {
-            html: document.documentElement,
-            appWrapper: document.getElementById('app-wrapper'),
-            loginView: document.getElementById('login-view'),
-            addPartBtn: document.getElementById('addPartBtn'),
-            searchResults: document.getElementById('searchResults'),
-            noResults: document.getElementById('no-results'),
-            userProfileArea: document.getElementById('user-profile-area'),
-            userProfile: document.getElementById('user-profile'),
-            userDp: document.getElementById('user-dp'),
-            userName: document.getElementById('user-name'),
-            userRole: document.getElementById('user-role'),
-            signInButtonMain: document.getElementById('signin-button-main'),
-            partForm: document.getElementById('partForm'),
-            formTitle: document.getElementById('form-title'),
-            editId: document.getElementById('edit-id'),
-            itemNameSelect: document.getElementById('item-name-main'),
-            specFieldsContainer: document.getElementById('spec-fields-container'),
-            specFields: document.getElementById('spec-fields'),
-            search: document.getElementById('search'),
-            formModal: document.getElementById('formModal'),
-            closeFormModalBtn: document.getElementById('closeFormModalBtn'),
-            cancelBtn: document.getElementById('cancelBtn'),
-            imageLinksInput: document.getElementById('image-links-input'),
-            skeletonLoader: document.getElementById('skeleton-loader'),
-            menuBtn: document.getElementById('menuBtn'),
-            sidebar: document.querySelector('.sidebar'),
-            gridViewBtn: document.getElementById('grid-view-btn'),
-            listViewBtn: document.getElementById('list-view-btn'),
-            themeToggle: document.getElementById('theme-toggle'),
-            detailModal: document.getElementById('detail-modal'),
-            detailBackdrop: document.getElementById('detail-backdrop'),
-            detailContent: document.getElementById('detail-content'),
-            detailCloseBtn: document.getElementById('detail-close-btn'),
-            imageNamerBtn: document.getElementById('imageNamerBtn'),
-            imageNamerModal: document.getElementById('imageNamerModal'),
-            closeNamerModalBtn: document.getElementById('closeNamerModalBtn'),
-            imageNamerForm: document.getElementById('imageNamerForm'),
-            filterDevice: document.getElementById('filter-device'),
-            filterSize: document.getElementById('filter-size'),
-            sortBy: document.getElementById('sort-by'),
-            paginationControls: document.getElementById('pagination-controls'),
-            navDashboard: document.getElementById('nav-dashboard'),
-            navReports: document.getElementById('nav-reports'),
-            dashboardView: document.getElementById('dashboard-view'),
-            reportsView: document.getElementById('reports-view'),
-            layoutSwitcher: document.getElementById('layout-switcher'),
-            analyticsToggle: document.getElementById('analytics-toggle'),
-            analyticsWidgets: document.getElementById('analytics-widgets'),
-            analyticsToggleIcon: document.getElementById('analytics-toggle-icon'),
-        };
+  <!-- Image Namer Modal -->
+  <div id="imageNamerModal" class="modal-backdrop hidden fixed inset-0 z-50 justify-center items-center p-4">
+    <div class="glass-card border border-[--premium-border] rounded-xl shadow-2xl w-full max-w-lg m-4">
+      <div class="flex justify-between items-center p-6 border-b border-[--premium-border]">
+        <h2 class="text-2xl font-bold text-[--premium-text-primary]">Image Name Generator</h2>
+        <button type="button" id="closeNamerModalBtn" class="text-[--premium-text-secondary] hover:text-[--premium-text-primary] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
+      </div>
+      <form id="imageNamerForm" class="p-6 space-y-4">
+        <div><label for="namer-model" class="block text-sm font-medium text-[--premium-text-secondary]">Model*</label><input type="text" id="namer-model" required placeholder="e.g., EX 200" class="mt-1 block w-full rounded-lg shadow-sm premium-input"/></div>
+        <div><label for="namer-device" class="block text-sm font-medium text-[--premium-text-secondary]">Device*</label><input type="text" id="namer-device" required placeholder="e.g., Travel Device" class="mt-1 block w-full rounded-lg shadow-sm premium-input"/></div>
+        <div><label for="namer-part-name" class="block text-sm font-medium text-[--premium-text-secondary]">Part Name*</label><input type="text" id="namer-part-name" required placeholder="e.g., Shaft" class="mt-1 block w-full rounded-lg shadow-sm premium-input"/></div>
+        <div><label for="namer-image-count" class="block text-sm font-medium text-[--premium-text-secondary]">Number of Images*</label><input type="number" id="namer-image-count" required value="1" min="1" class="mt-1 block w-full rounded-lg shadow-sm premium-input"/></div>
+        <div class="pt-4">
+          <h3 class="text-lg font-semibold mb-2 text-[--premium-text-primary]">Generated Names</h3>
+          <div id="generated-names-output" class="p-3 bg-black/20 rounded-lg space-y-2 text-sm font-mono h-32 overflow-y-auto"></div>
+        </div>
+        <div class="flex justify-end"><button type="submit" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-500">Generate</button></div>
+      </form>
+    </div>
+  </div>
 
-        const COLUMN_HEADERS = ['id', 'model', 'device', 'size', 'itemName', 'price', 'quantity', 'imageLinks', 'note', 'spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_width', 'spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_splineOd', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'];
-        const specDefinitions = { 'Planetary Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeeth'], 'Sun Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd'], 'Ring Gear': ['spec_teeth', 'spec_outerDiameter', 'spec_innerDiameter'], 'Spline/Pinion Shaft': ['spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_length', 'spec_splineOd'], 'Track Motor Shaft': ['spec_length', 'spec_outerDiameter', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'], 'Bearing': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_width'], 'Bushes': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length'], };
-        
-        // --- Initial Setup ---
-        initThemeAndLayout();
+  <!-- Google APIs -->
+  <script async defer src="https://apis.google.com/js/api.js"></script>
+  <script async defer src="https://accounts.google.com/gsi/client"></script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // ====== 🔧 REPLACE THESE TWO VALUES 🔧 ======
+    const API_KEY   = 'YOUR_API_KEY_HERE';
+    const CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';
+    // ===========================================
+
+    const DISCOVERY_DOCS = [
+      'https://sheets.googleapis.com/$discovery/rest?version=v4',
+      'https://www.googleapis.com/discovery/v1/apis/oauth2/v2/rest'
+    ];
+    const SCOPES = [
+      'https://www.googleapis.com/auth/spreadsheets',
+      'https://www.googleapis.com/auth/userinfo.profile',
+      'openid','email'
+    ].join(' ');
+
+    const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ';
+    const INVENTORY_RANGE = 'Sheet1!A:AC';
+    const SALES_RANGE = 'SalesLog!A:D';
+
+    let allItems = [], allSales = [], filteredItems = [];
+    let gapiInited = false, gisInited = false;
+    let tokenClient;
+    let currentLayout = 'grid', currentPage = 1;
+    const ITEMS_PER_PAGE = 10;
+    let revenueChart, bestsellersChart;
+
+    const dom = {
+      html: document.documentElement,
+      appWrapper: document.getElementById('app-wrapper'),
+      loginView: document.getElementById('login-view'),
+      addPartBtn: document.getElementById('addPartBtn'),
+      searchResults: document.getElementById('searchResults'),
+      noResults: document.getElementById('no-results'),
+      userProfileArea: document.getElementById('user-profile-area'),
+      userProfile: document.getElementById('user-profile'),
+      userDp: document.getElementById('user-dp'),
+      userName: document.getElementById('user-name'),
+      signInButtonMain: document.getElementById('signin-button-main'),
+      authWarning: document.getElementById('auth-warning'),
+      partForm: document.getElementById('partForm'),
+      formTitle: document.getElementById('form-title'),
+      editId: document.getElementById('edit-id'),
+      itemNameSelect: document.getElementById('item-name-main'),
+      specFieldsContainer: document.getElementById('spec-fields-container'),
+      specFields: document.getElementById('spec-fields'),
+      search: document.getElementById('search'),
+      formModal: document.getElementById('formModal'),
+      closeFormModalBtn: document.getElementById('closeFormModalBtn'),
+      cancelBtn: document.getElementById('cancelBtn'),
+      imageLinksInput: document.getElementById('image-links-input'),
+      skeletonLoader: document.getElementById('skeleton-loader'),
+      menuBtn: document.getElementById('menuBtn'),
+      sidebar: document.querySelector('.sidebar'),
+      gridViewBtn: document.getElementById('grid-view-btn'),
+      listViewBtn: document.getElementById('list-view-btn'),
+      themeToggle: document.getElementById('theme-toggle'),
+      detailModal: document.getElementById('detail-modal'),
+      detailBackdrop: document.getElementById('detail-backdrop'),
+      detailContent: document.getElementById('detail-content'),
+      detailCloseBtn: document.getElementById('detail-close-btn'),
+      imageNamerBtn: document.getElementById('imageNamerBtn'),
+      imageNamerModal: document.getElementById('imageNamerModal'),
+      closeNamerModalBtn: document.getElementById('closeNamerModalBtn'),
+      imageNamerForm: document.getElementById('imageNamerForm'),
+      filterDevice: document.getElementById('filter-device'),
+      filterSize: document.getElementById('filter-size'),
+      sortBy: document.getElementById('sort-by'),
+      paginationControls: document.getElementById('pagination-controls'),
+      navDashboard: document.getElementById('nav-dashboard'),
+      navReports: document.getElementById('nav-reports'),
+      dashboardView: document.getElementById('dashboard-view'),
+      reportsView: document.getElementById('reports-view'),
+      layoutSwitcher: document.getElementById('layout-switcher'),
+      analyticsToggle: document.getElementById('analytics-toggle'),
+      analyticsWidgets: document.getElementById('analytics-widgets'),
+      analyticsToggleIcon: document.getElementById('analytics-toggle-icon'),
+    };
+
+    const COLUMN_HEADERS = ['id','model','device','size','itemName','price','quantity','imageLinks','note','spec_innerDiameter','spec_outerDiameter','spec_length','spec_width','spec_teeth','spec_numberOfTeeth','spec_numberOfTeethInOd','spec_numberOfTeethInId','spec_stepOd','spec_bigTeethOd','spec_bigTeeth','spec_bigTeethLength','spec_smallTeethOd','spec_smallTeeth','spec_smallTeethLength','spec_splineOd','spec_teethOd','spec_outsideTeeth','spec_insideTeeth','spec_insideOd'];
+    const specDefinitions = {
+      'Planetary Gear':['spec_innerDiameter','spec_outerDiameter','spec_length','spec_numberOfTeeth'],
+      'Sun Gear':['spec_innerDiameter','spec_outerDiameter','spec_length','spec_numberOfTeethInOd','spec_numberOfTeethInId','spec_stepOd'],
+      'Ring Gear':['spec_teeth','spec_outerDiameter','spec_innerDiameter'],
+      'Spline/Pinion Shaft':['spec_bigTeethOd','spec_bigTeeth','spec_bigTeethLength','spec_smallTeethOd','spec_smallTeeth','spec_smallTeethLength','spec_length','spec_splineOd'],
+      'Track Motor Shaft':['spec_length','spec_outerDiameter','spec_teethOd','spec_outsideTeeth','spec_insideTeeth','spec_insideOd'],
+      'Bearing':['spec_innerDiameter','spec_outerDiameter','spec_width'],
+      'Bushes':['spec_innerDiameter','spec_outerDiameter','spec_length'],
+    };
+
+    // --- Initial Setup ---
+    initThemeAndLayout();
+    // Load gapi client
+    (function waitForGapi(){
+      if (window.gapi?.load) {
         gapi.load('client', initializeGapiClient);
-        const gisScript = document.createElement('script');
-        gisScript.src = 'https://accounts.google.com/gsi/client';
-        gisScript.async = true;
-        gisScript.defer = true;
-        gisScript.onload = initializeGis;
-        document.body.appendChild(gisScript);
+      } else { setTimeout(waitForGapi, 50); }
+    })();
+    // Wait for GIS
+    (function waitForGis(){
+      if (window.google?.accounts?.oauth2) initializeGis();
+      else setTimeout(waitForGis, 50);
+    })();
 
-        // --- Event Listeners ---
-        dom.partForm.addEventListener('submit', handleFormSubmit);
-        [dom.search, dom.filterDevice, dom.filterSize, dom.sortBy].forEach(el => el.addEventListener('input', () => {
-            currentPage = 1;
-            processAndRenderItems();
-        }));
-        dom.addPartBtn.addEventListener('click', openAddModal);
-        dom.closeFormModalBtn.addEventListener('click', closeFormModal);
-        dom.cancelBtn.addEventListener('click', closeFormModal);
-        dom.menuBtn.addEventListener('click', () => dom.sidebar.classList.toggle('open'));
-        dom.itemNameSelect.addEventListener('change', updateSpecFields);
-        dom.gridViewBtn.addEventListener('click', () => switchLayout('grid'));
-        dom.listViewBtn.addEventListener('click', () => switchLayout('list'));
-        dom.themeToggle.addEventListener('click', toggleTheme);
-        dom.detailCloseBtn.addEventListener('click', closeDetailPanel);
-        dom.detailBackdrop.addEventListener('click', closeDetailPanel);
-        dom.searchResults.addEventListener('click', handleCardClick);
-        dom.detailContent.addEventListener('click', handleDetailPanelClick);
-        dom.imageNamerBtn.addEventListener('click', () => dom.imageNamerModal.classList.remove('hidden'));
-        dom.closeNamerModalBtn.addEventListener('click', () => dom.imageNamerModal.classList.add('hidden'));
-        dom.imageNamerForm.addEventListener('submit', handleImageNamer);
-        dom.paginationControls.addEventListener('click', handlePaginationClick);
-        dom.navDashboard.addEventListener('click', (e) => { e.preventDefault(); switchView('dashboard'); });
-        dom.navReports.addEventListener('click', (e) => { e.preventDefault(); switchView('reports'); });
-        dom.analyticsToggle.addEventListener('click', toggleAnalytics);
+    // --- Events ---
+    dom.partForm.addEventListener('submit', handleFormSubmit);
+    [dom.search, dom.filterDevice, dom.filterSize, dom.sortBy].forEach(el => el.addEventListener('input', () => { currentPage = 1; processAndRenderItems(); }));
+    dom.addPartBtn.addEventListener('click', openAddModal);
+    dom.closeFormModalBtn.addEventListener('click', closeFormModal);
+    dom.cancelBtn.addEventListener('click', closeFormModal);
+    dom.menuBtn.addEventListener('click', () => dom.sidebar.classList.toggle('open'));
+    dom.itemNameSelect.addEventListener('change', updateSpecFields);
+    dom.gridViewBtn.addEventListener('click', () => switchLayout('grid'));
+    dom.listViewBtn.addEventListener('click', () => switchLayout('list'));
+    dom.themeToggle.addEventListener('click', toggleTheme);
+    dom.detailCloseBtn.addEventListener('click', closeDetailPanel);
+    dom.detailBackdrop.addEventListener('click', closeDetailPanel);
+    dom.searchResults.addEventListener('click', handleCardClick);
+    dom.detailContent.addEventListener('click', handleDetailPanelClick);
+    dom.imageNamerBtn.addEventListener('click', () => dom.imageNamerModal.classList.remove('hidden'));
+    dom.closeNamerModalBtn.addEventListener('click', () => dom.imageNamerModal.classList.add('hidden'));
+    dom.imageNamerForm.addEventListener('submit', handleImageNamer);
+    dom.paginationControls.addEventListener('click', handlePaginationClick);
+    dom.navDashboard.addEventListener('click', (e) => { e.preventDefault(); switchView('dashboard'); });
+    dom.navReports.addEventListener('click', (e) => { e.preventDefault(); switchView('reports'); });
+    dom.analyticsToggle.addEventListener('click', toggleAnalytics);
 
-
-        // --- Core Functions ---
-        async function initializeGapiClient() {
-            await gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS });
-            gapiInited = true; maybeEnableButtons();
-        }
-        function initializeGis() {
-            tokenClient = google.accounts.oauth2.initTokenClient({ client_id: CLIENT_ID, scope: SCOPES, callback: handleAuthResponse });
-            gisInited = true; maybeEnableButtons();
-        }
-        function maybeEnableButtons() {
-            if (gapiInited && gisInited) {
-                dom.userProfileArea.onclick = handleAuthClick;
-                dom.signInButtonMain.onclick = handleAuthClick;
-                lucide.createIcons();
-            }
-        }
-        function handleAuthResponse(resp) {
-            if (resp.error !== undefined) {
-                Swal.fire({ title: 'Authentication Error', text: 'Could not sign in. Please try again.', icon: 'error', background: 'var(--premium-surface)', color: 'var(--premium-text-primary)' });
-                updateAuthStatus(false); return;
-            }
-            gapi.client.setToken(resp);
-            updateAuthStatus(true);
-        }
-        function handleAuthClick() {
-            if (!gapiInited || !gisInited) {
-                Swal.fire('Loading...', 'Authentication libraries are still loading. Please try again in a moment.', 'info');
-                return;
-            }
-            if (gapi.client.getToken() === null) {
-                tokenClient?.requestAccessToken({ prompt: 'consent' });
-            } else {
-                Swal.fire({ title: 'Sign Out', text: 'Are you sure you want to sign out?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, sign out', background: 'var(--premium-surface)'})
-                .then((result) => { if (result.isConfirmed) { gapi.client.setToken(null); updateAuthStatus(false); } });
-            }
-        }
-        async function updateAuthStatus(isSignedIn) {
-            if (isSignedIn) {
-                dom.loginView.classList.add('hidden');
-                dom.appWrapper.classList.remove('hidden');
-                dom.addPartBtn.disabled = false;
-                dom.userProfile.classList.remove('hidden');
-                dom.userProfile.classList.add('flex');
-                
-                showSkeletonLoader(true);
-                try {
-                    const userInfo = await gapi.client.oauth2.userinfo.get();
-                    dom.userName.textContent = userInfo.result.name;
-                    dom.userDp.src = userInfo.result.picture;
-                } catch (e) {
-                    dom.userName.textContent = "User";
-                    dom.userDp.src = `https://placehold.co/44x44/${'161b22'}/${'8b949e'}?text=U`;
-                }
-                loadAllData();
-            } else {
-                dom.loginView.classList.remove('hidden');
-                dom.appWrapper.classList.add('hidden');
-                dom.addPartBtn.disabled = true;
-                dom.userProfile.classList.add('hidden');
-                dom.userProfile.classList.remove('flex');
-                allItems = [];
-                allSales = [];
-                updateAnalytics([]);
-            }
-        }
-        async function loadAllData() {
-            showSkeletonLoader(true);
-            try {
-                const responses = await Promise.all([
-                    gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: INVENTORY_RANGE }),
-                    gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: SALES_RANGE })
-                ]);
-                
-                const inventoryValues = responses[0].result.values;
-                allItems = (inventoryValues && inventoryValues.length > 1) ? inventoryValues.slice(1).map((row, index) => {
-                    const item = inventoryValues[0].reduce((obj, header, i) => ({...obj, [header]: row[i]}), {});
-                    item.rowIndex = index + 2;
-                    return item;
-                }).filter(item => item.id && item.id.trim() !== '') : [];
-
-                const salesValues = responses[1].result.values;
-                allSales = (salesValues && salesValues.length > 1) ? salesValues.slice(1).map(row => ({
-                    itemId: row[0],
-                    quantitySold: parseInt(row[1], 10),
-                    salePrice: parseFloat(row[2]),
-                    date: row[3]
-                })) : [];
-
-            } catch (err) {
-                Swal.fire({ title: 'Data Loading Error', text: `Could not load data. Check Sheet ID and permissions. Error: ${err.result.error.message}`, icon: 'error', background: 'var(--premium-surface)', color: 'var(--premium-text-primary)' });
-                updateAuthStatus(false);
-            } finally {
-                showSkeletonLoader(false);
-                populateFilters();
-                processAndRenderItems();
-                renderReportCharts();
-            }
-        }
-        async function handleFormSubmit(e) {
-            e.preventDefault();
-            const editId = dom.editId.value;
-            if (editId) {
-                await updateComponent(editId);
-            } else {
-                await addComponent();
-            }
-        }
-        async function addComponent() {
-            const newItem = collectFormData();
-            newItem.id = Date.now();
-            const newRow = COLUMN_HEADERS.map(header => newItem[header] || "");
-            try {
-                await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SPREADSHEET_ID, range: INVENTORY_RANGE, valueInputOption: 'USER_ENTERED', resource: { values: [newRow] } });
-                Swal.fire({ title: 'Success!', text: 'Component added successfully.', icon: 'success', background: 'var(--premium-surface)', color: 'var(--premium-text-primary)' });
-                closeFormModal();
-                loadAllData();
-            } catch (err) {
-                Swal.fire({ title: 'Save Error', text: `Could not save the component. Error: ${err.result.error.message}`, icon: 'error', background: 'var(--premium-surface)', color: 'var(--premium-text-primary)' });
-            }
-        }
-        async function updateComponent(id) {
-            const itemToUpdate = allItems.find(item => item.id === id);
-            if (!itemToUpdate) {
-                Swal.fire('Error', 'Could not find the component to update.', 'error');
-                return;
-            }
-            const updatedItem = collectFormData();
-            updatedItem.id = id; // Preserve original ID
-            const updatedRow = COLUMN_HEADERS.map(header => updatedItem[header] || "");
-            const updateRange = `Sheet1!A${itemToUpdate.rowIndex}:AC${itemToUpdate.rowIndex}`;
-            try {
-                await gapi.client.sheets.spreadsheets.values.update({
-                    spreadsheetId: SPREADSHEET_ID,
-                    range: updateRange,
-                    valueInputOption: 'USER_ENTERED',
-                    resource: { values: [updatedRow] }
-                });
-                Swal.fire('Success!', 'Component updated successfully.', 'success');
-                closeFormModal();
-                loadAllData();
-            } catch (err) {
-                Swal.fire('Update Error', `Could not update the component. Error: ${err.result.error.message}`, 'error');
-            }
-        }
-        async function deleteComponent(id) {
-            const itemToDelete = allItems.find(item => item.id === id);
-            if (!itemToDelete) {
-                Swal.fire('Error', 'Could not find the component to delete.', 'error');
-                return;
-            }
-            try {
-                await gapi.client.sheets.spreadsheets.batchUpdate({
-                    spreadsheetId: SPREADSHEET_ID,
-                    resource: {
-                        requests: [{
-                            deleteDimension: {
-                                range: {
-                                    sheetId: 0, // Assumes the first sheet
-                                    dimension: 'ROWS',
-                                    startIndex: itemToDelete.rowIndex - 1,
-                                    endIndex: itemToDelete.rowIndex
-                                }
-                            }
-                        }]
-                    }
-                });
-                Swal.fire('Deleted!', 'The component has been deleted.', 'success');
-                closeDetailPanel();
-                loadAllData();
-            } catch (err) {
-                 Swal.fire('Delete Error', `Could not delete the component. Error: ${err.result.error.message}`, 'error');
-            }
-        }
-        function processAndRenderItems() {
-            if (!gapiInited) return;
-            const searchTerm = dom.search.value.toLowerCase();
-            const deviceFilter = dom.filterDevice.value;
-            const sizeFilter = dom.filterSize.value;
-            const sortBy = dom.sortBy.value;
-
-            filteredItems = allItems.filter(item => {
-                const searchMatch = Object.values(item).join(' ').toLowerCase().includes(searchTerm);
-                const deviceMatch = !deviceFilter || item.device === deviceFilter;
-                const sizeMatch = !sizeFilter || item.size === sizeFilter;
-                return searchMatch && deviceMatch && sizeMatch;
-            });
-
-            // Sorting
-            switch (sortBy) {
-                case 'price-desc':
-                    filteredItems.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0));
-                    break;
-                case 'quantity-asc':
-                    filteredItems.sort((a, b) => (parseInt(a.quantity) || 0) - (parseInt(b.quantity) || 0));
-                    break;
-                case 'model-asc':
-                default:
-                    filteredItems.sort((a, b) => (a.model || '').localeCompare(b.model || ''));
-                    break;
-            }
-            
-            updateAnalytics(allItems); // Analytics should be based on all items, not filtered
-            renderItems();
-        }
-        function renderItems() {
-            if (!gapiInited || !gapi.client || !gapi.client.getToken) return; // FIX: Guard against premature execution
-            dom.searchResults.innerHTML = '';
-            dom.noResults.classList.toggle('hidden', filteredItems.length > 0 || !gapi.client.getToken());
-            dom.searchResults.classList.toggle('hidden', filteredItems.length === 0);
-            
-            const paginatedItems = filteredItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
-            
-            if (paginatedItems.length === 0 && currentPage > 1) { // If on a page that no longer exists
-                currentPage = 1;
-                renderItems();
-                return;
-            }
-
-            if (currentLayout === 'grid') {
-                dom.searchResults.className = 'grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5';
-                paginatedItems.forEach((item, index) => {
-                    const card = createGridCard(item);
-                    dom.searchResults.insertAdjacentHTML('beforeend', card);
-                    const cardEl = dom.searchResults.lastElementChild;
-                    setTimeout(() => cardEl.classList.add('card-enter-active'), index * 50);
-                });
-            } else {
-                dom.searchResults.className = 'space-y-3';
-                paginatedItems.forEach(item => dom.searchResults.insertAdjacentHTML('beforeend', createListCard(item)));
-            }
-            lucide.createIcons();
-            initGalleries();
-            renderPaginationControls();
-        }
-
-        // --- UI & Layout ---
-        function createGridCard(item) {
-            const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
-            const firstImage = getDriveThumbnail(images[0]) || `https://placehold.co/600x400/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=${encodeURIComponent(item.itemName || 'No Image')}`;
-            const quantity = parseInt(item.quantity, 10);
-            const statusColor = quantity > 10 ? 'bg-green-400/10 text-green-300' : quantity > 0 ? 'bg-yellow-400/10 text-yellow-300' : 'bg-red-400/10 text-red-300';
-            const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
-            return `<div class="glass-card rounded-xl overflow-hidden flex flex-col group card-enter">
-                        <div class="relative image-gallery bg-black/10 dark:bg-black/20" data-images="${images.join(',')}">
-                            <img src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-52 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/600x400/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=Invalid+Image';">
-                            ${images.length > 1 ? `<button class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white" data-direction="-1"><i data-lucide="chevron-left"></i></button><button class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
-                            <div class="absolute top-4 right-4 ${statusColor} text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm">${statusText}</div>
-                        </div>
-                        <div class="p-5 flex-grow flex flex-col"><h3 class="font-bold text-[--premium-text-primary] leading-tight">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3><p class="text-sm text-[--premium-text-secondary] mt-1">Price: ₹${item.price || 'N/A'}</p><div class="mt-auto pt-4 text-right"><button class="view-details-btn text-sm font-semibold text-[--premium-accent] hover:text-[--premium-accent-hover]" data-id="${item.id}">View Details &rarr;</button></div></div>
-                    </div>`;
-        }
-        function createListCard(item) {
-            const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://placehold.co/100x100/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=Img`;
-            const quantity = parseInt(item.quantity, 10);
-            const statusColor = quantity > 10 ? 'text-green-500 dark:text-green-400' : quantity > 0 ? 'text-yellow-500 dark:text-yellow-400' : 'text-red-500 dark:text-red-400';
-            return `<div class="list-item rounded-xl p-4 flex items-center gap-4">
-                        <img src="${image}" class="w-16 h-16 rounded-lg object-contain flex-shrink-0 bg-black/10 dark:bg-black/20" onerror="this.onerror=null;this.src='https://placehold.co/100x100/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=Err';">
-                        <div class="flex-1 grid grid-cols-5 gap-4 items-center">
-                            <h3 class="col-span-2 font-semibold text-[--premium-text-primary]">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
-                            <p class="text-[--premium-text-secondary]">₹${item.price || 'N/A'}</p>
-                            <p class="${statusColor} font-medium">${quantity > 0 ? `${quantity} in Stock` : 'Out of Stock'}</p>
-                            <div class="text-right"><button class="view-details-btn text-sm font-semibold text-[--premium-accent] hover:text-[--premium-accent-hover]" data-id="${item.id}">Details</button></div>
-                        </div>
-                    </div>`;
-        }
-        function switchLayout(layout) {
-            currentLayout = layout;
-            localStorage.setItem('layout', layout);
-            if (layout === 'grid') {
-                dom.gridViewBtn.classList.add('bg-[--premium-surface]', 'text-[--premium-accent]');
-                dom.listViewBtn.classList.remove('bg-[--premium-surface]', 'text-[--premium-accent]');
-            } else {
-                dom.listViewBtn.classList.add('bg-[--premium-surface]', 'text-[--premium-accent]');
-                dom.gridViewBtn.classList.remove('bg-[--premium-surface]', 'text-[--premium-accent]');
-            }
-            processAndRenderItems();
-        }
-        function showSkeletonLoader(show) {
-            dom.skeletonLoader.classList.toggle('hidden', !show);
-            dom.searchResults.classList.add('hidden');
-            dom.noResults.classList.add('hidden');
-            if (show) {
-                let skeletonHtml = '';
-                for(let i = 0; i < 10; i++) { skeletonHtml += `<div class="skeleton-card rounded-xl p-4 space-y-4"><div class="h-48 rounded bg-[--premium-border] skeleton-animate"></div><div class="space-y-2"><div class="h-6 w-3/4 rounded bg-[--premium-border] skeleton-animate"></div><div class="h-4 w-1/2 rounded bg-[--premium-border] skeleton-animate"></div></div></div>`; }
-                dom.skeletonLoader.innerHTML = `<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">${skeletonHtml}</div>`;
-            }
-        }
-        function initThemeAndLayout() {
-            if (localStorage.getItem('theme') === 'light') {
-                dom.html.classList.remove('dark');
-            } else {
-                dom.html.classList.add('dark');
-            }
-            const savedLayout = localStorage.getItem('layout');
-            if (savedLayout) {
-                switchLayout(savedLayout);
-            }
-            const analyticsCollapsed = localStorage.getItem('analyticsCollapsed') === 'true';
-            if (analyticsCollapsed) {
-                dom.analyticsWidgets.classList.add('collapsed');
-                dom.analyticsToggleIcon.classList.add('collapsed');
-            }
-        }
-        function toggleTheme() {
-            dom.html.classList.toggle('dark');
-            localStorage.setItem('theme', dom.html.classList.contains('dark') ? 'dark' : 'light');
-        }
-        function getDriveThumbnail(url) {
-            if (!url) return null;
-            const match = url.match(/file\/d\/([a-zA-Z0-9_-]+)/);
-            return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w512-h512` : url;
-        }
-        function initGalleries() {
-            document.querySelectorAll('.image-gallery').forEach(gallery => {
-                const images = (gallery.dataset.images || '').split(',').map(link => link.trim()).filter(Boolean);
-                if (images.length <= 1) return;
-                let currentIndex = 0;
-                const imgElement = gallery.querySelector('.gallery-image');
-                gallery.querySelectorAll('.gallery-arrow').forEach(arrow => {
-                    arrow.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const direction = parseInt(e.currentTarget.dataset.direction);
-                        currentIndex = (currentIndex + direction + images.length) % images.length;
-                        imgElement.src = getDriveThumbnail(images[currentIndex]);
-                    });
-                });
-            });
-        }
-        
-        // --- Modal & Form ---
-        function openAddModal() {
-            dom.formTitle.textContent = 'Add New Component';
-            dom.editId.value = '';
-            dom.partForm.reset();
-            dom.specFieldsContainer.classList.add('hidden');
-            dom.specFields.innerHTML = '';
-            dom.formModal.classList.remove('hidden');
-            dom.formModal.classList.add('flex');
-        }
-        function openEditModal(item) {
-            dom.formTitle.textContent = 'Edit Component';
-            dom.editId.value = item.id;
-            // Populate form
-            dom.partForm.querySelector('#model').value = item.model || '';
-            dom.partForm.querySelector('#device').value = item.device || '';
-            dom.partForm.querySelector('#size').value = item.size || '';
-            dom.itemNameSelect.value = item.itemName || '';
-            dom.partForm.querySelector('#price').value = item.price || '';
-            dom.partForm.querySelector('#quantity').value = item.quantity || '0';
-            dom.imageLinksInput.value = item.imageLinks || '';
-            dom.partForm.querySelector('#note').value = item.note || '';
-
-            updateSpecFields(); // This will show the spec container if needed
-            // Populate spec fields
-            Object.keys(item).forEach(key => {
-                if (key.startsWith('spec_')) {
-                    const input = dom.partForm.querySelector(`[name="${key}"]`);
-                    if (input) input.value = item[key];
-                }
-            });
-
-            dom.formModal.classList.remove('hidden');
-            dom.formModal.classList.add('flex');
-        }
-        function closeFormModal() { 
-            dom.formModal.classList.add('hidden'); dom.formModal.classList.remove('flex');
-            dom.partForm.reset();
-            dom.specFieldsContainer.classList.add('hidden');
-            dom.specFields.innerHTML = '';
-        }
-        function collectFormData() {
-            const formData = {
-                model: dom.partForm.querySelector('#model').value,
-                device: dom.partForm.querySelector('#device').value,
-                size: dom.partForm.querySelector('#size').value,
-                itemName: dom.itemNameSelect.value,
-                price: dom.partForm.querySelector('#price').value,
-                quantity: dom.partForm.querySelector('#quantity').value,
-                imageLinks: dom.imageLinksInput.value,
-                note: dom.partForm.querySelector('#note').value,
-            };
-            dom.partForm.querySelectorAll('#spec-fields input').forEach(input => {
-                formData[input.name] = input.value;
-            });
-            return formData;
-        }
-        function updateSpecFields() {
-            const selectedType = dom.itemNameSelect.value;
-            dom.specFields.innerHTML = '';
-            if (selectedType && specDefinitions[selectedType]) {
-                dom.specFieldsContainer.classList.remove('hidden');
-                specDefinitions[selectedType].forEach(specName => { dom.specFields.appendChild(createSpecInput(specName)); });
-            } else {
-                dom.specFieldsContainer.classList.add('hidden');
-            }
-        }
-        function createSpecInput(specName) {
-            const id = specName.replace(/_/g, '-');
-            const wrapper = document.createElement('div');
-            const label = document.createElement('label');
-            label.htmlFor = id;
-            label.className = 'block text-sm font-medium text-[--premium-text-secondary]';
-            label.textContent = specName.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-            const input = document.createElement('input');
-            input.type = 'text'; input.id = id; input.name = specName;
-            input.className = 'mt-1 block w-full rounded-lg shadow-sm premium-input';
-            wrapper.appendChild(label); wrapper.appendChild(input);
-            return wrapper;
-        }
-
-        // --- Detail Panel ---
-        function handleCardClick(e) {
-            const viewBtn = e.target.closest('.view-details-btn');
-            if (viewBtn) {
-                const card = viewBtn.closest('.glass-card, .list-item');
-                const itemId = viewBtn.dataset.id;
-                const item = allItems.find(i => i.id === itemId);
-                if (item) openDetailPanel(item);
-            }
-        }
-        function openDetailPanel(item) {
-            populateDetailPanel(item);
-            dom.detailModal.classList.remove('hidden');
-            requestAnimationFrame(() => {
-                dom.detailModal.classList.remove('opacity-0', 'scale-95');
-            });
-        }
-        function closeDetailPanel() {
-            dom.detailModal.classList.add('opacity-0', 'scale-95');
-            setTimeout(() => {
-                dom.detailModal.classList.add('hidden');
-            }, 300);
-        }
-        function populateDetailPanel(item) {
-            const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
-            
-            let specsHtml = '';
-            Object.keys(item).forEach(key => {
-                if (key.startsWith('spec_') && item[key]) {
-                    const label = key.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-                    specsHtml += `<div class="flex justify-between py-3 border-b border-[--premium-border]"><dt class="text-[--premium-text-secondary]">${label}</dt><dd class="font-semibold text-[--premium-text-primary]">${item[key]}</dd></div>`;
-                }
-            });
-            if (!specsHtml) specsHtml = '<p class="text-[--premium-text-secondary] text-sm">No specifications provided.</p>';
-
-            dom.detailContent.innerHTML = `
-                <!-- Left Column: Images -->
-                <div class="md:col-span-1 relative image-gallery flex items-center justify-center" data-images="${images.join(',')}" data-current-index="0" style="min-height: 300px;">
-                    ${images.length > 0 ? `
-                        <img src="${getDriveThumbnail(images[0])}" class="gallery-image w-full h-full max-h-[60vh] object-contain rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x400/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=Invalid+Image';">
-                        ${images.length > 1 ? `<button class="detail-gallery-arrow absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white" data-direction="-1"><i data-lucide="chevron-left"></i></button><button class="detail-gallery-arrow absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
-                    ` : `<div class="h-full flex items-center justify-center bg-black/20 rounded-lg text-[--premium-text-secondary]">No Images</div>`}
-                </div>
-                <!-- Right Column: Data -->
-                <div class="md:col-span-1 space-y-6 overflow-y-auto max-h-[70vh] p-2">
-                    <div>
-                        <h3 class="text-3xl font-bold text-[--premium-text-primary]">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
-                        <div class="flex items-center gap-4 mt-4">
-                            <button data-id="${item.id}" class="edit-btn flex-1 bg-indigo-600/10 dark:bg-blue-500/10 text-indigo-600 dark:text-blue-400 font-semibold py-2.5 px-4 rounded-lg hover:bg-indigo-600/20 dark:hover:bg-blue-500/20 transition-colors flex items-center justify-center gap-2"><i data-lucide="edit"></i>Edit</button>
-                            <button data-id="${item.id}" class="delete-btn flex-1 bg-red-600/10 text-red-500 font-semibold py-2.5 px-4 rounded-lg hover:bg-red-600/20 transition-colors flex items-center justify-center gap-2"><i data-lucide="trash-2"></i>Delete</button>
-                        </div>
-                    </div>
-                    <dl class="divide-y divide-[--premium-border] border-t border-[--premium-border]">
-                        <div class="flex justify-between py-3"><dt class="text-[--premium-text-secondary]">Price</dt><dd class="font-semibold text-[--premium-text-primary]">₹${item.price || 'N/A'}</dd></div>
-                        <div class="flex justify-between py-3"><dt class="text-[--premium-text-secondary]">Quantity</dt><dd class="font-semibold text-[--premium-text-primary]">${item.quantity || '0'}</dd></div>
-                        <div class="flex justify-between py-3"><dt class="text-[--premium-text-secondary]">Note</dt><dd class="font-semibold text-[--premium-text-primary] text-right">${item.note || 'None'}</dd></div>
-                    </dl>
-                    <div>
-                        <h4 class="text-lg font-semibold text-[--premium-text-primary] mb-2">Specifications</h4>
-                        <dl>${specsHtml}</dl>
-                    </div>
-                </div>
-            `;
-            lucide.createIcons();
-        }
-        function handleDetailPanelClick(e) {
-            const editBtn = e.target.closest('.edit-btn');
-            const deleteBtn = e.target.closest('.delete-btn');
-            const arrowBtn = e.target.closest('.detail-gallery-arrow');
-
-            if (editBtn) {
-                const itemId = editBtn.dataset.id;
-                const item = allItems.find(i => i.id === itemId);
-                if (item) {
-                    closeDetailPanel();
-                    openEditModal(item);
-                }
-            }
-            if (deleteBtn) {
-                const itemId = deleteBtn.dataset.id;
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, delete it!',
-                    background: 'var(--premium-surface)'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        deleteComponent(itemId);
-                    }
-                });
-            }
-            if (arrowBtn) {
-                const gallery = arrowBtn.closest('.image-gallery');
-                const images = (gallery.dataset.images || '').split(',').map(link => link.trim()).filter(Boolean);
-                if (images.length <= 1) return;
-                
-                let currentIndex = parseInt(gallery.dataset.currentIndex || '0');
-                const direction = parseInt(arrowBtn.dataset.direction);
-                currentIndex = (currentIndex + direction + images.length) % images.length;
-                
-                gallery.querySelector('.gallery-image').src = getDriveThumbnail(images[currentIndex]);
-                gallery.dataset.currentIndex = currentIndex;
-            }
-        }
-        
-        function handleImageNamer(e) {
-            e.preventDefault();
-            const form = e.target;
-            const model = form.querySelector('#namer-model').value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
-            const device = form.querySelector('#namer-device').value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
-            const partName = form.querySelector('#namer-part-name').value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
-            const count = parseInt(form.querySelector('#namer-image-count').value, 10);
-            const output = form.querySelector('#generated-names-output');
-            output.innerHTML = '';
-            for (let i = 1; i <= count; i++) {
-                const fileName = `${model}_${device}_${partName}_${i}.jpg`;
-                const el = document.createElement('div');
-                el.textContent = fileName;
-                el.className = 'p-2 bg-black/20 rounded cursor-pointer hover:bg-white/10';
-                el.onclick = () => { navigator.clipboard.writeText(fileName).then(() => { el.textContent = 'Copied!'; setTimeout(() => el.textContent = fileName, 1000); }); };
-                output.appendChild(el);
-            }
-        }
-        
-        // --- Analytics and Filters ---
-        function populateFilters() {
-            const devices = [...new Set(allItems.map(item => item.device).filter(Boolean))];
-            const sizes = [...new Set(allItems.map(item => item.size).filter(Boolean))];
-            
-            dom.filterDevice.innerHTML = '<option value="">All Devices</option>';
-            devices.forEach(d => dom.filterDevice.innerHTML += `<option value="${d}">${d}</option>`);
-            
-            dom.filterSize.innerHTML = '<option value="">All Sizes</option>';
-            sizes.forEach(s => dom.filterSize.innerHTML += `<option value="${s}">${s}</option>`);
-        }
-
-        function updateAnalytics(items) {
-            document.getElementById('total-components').textContent = items.length;
-            
-            const totalValue = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0), 0);
-            document.getElementById('total-value').textContent = `₹${totalValue.toLocaleString('en-IN')}`;
-
-            const lowStockCount = items.filter(item => (parseInt(item.quantity) || 0) < 5).length;
-            document.getElementById('low-stock').textContent = lowStockCount;
-
-            const deviceCounts = items.reduce((acc, item) => {
-                if (item.device) {
-                    acc[item.device] = (acc[item.device] || 0) + 1;
-                }
-                return acc;
-            }, {});
-            const commonDevice = Object.keys(deviceCounts).reduce((a, b) => deviceCounts[a] > deviceCounts[b] ? a : b, '-');
-            document.getElementById('common-device').textContent = commonDevice;
-        }
-
-        function renderPaginationControls() {
-            const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
-            dom.paginationControls.innerHTML = '';
-            if (totalPages <= 1) return;
-
-            let html = `<button data-page="${currentPage - 1}" class="px-3 py-1 rounded-lg bg-[--premium-surface] border border-[--premium-border]" ${currentPage === 1 ? 'disabled' : ''}>&larr; Prev</button>`;
-            html += `<span class="text-[--premium-text-secondary]">Page ${currentPage} of ${totalPages}</span>`;
-            html += `<button data-page="${currentPage + 1}" class="px-3 py-1 rounded-lg bg-[--premium-surface] border border-[--premium-border]" ${currentPage === totalPages ? 'disabled' : ''}>Next &rarr;</button>`;
-            dom.paginationControls.innerHTML = html;
-        }
-
-        function handlePaginationClick(e) {
-            const button = e.target.closest('button');
-            if (button && !button.disabled) {
-                currentPage = parseInt(button.dataset.page);
-                renderItems();
-            }
-        }
-        
-        // --- View Switching ---
-        function switchView(view) {
-            document.querySelectorAll('.sidebar-nav-link').forEach(l => l.classList.remove('active'));
-            if (view === 'dashboard') {
-                dom.navDashboard.classList.add('active');
-                dom.dashboardView.classList.remove('hidden');
-                dom.reportsView.classList.add('hidden');
-                dom.layoutSwitcher.classList.remove('hidden');
-            } else if (view === 'reports') {
-                dom.navReports.classList.add('active');
-                dom.dashboardView.classList.add('hidden');
-                dom.reportsView.classList.remove('hidden');
-                dom.layoutSwitcher.classList.add('hidden');
-            }
-        }
-        
-        // --- Charting ---
-        function renderReportCharts() {
-            const monthlyRevenue = allSales.reduce((acc, sale) => {
-                const month = new Date(sale.date).toLocaleString('default', { month: 'short', year: 'numeric' });
-                const revenue = sale.quantitySold * sale.salePrice;
-                acc[month] = (acc[month] || 0) + revenue;
-                return acc;
-            }, {});
-
-            const bestSellers = allSales.reduce((acc, sale) => {
-                const item = allItems.find(i => i.id === sale.itemId);
-                if (item) {
-                    const itemName = [item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ');
-                    acc[itemName] = (acc[itemName] || 0) + sale.quantitySold;
-                }
-                return acc;
-            }, {});
-            
-            const sortedBestSellers = Object.entries(bestSellers).sort((a, b) => b[1] - a[1]).slice(0, 5);
-
-            const chartOptions = {
-                plugins: { legend: { labels: { color: 'var(--premium-text-secondary)' } } },
-                scales: {
-                    x: { ticks: { color: 'var(--premium-text-secondary)' }, grid: { color: 'var(--premium-border)' } },
-                    y: { ticks: { color: 'var(--premium-text-secondary)' }, grid: { color: 'var(--premium-border)' } }
-                }
-            };
-
-            if (revenueChart) revenueChart.destroy();
-            revenueChart = new Chart(document.getElementById('revenue-chart'), {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(monthlyRevenue),
-                    datasets: [{
-                        label: 'Monthly Revenue',
-                        data: Object.values(monthlyRevenue),
-                        backgroundColor: 'rgba(99, 102, 241, 0.5)',
-                        borderColor: 'var(--premium-accent)',
-                        borderWidth: 1
-                    }]
-                },
-                options: chartOptions
-            });
-
-            if (bestsellersChart) bestsellersChart.destroy();
-            bestsellersChart = new Chart(document.getElementById('bestsellers-chart'), {
-                type: 'doughnut',
-                data: {
-                    labels: sortedBestSellers.map(item => item[0]),
-                    datasets: [{
-                        label: 'Quantity Sold',
-                        data: sortedBestSellers.map(item => item[1]),
-                        backgroundColor: ['#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe', '#e0e7ff'],
-                    }]
-                },
-                options: { plugins: { legend: { position: 'right', labels: { color: 'var(--premium-text-secondary)' } } } }
-            });
-        }
-        
-        function toggleAnalytics() {
-            const isCollapsed = dom.analyticsWidgets.classList.toggle('collapsed');
-            dom.analyticsToggleIcon.classList.toggle('collapsed', isCollapsed);
-            localStorage.setItem('analyticsCollapsed', isCollapsed);
-        }
-
+    // --- Auth / GAPI init ---
+    async function initializeGapiClient() {
+      // Basic validation to avoid the 401 invalid_client trap
+      if (!CLIENT_ID.endsWith('.apps.googleusercontent.com')) {
+        dom.authWarning.textContent = 'Invalid CLIENT_ID. Use a Web OAuth Client ID that ends with .apps.googleusercontent.com';
+        dom.authWarning.classList.remove('hidden');
+      }
+      try {
+        await gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS });
+        gapiInited = true; maybeEnableButtons();
+      } catch (e) {
+        Swal.fire('Error', 'Failed to initialize Google API client. Check your API key.', 'error');
+      }
+    }
+    function initializeGis() {
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: handleAuthResponse
+      });
+      gisInited = true; maybeEnableButtons();
+    }
+    function maybeEnableButtons() {
+      if (gapiInited && gisInited) {
+        dom.userProfileArea.onclick = handleAuthClick;
+        dom.signInButtonMain.onclick = handleAuthClick;
         lucide.createIcons();
-    });
-    </script>
+      }
+    }
+    function handleAuthResponse(resp) {
+      if (resp && resp.error) {
+        const msg = (resp.error === 'invalid_client') ? 'Invalid OAuth client ID. Replace CLIENT_ID with a valid Web OAuth client ID.' : 'Could not sign in. Please try again.';
+        Swal.fire({ title:'Authentication Error', text: msg, icon:'error', background:'var(--premium-surface)' });
+        updateAuthStatus(false); return;
+      }
+      gapi.client.setToken(resp);
+      updateAuthStatus(true);
+    }
+    function handleAuthClick() {
+      if (!gapiInited || !gisInited) {
+        Swal.fire('Loading...', 'Authentication libraries are still loading. Try again shortly.', 'info');
+        return;
+      }
+      if (gapi.client.getToken() === null) {
+        tokenClient?.requestAccessToken({ prompt: 'consent' });
+      } else {
+        Swal.fire({ title:'Sign Out', text:'Are you sure you want to sign out?', icon:'warning', showCancelButton:true, confirmButtonText:'Yes, sign out', background:'var(--premium-surface)' })
+          .then((r)=>{ if (r.isConfirmed){ gapi.client.setToken(null); updateAuthStatus(false); }});
+      }
+    }
+
+    async function getUserInfo() {
+      const token = gapi.client.getToken()?.access_token;
+      if (!token) throw new Error('No access token');
+      const res = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', { headers: { Authorization: `Bearer ${token}` }});
+      if (!res.ok) throw new Error('Failed to fetch userinfo');
+      return await res.json();
+    }
+
+    async function updateAuthStatus(isSignedIn) {
+      if (isSignedIn) {
+        dom.loginView.classList.add('hidden');
+        dom.appWrapper.classList.remove('hidden');
+        dom.addPartBtn.disabled = false;
+        dom.userProfile.classList.remove('hidden'); dom.userProfile.classList.add('flex');
+        showSkeletonLoader(true);
+        try {
+          const userInfo = await getUserInfo();
+          dom.userName.textContent = userInfo.name || 'User';
+          dom.userDp.src = userInfo.picture || `https://placehold.co/44x44/${'161b22'}/${'8b949e'}?text=U`;
+        } catch (e) {
+          dom.userName.textContent = 'User';
+          dom.userDp.src = `https://placehold.co/44x44/${'161b22'}/${'8b949e'}?text=U`;
+        }
+        loadAllData();
+      } else {
+        dom.loginView.classList.remove('hidden');
+        dom.appWrapper.classList.add('hidden');
+        dom.addPartBtn.disabled = true;
+        dom.userProfile.classList.add('hidden'); dom.userProfile.classList.remove('flex');
+        allItems = []; allSales = []; updateAnalytics([]);
+      }
+    }
+
+    // --- Data load ---
+    async function loadAllData() {
+      showSkeletonLoader(true);
+      try {
+        const [inv, sales] = await Promise.all([
+          gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: INVENTORY_RANGE }),
+          gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: SALES_RANGE })
+        ]);
+
+        const inventoryValues = inv.result.values || [];
+        allItems = (inventoryValues.length > 1)
+          ? inventoryValues.slice(1).map((row, idx) => {
+              const item = inventoryValues[0].reduce((o,h,i)=>({...o,[h]:row[i]}),{});
+              item.rowIndex = idx + 2;
+              return item;
+            }).filter(item => item.id && item.id.trim() !== '')
+          : [];
+
+        const salesValues = sales.result.values || [];
+        allSales = (salesValues.length > 1)
+          ? salesValues.slice(1).map(row => ({
+              itemId: row[0],
+              quantitySold: parseInt(row[1],10),
+              salePrice: parseFloat(row[2]),
+              date: row[3]
+            }))
+          : [];
+      } catch (err) {
+        const msg = err?.result?.error?.message || err.message || 'Unknown error';
+        Swal.fire({ title:'Data Loading Error', text:`Could not load data. Check Sheet ID and permissions. Error: ${msg}`, icon:'error', background:'var(--premium-surface)' });
+        updateAuthStatus(false);
+      } finally {
+        showSkeletonLoader(false);
+        populateFilters();
+        processAndRenderItems();
+        renderReportCharts();
+      }
+    }
+
+    // --- CRUD ---
+    dom.partForm.addEventListener('submit', handleFormSubmit);
+    async function handleFormSubmit(e){ e.preventDefault(); const editId = dom.editId.value; if (editId) await updateComponent(editId); else await addComponent(); }
+    function collectFormData(){
+      const fd = {
+        model: document.querySelector('#model').value,
+        device: document.querySelector('#device').value,
+        size: document.querySelector('#size').value,
+        itemName: dom.itemNameSelect.value,
+        price: document.querySelector('#price').value,
+        quantity: document.querySelector('#quantity').value,
+        imageLinks: dom.imageLinksInput.value,
+        note: document.querySelector('#note').value,
+      };
+      document.querySelectorAll('#spec-fields input').forEach(i => { fd[i.name] = i.value; });
+      return fd;
+    }
+    async function addComponent(){
+      const newItem = collectFormData(); newItem.id = Date.now();
+      const row = COLUMN_HEADERS.map(h => newItem[h] || '');
+      try{
+        await gapi.client.sheets.spreadsheets.values.append({
+          spreadsheetId: SPREADSHEET_ID, range: INVENTORY_RANGE, valueInputOption:'USER_ENTERED', resource:{ values:[row] }
+        });
+        Swal.fire('Success!','Component added successfully.','success');
+        closeFormModal(); loadAllData();
+      }catch(err){
+        Swal.fire('Save Error', `Could not save the component. Error: ${err.result?.error?.message || err.message}`, 'error');
+      }
+    }
+    async function updateComponent(id){
+      const item = allItems.find(x => x.id === id);
+      if (!item) return Swal.fire('Error','Could not find the component to update.','error');
+      const updated = collectFormData(); updated.id = id;
+      const row = COLUMN_HEADERS.map(h => updated[h] || '');
+      const updateRange = `Sheet1!A${item.rowIndex}:AC${item.rowIndex}`;
+      try{
+        await gapi.client.sheets.spreadsheets.values.update({
+          spreadsheetId: SPREADSHEET_ID, range: updateRange, valueInputOption:'USER_ENTERED', resource:{ values:[row] }
+        });
+        Swal.fire('Success!','Component updated successfully.','success');
+        closeFormModal(); loadAllData();
+      }catch(err){
+        Swal.fire('Update Error', `Could not update the component. Error: ${err.result?.error?.message || err.message}`, 'error');
+      }
+    }
+    async function deleteComponent(id){
+      const item = allItems.find(x => x.id === id);
+      if (!item) return Swal.fire('Error','Could not find the component to delete.','error');
+      try{
+        await gapi.client.sheets.spreadsheets.batchUpdate({
+          spreadsheetId: SPREADSHEET_ID,
+          resource:{ requests:[{ deleteDimension:{ range:{ sheetId:0, dimension:'ROWS', startIndex:item.rowIndex-1, endIndex:item.rowIndex }}}] }
+        });
+        Swal.fire('Deleted!','The component has been deleted.','success');
+        closeDetailPanel(); loadAllData();
+      }catch(err){
+        Swal.fire('Delete Error', `Could not delete the component. Error: ${err.result?.error?.message || err.message}`, 'error');
+      }
+    }
+
+    // --- List & Render ---
+    function processAndRenderItems(){
+      if (!gapiInited) return;
+      const searchTerm = dom.search.value.toLowerCase();
+      const deviceFilter = dom.filterDevice.value;
+      const sizeFilter = dom.filterSize.value;
+      const sortBy = dom.sortBy.value;
+
+      filteredItems = allItems.filter(item => {
+        const searchMatch = Object.values(item).join(' ').toLowerCase().includes(searchTerm);
+        const deviceMatch = !deviceFilter || item.device === deviceFilter;
+        const sizeMatch = !sizeFilter || item.size === sizeFilter;
+        return searchMatch && deviceMatch && sizeMatch;
+      });
+
+      switch (sortBy) {
+        case 'price-desc': filteredItems.sort((a,b) => (parseFloat(b.price)||0) - (parseFloat(a.price)||0)); break;
+        case 'quantity-asc': filteredItems.sort((a,b) => (parseInt(a.quantity)||0) - (parseInt(b.quantity)||0)); break;
+        default: filteredItems.sort((a,b) => (a.model||'').localeCompare(b.model||'')); break;
+      }
+
+      updateAnalytics(allItems);
+      renderItems();
+    }
+
+    function renderItems(){
+      if (!gapiInited) return;
+      dom.searchResults.innerHTML = '';
+      dom.noResults.classList.toggle('hidden', filteredItems.length > 0);
+      dom.searchResults.classList.toggle('hidden', filteredItems.length === 0);
+
+      const pageItems = filteredItems.slice((currentPage-1)*ITEMS_PER_PAGE, currentPage*ITEMS_PER_PAGE);
+      if (pageItems.length === 0 && currentPage > 1){ currentPage = 1; return renderItems(); }
+
+      if (currentLayout === 'grid') {
+        dom.searchResults.className = 'grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5';
+        pageItems.forEach((item, idx) => {
+          dom.searchResults.insertAdjacentHTML('beforeend', createGridCard(item));
+          setTimeout(() => dom.searchResults.lastElementChild.classList.add('card-enter-active'), idx*50);
+        });
+      } else {
+        dom.searchResults.className = 'space-y-3';
+        pageItems.forEach(item => dom.searchResults.insertAdjacentHTML('beforeend', createListCard(item)));
+      }
+      lucide.createIcons(); initGalleries(); renderPaginationControls();
+    }
+
+    function createGridCard(item){
+      const images = (item.imageLinks || '').split(',').map(s=>s.trim()).filter(Boolean);
+      const firstImage = getDriveThumbnail(images[0]) || `https://placehold.co/600x400/${dom.html.classList.contains('dark')?'161b22/8b949e':'e5e7eb/4b5563'}?text=${encodeURIComponent(item.itemName||'No Image')}`;
+      const q = parseInt(item.quantity,10);
+      const statusColor = q>10 ? 'bg-green-400/10 text-green-300' : q>0 ? 'bg-yellow-400/10 text-yellow-300' : 'bg-red-400/10 text-red-300';
+      const statusText = q>0 ? `${q} in Stock` : 'Out of Stock';
+      return `<div class="glass-card rounded-xl overflow-hidden flex flex-col group card-enter">
+        <div class="relative image-gallery bg-black/10 dark:bg-black/20" data-images="${images.join(',')}">
+          <img src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-52 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/600x400/${dom.html.classList.contains('dark')?'161b22/8b949e':'e5e7eb/4b5563'}?text=Invalid+Image';">
+          ${images.length>1?`<button class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white" data-direction="-1"><i data-lucide="chevron-left"></i></button><button class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white" data-direction="1"><i data-lucide="chevron-right"></i></button>`:''}
+          <div class="absolute top-4 right-4 ${statusColor} text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm">${statusText}</div>
+        </div>
+        <div class="p-5 flex-grow flex flex-col">
+          <h3 class="font-bold text-[--premium-text-primary] leading-tight">${[item.model,item.device,item.size,item.itemName].filter(Boolean).join(' ')}</h3>
+          <p class="text-sm text-[--premium-text-secondary] mt-1">Price: ₹${item.price||'N/A'}</p>
+          <div class="mt-auto pt-4 text-right"><button class="view-details-btn text-sm font-semibold text-[--premium-accent] hover:text-[--premium-accent-hover]" data-id="${item.id}">View Details &rarr;</button></div>
+        </div>
+      </div>`;
+    }
+    function createListCard(item){
+      const img = getDriveThumbnail((item.imageLinks||'').split(',')[0]) || `https://placehold.co/100x100/${dom.html.classList.contains('dark')?'161b22/8b949e':'e5e7eb/4b5563'}?text=Img`;
+      const q = parseInt(item.quantity,10);
+      const color = q>10?'text-green-500 dark:text-green-400': q>0?'text-yellow-500 dark:text-yellow-400':'text-red-500 dark:text-red-400';
+      return `<div class="list-item rounded-xl p-4 flex items-center gap-4">
+        <img src="${img}" class="w-16 h-16 rounded-lg object-contain flex-shrink-0 bg-black/10 dark:bg-black/20" onerror="this.onerror=null;this.src='https://placehold.co/100x100/${dom.html.classList.contains('dark')?'161b22/8b949e':'e5e7eb/4b5563'}?text=Err';">
+        <div class="flex-1 grid grid-cols-5 gap-4 items-center">
+          <h3 class="col-span-2 font-semibold text-[--premium-text-primary]">${[item.model,item.device,item.size,item.itemName].filter(Boolean).join(' ')}</h3>
+          <p class="text-[--premium-text-secondary]">₹${item.price||'N/A'}</p>
+          <p class="${color} font-medium">${q>0?`${q} in Stock`:'Out of Stock'}</p>
+          <div class="text-right"><button class="view-details-btn text-sm font-semibold text-[--premium-accent] hover:text-[--premium-accent-hover]" data-id="${item.id}">Details</button></div>
+        </div>
+      </div>`;
+    }
+
+    function showSkeletonLoader(show){
+      dom.skeletonLoader.classList.toggle('hidden', !show);
+      dom.searchResults.classList.add('hidden'); dom.noResults.classList.add('hidden');
+      if (show){
+        let s = ''; for(let i=0;i<10;i++){ s += `<div class="skeleton-card rounded-xl p-4 space-y-4"><div class="h-48 rounded bg-[--premium-border]"></div><div class="space-y-2"><div class="h-6 w-3/4 rounded bg-[--premium-border]"></div><div class="h-4 w-1/2 rounded bg-[--premium-border]"></div></div></div>`; }
+        dom.skeletonLoader.innerHTML = `<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">${s}</div>`;
+      }
+    }
+
+    function initThemeAndLayout(){
+      if (localStorage.getItem('theme') === 'light') dom.html.classList.remove('dark'); else dom.html.classList.add('dark');
+      const savedLayout = localStorage.getItem('layout'); if (savedLayout) switchLayout(savedLayout);
+      const c = localStorage.getItem('analyticsCollapsed') === 'true'; if (c){ dom.analyticsWidgets.classList.add('collapsed'); dom.analyticsToggleIcon.classList.add('collapsed'); }
+    }
+    function toggleTheme(){ dom.html.classList.toggle('dark'); localStorage.setItem('theme', dom.html.classList.contains('dark') ? 'dark' : 'light'); }
+
+    function getDriveThumbnail(url){
+      if (!url) return null;
+      // Support multiple Drive URL formats
+      let id = null;
+      const m1 = url.match(/file\/d\/([a-zA-Z0-9_-]+)/);
+      const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (m1) id = m1[1]; else if (m2) id = m2[1];
+      return id ? `https://drive.google.com/thumbnail?id=${id}&sz=w512-h512` : url;
+    }
+    function initGalleries(){
+      document.querySelectorAll('.image-gallery').forEach(g => {
+        const imgs = (g.dataset.images || '').split(',').map(s=>s.trim()).filter(Boolean);
+        if (imgs.length <= 1) return;
+        let i = 0; const imgEl = g.querySelector('.gallery-image');
+        g.querySelectorAll('.gallery-arrow').forEach(a => {
+          a.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const d = parseInt(e.currentTarget.dataset.direction); i = (i + d + imgs.length) % imgs.length;
+            imgEl.src = getDriveThumbnail(imgs[i]);
+          });
+        });
+      });
+    }
+
+    // Modal & Spec fields
+    function openAddModal(){ dom.formTitle.textContent='Add New Component'; dom.editId.value=''; dom.partForm.reset(); dom.specFieldsContainer.classList.add('hidden'); dom.specFields.innerHTML=''; dom.formModal.classList.remove('hidden'); dom.formModal.classList.add('flex'); }
+    function openEditModal(item){
+      dom.formTitle.textContent='Edit Component'; dom.editId.value=item.id;
+      document.querySelector('#model').value = item.model || '';
+      document.querySelector('#device').value = item.device || '';
+      document.querySelector('#size').value = item.size || '';
+      dom.itemNameSelect.value = item.itemName || '';
+      document.querySelector('#price').value = item.price || '';
+      document.querySelector('#quantity').value = item.quantity || '0';
+      dom.imageLinksInput.value = item.imageLinks || '';
+      document.querySelector('#note').value = item.note || '';
+      updateSpecFields();
+      Object.keys(item).forEach(k => { if (k.startsWith('spec_')) { const i = dom.partForm.querySelector(`[name="${k}"]`); if (i) i.value = item[k]; }});
+      dom.formModal.classList.remove('hidden'); dom.formModal.classList.add('flex');
+    }
+    function closeFormModal(){ dom.formModal.classList.add('hidden'); dom.formModal.classList.remove('flex'); dom.partForm.reset(); dom.specFieldsContainer.classList.add('hidden'); dom.specFields.innerHTML=''; }
+    function updateSpecFields(){
+      const t = dom.itemNameSelect.value; dom.specFields.innerHTML='';
+      if (t && specDefinitions[t]){ dom.specFieldsContainer.classList.remove('hidden'); specDefinitions[t].forEach(n => dom.specFields.appendChild(createSpecInput(n))); }
+      else dom.specFieldsContainer.classList.add('hidden');
+    }
+    function createSpecInput(name){
+      const id = name.replace(/_/g,'-'); const w = document.createElement('div');
+      const label = document.createElement('label'); label.htmlFor = id; label.className='block text-sm font-medium text-[--premium-text-secondary]';
+      label.textContent = name.replace('spec_','').replace(/([A-Z])/g,' $1').replace(/^./, s => s.toUpperCase());
+      const input = document.createElement('input'); input.type='text'; input.id=id; input.name=name; input.className='mt-1 block w-full rounded-lg shadow-sm premium-input';
+      w.appendChild(label); w.appendChild(input); return w;
+    }
+
+    // Detail Panel
+    function handleCardClick(e){
+      const btn = e.target.closest('.view-details-btn');
+      if (btn){ const id = btn.dataset.id; const item = allItems.find(i => i.id === id); if (item) openDetailPanel(item); }
+    }
+    function openDetailPanel(item){ populateDetailPanel(item); dom.detailModal.classList.remove('hidden'); requestAnimationFrame(()=>{ dom.detailModal.classList.remove('opacity-0','scale-95'); }); }
+    function closeDetailPanel(){ dom.detailModal.classList.add('opacity-0','scale-95'); setTimeout(()=>{ dom.detailModal.classList.add('hidden'); },300); }
+    function populateDetailPanel(item){
+      const images = (item.imageLinks || '').split(',').map(s=>s.trim()).filter(Boolean);
+      let specsHtml = '';
+      Object.keys(item).forEach(k => {
+        if (k.startsWith('spec_') && item[k]) {
+          const label = k.replace('spec_','').replace(/([A-Z])/g,' $1').replace(/^./, s=>s.toUpperCase());
+          specsHtml += `<div class="flex justify-between py-3 border-b border-[--premium-border]"><dt class="text-[--premium-text-secondary]">${label}</dt><dd class="font-semibold text-[--premium-text-primary]">${item[k]}</dd></div>`;
+        }
+      });
+      if (!specsHtml) specsHtml = '<p class="text-[--premium-text-secondary] text-sm">No specifications provided.</p>';
+      dom.detailContent.innerHTML = `
+        <div class="md:col-span-1 relative image-gallery flex items-center justify-center" data-images="${images.join(',')}" data-current-index="0" style="min-height:300px;">
+          ${images.length>0 ? `
+            <img src="${getDriveThumbnail(images[0])}" class="gallery-image w-full h-full max-h-[60vh] object-contain rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x400/${dom.html.classList.contains('dark')?'161b22/8b949e':'e5e7eb/4b5563'}?text=Invalid+Image';">
+            ${images.length>1?`<button class="detail-gallery-arrow absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white" data-direction="-1"><i data-lucide="chevron-left"></i></button><button class="detail-gallery-arrow absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white" data-direction="1"><i data-lucide="chevron-right"></i></button>`:''}
+          ` : `<div class="h-full flex items-center justify-center bg-black/20 rounded-lg text-[--premium-text-secondary]">No Images</div>`}
+        </div>
+        <div class="md:col-span-1 space-y-6 overflow-y-auto max-h-[70vh] p-2">
+          <div>
+            <h3 class="text-3xl font-bold text-[--premium-text-primary]">${[item.model,item.device,item.size,item.itemName].filter(Boolean).join(' ')}</h3>
+            <div class="flex items-center gap-4 mt-4">
+              <button data-id="${item.id}" class="edit-btn flex-1 bg-indigo-600/10 dark:bg-blue-500/10 text-indigo-600 dark:text-blue-400 font-semibold py-2.5 px-4 rounded-lg hover:bg-indigo-600/20 dark:hover:bg-blue-500/20 transition-colors flex items-center justify-center gap-2"><i data-lucide="edit"></i>Edit</button>
+              <button data-id="${item.id}" class="delete-btn flex-1 bg-red-600/10 text-red-500 font-semibold py-2.5 px-4 rounded-lg hover:bg-red-600/20 transition-colors flex items-center justify-center gap-2"><i data-lucide="trash-2"></i>Delete</button>
+            </div>
+          </div>
+          <dl class="divide-y divide-[--premium-border] border-t border-[--premium-border]">
+            <div class="flex justify-between py-3"><dt class="text-[--premium-text-secondary]">Price</dt><dd class="font-semibold text-[--premium-text-primary]">₹${item.price||'N/A'}</dd></div>
+            <div class="flex justify-between py-3"><dt class="text-[--premium-text-secondary]">Quantity</dt><dd class="font-semibold text-[--premium-text-primary]">${item.quantity||'0'}</dd></div>
+            <div class="flex justify-between py-3"><dt class="text-[--premium-text-secondary]">Note</dt><dd class="font-semibold text-[--premium-text-primary] text-right">${item.note||'None'}</dd></div>
+          </dl>
+          <div>
+            <h4 class="text-lg font-semibold text-[--premium-text-primary] mb-2">Specifications</h4>
+            <dl>${specsHtml}</dl>
+          </div>
+        </div>`;
+      lucide.createIcons();
+    }
+    function handleDetailPanelClick(e){
+      const editBtn = e.target.closest('.edit-btn');
+      const deleteBtn = e.target.closest('.delete-btn');
+      const arrowBtn = e.target.closest('.detail-gallery-arrow');
+      if (editBtn){ const id = editBtn.dataset.id; const item = allItems.find(i=>i.id===id); if (item){ closeDetailPanel(); openEditModal(item);} }
+      if (deleteBtn){ const id = deleteBtn.dataset.id;
+        Swal.fire({ title:'Are you sure?', text:"You won't be able to revert this!", icon:'warning', showCancelButton:true, confirmButtonText:'Yes, delete it!', background:'var(--premium-surface)'})
+          .then(r=>{ if (r.isConfirmed) deleteComponent(id); });
+      }
+      if (arrowBtn){
+        const g = arrowBtn.closest('.image-gallery'); const imgs = (g.dataset.images||'').split(',').map(s=>s.trim()).filter(Boolean);
+        if (imgs.length<=1) return; let i = parseInt(g.dataset.currentIndex||'0'); const d = parseInt(arrowBtn.dataset.direction); i = (i + d + imgs.length) % imgs.length;
+        g.querySelector('.gallery-image').src = getDriveThumbnail(imgs[i]); g.dataset.currentIndex = i;
+      }
+    }
+
+    // Image namer
+    function handleImageNamer(e){
+      e.preventDefault();
+      const f = e.target;
+      const model = f.querySelector('#namer-model').value.toLowerCase().replace(/[^a-z0-9-]/g,'-');
+      const device = f.querySelector('#namer-device').value.toLowerCase().replace(/[^a-z0-9-]/g,'-');
+      const part = f.querySelector('#namer-part-name').value.toLowerCase().replace(/[^a-z0-9-]/g,'-');
+      const count = parseInt(f.querySelector('#namer-image-count').value,10);
+      const out = f.querySelector('#generated-names-output'); out.innerHTML='';
+      for (let i=1;i<=count;i++){
+        const name = `${model}_${device}_${part}_${i}.jpg`;
+        const el = document.createElement('div'); el.textContent=name; el.className='p-2 bg-black/20 rounded cursor-pointer hover:bg-white/10';
+        el.onclick = ()=>{ navigator.clipboard.writeText(name).then(()=>{ el.textContent='Copied!'; setTimeout(()=> el.textContent=name, 1000); }); };
+        out.appendChild(el);
+      }
+    }
+
+    // Filters & Analytics
+    function populateFilters(){
+      const devices = [...new Set(allItems.map(i => i.device).filter(Boolean))];
+      const sizes = [...new Set(allItems.map(i => i.size).filter(Boolean))];
+      dom.filterDevice.innerHTML = '<option value="">All Devices</option>'; devices.forEach(d => dom.filterDevice.innerHTML += `<option value="${d}">${d}</option>`);
+      dom.filterSize.innerHTML = '<option value="">All Sizes</option>'; sizes.forEach(s => dom.filterSize.innerHTML += `<option value="${s}">${s}</option>`);
+    }
+
+    function updateAnalytics(items){
+      document.getElementById('total-components').textContent = items.length;
+      const totalValue = items.reduce((s,i)=> s + (parseFloat(i.price)||0) * (parseInt(i.quantity)||0), 0);
+      document.getElementById('total-value').textContent = `₹${totalValue.toLocaleString('en-IN')}`;
+      const low = items.filter(i => (parseInt(i.quantity)||0) < 5).length;
+      document.getElementById('low-stock').textContent = low;
+      const deviceCounts = items.reduce((a,i)=>{ if (i.device){ a[i.device]=(a[i.device]||0)+1; } return a; },{});
+      const common = Object.keys(deviceCounts).reduce((a,b)=> deviceCounts[a]>deviceCounts[b]?a:b, '-') || '-';
+      document.getElementById('common-device').textContent = common;
+    }
+
+    function renderPaginationControls(){
+      const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+      dom.paginationControls.innerHTML = ''; if (totalPages <= 1) return;
+      let html = `<button data-page="${currentPage-1}" class="px-3 py-1 rounded-lg bg-[--premium-surface] border border-[--premium-border]" ${currentPage===1?'disabled':''}>&larr; Prev</button>`;
+      html += `<span class="text-[--premium-text-secondary]">Page ${currentPage} of ${totalPages}</span>`;
+      html += `<button data-page="${currentPage+1}" class="px-3 py-1 rounded-lg bg-[--premium-surface] border border-[--premium-border]" ${currentPage===totalPages?'disabled':''}>Next &rarr;</button>`;
+      dom.paginationControls.innerHTML = html;
+    }
+    function handlePaginationClick(e){ const b = e.target.closest('button'); if (b && !b.disabled){ currentPage = parseInt(b.dataset.page); renderItems(); } }
+
+    // Views
+    function switchView(view){
+      document.querySelectorAll('.sidebar-nav-link').forEach(l => l.classList.remove('active'));
+      if (view==='dashboard'){ dom.navDashboard.classList.add('active'); dom.dashboardView.classList.remove('hidden'); dom.reportsView.classList.add('hidden'); dom.layoutSwitcher.classList.remove('hidden'); }
+      else { dom.navReports.classList.add('active'); dom.dashboardView.classList.add('hidden'); dom.reportsView.classList.remove('hidden'); dom.layoutSwitcher.classList.add('hidden'); }
+    }
+
+    // Charts
+    function renderReportCharts(){
+      const monthlyRevenue = allSales.reduce((acc,s) => {
+        const m = new Date(s.date).toLocaleString('default',{month:'short', year:'numeric'});
+        const rev = s.quantitySold * s.salePrice; acc[m] = (acc[m]||0) + rev; return acc;
+      }, {});
+      const best = allSales.reduce((acc,s) => {
+        const item = allItems.find(i=>i.id===s.itemId);
+        if (item){ const name = [item.model,item.device,item.size,item.itemName].filter(Boolean).join(' '); acc[name] = (acc[name]||0) + s.quantitySold; }
+        return acc;
+      }, {});
+      const top = Object.entries(best).sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+      const commonOptions = {
+        plugins:{ legend:{ labels:{ color:'var(--premium-text-secondary)' } } },
+        scales:{ x:{ ticks:{ color:'var(--premium-text-secondary)' }, grid:{ color:'var(--premium-border)' } },
+                y:{ ticks:{ color:'var(--premium-text-secondary)' }, grid:{ color:'var(--premium-border)' } } }
+      };
+
+      if (revenueChart) revenueChart.destroy();
+      revenueChart = new Chart(document.getElementById('revenue-chart'), {
+        type:'bar',
+        data:{ labels:Object.keys(monthlyRevenue), datasets:[{ label:'Monthly Revenue', data:Object.values(monthlyRevenue), backgroundColor:'rgba(99,102,241,.5)', borderColor:'var(--premium-accent)', borderWidth:1 }]},
+        options: commonOptions
+      });
+
+      if (bestsellersChart) bestsellersChart.destroy();
+      bestsellersChart = new Chart(document.getElementById('bestsellers-chart'), {
+        type:'doughnut',
+        data:{ labels:top.map(t=>t[0]), datasets:[{ label:'Quantity Sold', data:top.map(t=>t[1]), backgroundColor:['#6366f1','#818cf8','#a5b4fc','#c7d2fe','#e0e7ff'] }]},
+        options:{ plugins:{ legend:{ position:'right', labels:{ color:'var(--premium-text-secondary)' } } } }
+      });
+    }
+
+    function toggleAnalytics(){
+      const c = dom.analyticsWidgets.classList.toggle('collapsed');
+      dom.analyticsToggleIcon.classList.toggle('collapsed', c);
+      localStorage.setItem('analyticsCollapsed', c);
+    }
+
+    lucide.createIcons();
+  });
+  </script>
 </body>
 </html>
