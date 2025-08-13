@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vinayaka Industries | Component Database</title>
+    <title>Vin ustries | Component Database</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -428,6 +428,10 @@
             updateAuthStatus(true);
         }
         function handleAuthClick() {
+            if (!gapiInited || !gisInited) {
+                Swal.fire('Loading...', 'Authentication libraries are still loading. Please try again in a moment.', 'info');
+                return;
+            }
             if (gapi.client.getToken() === null) {
                 tokenClient?.requestAccessToken({ prompt: 'consent' });
             } else {
@@ -570,6 +574,7 @@
             }
         }
         function processAndRenderItems() {
+            if (!gapiInited) return;
             const searchTerm = dom.search.value.toLowerCase();
             const deviceFilter = dom.filterDevice.value;
             const sizeFilter = dom.filterSize.value;
@@ -600,6 +605,7 @@
             renderItems();
         }
         function renderItems() {
+            if (!gapiInited || !gapi.client) return; // FIX: Guard against premature execution
             dom.searchResults.innerHTML = '';
             dom.noResults.classList.toggle('hidden', filteredItems.length > 0 || !gapi.client.getToken());
             dom.searchResults.classList.toggle('hidden', filteredItems.length === 0);
