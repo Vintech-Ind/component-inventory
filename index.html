@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vin ustries | Component Database</title>
+    <title>Vinayaka Industries | Component Database</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
@@ -136,7 +137,20 @@
 </head>
 <body class="antialiased">
 
-    <div class="relative min-h-screen">
+    <div id="login-view" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-8">
+        <div class="text-center">
+            <div class="inline-block bg-indigo-500 p-4 rounded-2xl shadow-inner mb-6">
+                <i data-lucide="gem" class="w-12 h-12 text-white"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-[--premium-text-primary]">Welcome to Vinayaka DB</h1>
+            <p class="text-lg text-[--premium-text-secondary] mt-2 mb-8">Your intelligent component inventory.</p>
+            <button id="signin-button-main" class="bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-indigo-500 transition-all">
+                Sign In with Google
+            </button>
+        </div>
+    </div>
+
+    <div id="app-wrapper" class="relative min-h-screen hidden">
         <!-- Sidebar -->
         <aside class="sidebar fixed top-0 left-0 w-[var(--sidebar-width)] z-40 flex flex-col">
             <div class="flex items-center gap-4 p-5 h-[var(--header-height)]">
@@ -169,7 +183,7 @@
                         <img id="user-dp" class="w-11 h-11 rounded-full" src="" alt="User">
                         <div>
                             <p id="user-name" class="font-semibold text-[--premium-text-primary]"></p>
-                            <p class="text-xs text-green-400 font-medium">Online</p>
+                            <p id="user-role" class="text-xs text-green-400 font-medium">Online</p>
                         </div>
                     </div>
                 </div>
@@ -221,7 +235,6 @@
                         </div>
                     </div>
                 
-                    <div id="auth-required-main" class="text-center py-16 glass-card rounded-xl"><i data-lucide="lock" class="w-16 h-16 mx-auto text-[--premium-text-secondary]"></i><h3 class="mt-4 text-2xl font-bold text-[--premium-text-primary]">Authentication Required</h3><p class="mt-2 text-[--premium-text-secondary] mb-6">Please sign in to load and manage your component data.</p><button id="signin-button-main" class="bg-indigo-600 text-white font-semibold py-2.5 px-6 rounded-lg shadow-md hover:bg-indigo-500 transition-all">Sign In with Google</button></div>
                     <div id="skeleton-loader" class="hidden"></div>
                     <div id="searchResults" class="hidden"></div>
                     <div id="no-results" class="hidden text-center py-16 glass-card rounded-xl"><i data-lucide="search-x" class="w-16 h-16 mx-auto text-[--premium-text-secondary]"></i><h3 class="mt-4 text-2xl font-bold text-[--premium-text-primary]">No Components Found</h3><p class="mt-2 text-[--premium-text-secondary]">Your database is empty or your search returned no results.</p></div>
@@ -319,15 +332,16 @@
 
         const dom = {
             html: document.documentElement,
+            appWrapper: document.getElementById('app-wrapper'),
+            loginView: document.getElementById('login-view'),
             addPartBtn: document.getElementById('addPartBtn'),
             searchResults: document.getElementById('searchResults'),
             noResults: document.getElementById('no-results'),
-            authRequiredMain: document.getElementById('auth-required-main'),
             userProfileArea: document.getElementById('user-profile-area'),
-            authRequiredProfile: document.getElementById('auth-required-profile'),
             userProfile: document.getElementById('user-profile'),
             userDp: document.getElementById('user-dp'),
             userName: document.getElementById('user-name'),
+            userRole: document.getElementById('user-role'),
             signInButtonMain: document.getElementById('signin-button-main'),
             partForm: document.getElementById('partForm'),
             formTitle: document.getElementById('form-title'),
@@ -440,12 +454,13 @@
             }
         }
         async function updateAuthStatus(isSignedIn) {
-            dom.addPartBtn.disabled = !isSignedIn;
-            dom.authRequiredMain.classList.toggle('hidden', isSignedIn);
-            dom.authRequiredProfile.classList.toggle('hidden', isSignedIn);
-            dom.userProfile.classList.toggle('hidden', !isSignedIn);
-            dom.userProfile.classList.toggle('flex', isSignedIn);
             if (isSignedIn) {
+                dom.loginView.classList.add('hidden');
+                dom.appWrapper.classList.remove('hidden');
+                dom.addPartBtn.disabled = false;
+                dom.userProfile.classList.remove('hidden');
+                dom.userProfile.classList.add('flex');
+                
                 showSkeletonLoader(true);
                 try {
                     const userInfo = await gapi.client.oauth2.userinfo.get();
@@ -457,9 +472,11 @@
                 }
                 loadAllData();
             } else {
-                showSkeletonLoader(false);
-                dom.searchResults.classList.add('hidden');
-                dom.noResults.classList.add('hidden');
+                dom.loginView.classList.remove('hidden');
+                dom.appWrapper.classList.add('hidden');
+                dom.addPartBtn.disabled = true;
+                dom.userProfile.classList.add('hidden');
+                dom.userProfile.classList.remove('flex');
                 allItems = [];
                 allSales = [];
                 updateAnalytics([]);
