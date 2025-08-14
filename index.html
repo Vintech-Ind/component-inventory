@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vinayaka  | Component Database</title>
+    <title>Vinayaka Industries | Component Database</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -203,6 +203,9 @@
                 <a href="#" id="nav-reports" class="sidebar-nav-link flex items-center gap-3 px-3 py-2.5 rounded-md">
                     <i data-lucide="bar-chart-2" class="w-5 h-5"></i><span>Reports</span>
                 </a>
+                <a href="#" id="nav-library" class="sidebar-nav-link flex items-center gap-3 px-3 py-2.5 rounded-md">
+                    <i data-lucide="folder-images" class="w-5 h-5"></i><span>Image Library</span>
+                </a>
             </nav>
 
             <div class="p-3 border-t border-t-[var(--border-primary)]">
@@ -229,8 +232,11 @@
                          <i data-lucide="rotate-cw" class="w-5 h-5"></i>
                      </button>
                      <div id="layout-switcher" class="flex items-center gap-1 bg-gray-200 p-1 rounded-md border border-[var(--border-primary)]">
-                         <button id="grid-view-btn" class="p-1.5 rounded-sm bg-white text-black shadow-sm"><i data-lucide="layout-grid"></i></button>
-                         <button id="list-view-btn" class="p-1.5 rounded-sm text-gray-500"><i data-lucide="list"></i></button>
+                         <button id="grid-view-btn" class="p-1.5 rounded-sm bg-white text-black shadow-sm" title="Grid View"><i data-lucide="layout-grid"></i></button>
+                         <button id="list-view-btn" class="p-1.5 rounded-sm text-gray-500" title="List View"><i data-lucide="list"></i></button>
+                         <button id="kanban-view-btn" class="p-1.5 rounded-sm text-gray-500" title="Kanban View"><i data-lucide="columns"></i></button>
+                         <button id="table-view-btn" class="p-1.5 rounded-sm text-gray-500" title="Table View"><i data-lucide="table"></i></button>
+                         <button id="compact-view-btn" class="p-1.5 rounded-sm text-gray-500" title="Compact View"><i data-lucide="layout-dashboard"></i></button>
                      </div>
                      <button id="addPartBtn" class="btn btn-primary" disabled>
                          <i data-lucide="plus" class="w-5 h-5"></i><span class="hidden sm:inline">Add Component</span>
@@ -293,6 +299,12 @@
                         <div class="brutalist-card p-6"><h3 class="font-semibold mb-4">Best Selling Items (by Quantity)</h3><canvas id="bestsellers-chart"></canvas></div>
                     </div>
                 </div>
+
+                <!-- Image Library View -->
+                <div id="library-view" class="hidden">
+                    <h2 class="text-3xl font-extrabold mb-4">Image Library</h2>
+                    <div id="library-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
+                </div>
             </div>
         </main>
     </div>
@@ -339,9 +351,10 @@
     window.onload = () => {
         const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
         const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com';
-        const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
-        const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile";
+        const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4", "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
+        const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/drive.readonly";
         const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ'; 
+        const IMAGE_FOLDER_ID = '1o3i8aVtpFb2EZd4-014OrxPB1H6ncGu0';
         const INVENTORY_RANGE = 'Sheet1!A:AC';
         const SALES_RANGE = 'SalesLog!A:D';
 
@@ -384,6 +397,9 @@
             sidebar: document.querySelector('.sidebar'),
             gridViewBtn: document.getElementById('grid-view-btn'),
             listViewBtn: document.getElementById('list-view-btn'),
+            kanbanViewBtn: document.getElementById('kanban-view-btn'),
+            tableViewBtn: document.getElementById('table-view-btn'),
+            compactViewBtn: document.getElementById('compact-view-btn'),
             detailModal: document.getElementById('detail-modal'),
             detailBackdrop: document.getElementById('detail-backdrop'),
             detailContent: document.getElementById('detail-content'),
@@ -394,8 +410,11 @@
             paginationControls: document.getElementById('pagination-controls'),
             navDashboard: document.getElementById('nav-dashboard'),
             navReports: document.getElementById('nav-reports'),
+            navLibrary: document.getElementById('nav-library'),
             dashboardView: document.getElementById('dashboard-view'),
             reportsView: document.getElementById('reports-view'),
+            libraryView: document.getElementById('library-view'),
+            libraryGrid: document.getElementById('library-grid'),
             layoutSwitcher: document.getElementById('layout-switcher'),
             toggleValueVisibility: document.getElementById('toggle-value-visibility'),
             refreshBtn: document.getElementById('refresh-btn'),
@@ -427,6 +446,9 @@
         dom.itemNameSelect.addEventListener('change', updateSpecFields);
         dom.gridViewBtn.addEventListener('click', () => switchLayout('grid'));
         dom.listViewBtn.addEventListener('click', () => switchLayout('list'));
+        dom.kanbanViewBtn.addEventListener('click', () => switchLayout('kanban'));
+        dom.tableViewBtn.addEventListener('click', () => switchLayout('table'));
+        dom.compactViewBtn.addEventListener('click', () => switchLayout('compact'));
         dom.detailCloseBtn.addEventListener('click', closeDetailPanel);
         dom.detailBackdrop.addEventListener('click', closeDetailPanel);
         dom.searchResults.addEventListener('click', handleCardClick);
@@ -434,6 +456,7 @@
         dom.paginationControls.addEventListener('click', handlePaginationClick);
         dom.navDashboard.addEventListener('click', (e) => { e.preventDefault(); switchView('dashboard'); });
         dom.navReports.addEventListener('click', (e) => { e.preventDefault(); switchView('reports'); });
+        dom.navLibrary.addEventListener('click', (e) => { e.preventDefault(); switchView('library'); });
         dom.toggleValueVisibility.addEventListener('click', toggleValueVisibility);
         dom.refreshBtn.addEventListener('click', loadAllData);
 
@@ -664,9 +687,16 @@
             if (currentLayout === 'grid') {
                 dom.searchResults.className = 'grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5';
                 paginatedItems.forEach(item => dom.searchResults.insertAdjacentHTML('beforeend', createGridCard(item)));
-            } else {
+            } else if (currentLayout === 'list') {
                 dom.searchResults.className = 'space-y-3';
                 paginatedItems.forEach(item => dom.searchResults.insertAdjacentHTML('beforeend', createListCard(item)));
+            } else if (currentLayout === 'kanban') {
+                renderKanbanView();
+            } else if (currentLayout === 'table') {
+                renderTableView();
+            } else if (currentLayout === 'compact') {
+                dom.searchResults.className = 'grid gap-4 grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10';
+                paginatedItems.forEach(item => dom.searchResults.insertAdjacentHTML('beforeend', createCompactCard(item)));
             }
             lucide.createIcons();
             renderPaginationControls();
@@ -707,16 +737,76 @@
                         </div>
                     </div>`;
         }
+        function createCompactCard(item) {
+            const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://placehold.co/100x100/E9ECEF/6C757D?text=Img`;
+            return `<div class="brutalist-card text-center p-2 group">
+                        <img src="${image}" class="w-full h-20 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/100x100/E9ECEF/6C757D?text=Err';">
+                        <p class="text-xs font-semibold mt-2 truncate">${item.model || item.itemName}</p>
+                        <button class="view-details-btn absolute inset-0" data-id="${item.id}"></button>
+                    </div>`;
+        }
+        function renderKanbanView() {
+            const statuses = {
+                'In Stock': items => parseInt(items.quantity) > 10,
+                'Low Stock': items => parseInt(items.quantity) > 0 && parseInt(items.quantity) <= 10,
+                'Out of Stock': items => parseInt(items.quantity) === 0,
+            };
+            let html = '<div class="grid grid-cols-1 md:grid-cols-3 gap-6">';
+            for (const status in statuses) {
+                html += `<div class="bg-gray-100 rounded-lg p-3">
+                            <h3 class="font-bold mb-3 px-2">${status}</h3>
+                            <div class="space-y-3">`;
+                const itemsInStatus = filteredItems.filter(statuses[status]);
+                itemsInStatus.forEach(item => {
+                    html += `<div class="brutalist-card p-3 text-sm">
+                                <p class="font-bold">${item.model || item.itemName}</p>
+                                <p class="text-xs text-gray-500">${item.device || ''}</p>
+                                <button class="view-details-btn absolute inset-0" data-id="${item.id}"></button>
+                            </div>`;
+                });
+                html += `</div></div>`;
+            }
+            html += '</div>';
+            dom.searchResults.innerHTML = html;
+        }
+        function renderTableView() {
+            let html = `<div class="overflow-x-auto brutalist-card"><table class="w-full text-sm text-left">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="p-3">Model</th>
+                                    <th class="p-3">Item Name</th>
+                                    <th class="p-3">Device</th>
+                                    <th class="p-3">Price</th>
+                                    <th class="p-3">Quantity</th>
+                                    <th class="p-3"></th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+            filteredItems.forEach(item => {
+                html += `<tr class="border-b border-gray-200 hover:bg-gray-50">
+                            <td class="p-3 font-semibold">${item.model || ''}</td>
+                            <td class="p-3">${item.itemName || ''}</td>
+                            <td class="p-3">${item.device || ''}</td>
+                            <td class="p-3">₹${item.price || 'N/A'}</td>
+                            <td class="p-3">${item.quantity || '0'}</td>
+                            <td class="p-3 text-right"><button class="view-details-btn text-sm font-semibold text-[var(--text-primary)] hover:text-[var(--accent-primary)]" data-id="${item.id}">Details</button></td>
+                        </tr>`;
+            });
+            html += `</tbody></table></div>`;
+            dom.searchResults.innerHTML = html;
+        }
         function switchLayout(layout) {
             currentLayout = layout;
             localStorage.setItem('layout', layout);
-            if (layout === 'grid') {
-                dom.gridViewBtn.classList.add('bg-white', 'text-black', 'shadow-sm');
-                dom.listViewBtn.classList.remove('bg-white', 'text-black', 'shadow-sm');
-            } else {
-                dom.listViewBtn.classList.add('bg-white', 'text-black', 'shadow-sm');
-                dom.gridViewBtn.classList.remove('bg-white', 'text-black', 'shadow-sm');
-            }
+            
+            ['grid', 'list', 'kanban', 'table', 'compact'].forEach(l => {
+                const btn = dom[`${l}ViewBtn`];
+                if (l === layout) {
+                    btn.classList.add('bg-white', 'text-black', 'shadow-sm');
+                } else {
+                    btn.classList.remove('bg-white', 'text-black', 'shadow-sm');
+                }
+            });
             processAndRenderItems();
         }
         function showSkeletonLoader(show) {
@@ -730,10 +820,8 @@
             }
         }
         function initLayout() {
-            const savedLayout = localStorage.getItem('layout');
-            if (savedLayout) {
-                switchLayout(savedLayout);
-            }
+            const savedLayout = localStorage.getItem('layout') || 'grid';
+            switchLayout(savedLayout);
         }
         function getDriveThumbnail(url) {
             if (!url) return null;
@@ -1057,16 +1145,62 @@
         // --- View Switching ---
         function switchView(view) {
             document.querySelectorAll('.sidebar-nav-link').forEach(l => l.classList.remove('active'));
+            ['dashboard', 'reports', 'library'].forEach(v => {
+                dom[`${v}View`].classList.add('hidden');
+            });
+
             if (view === 'dashboard') {
                 dom.navDashboard.classList.add('active');
                 dom.dashboardView.classList.remove('hidden');
-                dom.reportsView.classList.add('hidden');
                 dom.layoutSwitcher.classList.remove('hidden');
             } else if (view === 'reports') {
                 dom.navReports.classList.add('active');
-                dom.dashboardView.classList.add('hidden');
                 dom.reportsView.classList.remove('hidden');
                 dom.layoutSwitcher.classList.add('hidden');
+            } else if (view === 'library') {
+                dom.navLibrary.classList.add('active');
+                dom.libraryView.classList.remove('hidden');
+                dom.layoutSwitcher.classList.add('hidden');
+                loadLibraryImages();
+            }
+        }
+
+        async function loadLibraryImages() {
+            dom.libraryGrid.innerHTML = '<p class="text-gray-500">Loading images...</p>';
+            try {
+                const response = await gapi.client.drive.files.list({
+                    q: `'${IMAGE_FOLDER_ID}' in parents and mimeType contains 'image/'`,
+                    fields: 'files(id, name, webViewLink, thumbnailLink)',
+                    pageSize: 100
+                });
+                const files = response.result.files;
+                if (files && files.length > 0) {
+                    let html = '';
+                    files.forEach(file => {
+                        const whatsappLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(file.webViewLink)}`;
+                        html += `<div class="brutalist-card p-2">
+                                    <img src="${file.thumbnailLink.replace('s220', 's400')}" class="w-full h-32 object-cover rounded-sm">
+                                    <p class="text-xs font-semibold truncate mt-2">${file.name}</p>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <a href="${whatsappLink}" target="_blank" class="flex-1 btn btn-secondary btn-icon !p-1.5" title="Share to WhatsApp"><i data-lucide="share-2" class="w-4 h-4"></i></a>
+                                        <button class="copy-link-btn flex-1 btn btn-secondary btn-icon !p-1.5" data-link="${file.webViewLink}" title="Copy Link"><i data-lucide="link" class="w-4 h-4"></i></button>
+                                    </div>
+                                </div>`;
+                    });
+                    dom.libraryGrid.innerHTML = html;
+                    lucide.createIcons();
+                    dom.libraryGrid.querySelectorAll('.copy-link-btn').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            navigator.clipboard.writeText(btn.dataset.link);
+                            Swal.fire({ title: 'Copied!', text: 'Image link copied to clipboard.', icon: 'success', timer: 1500, showConfirmButton: false });
+                        });
+                    });
+                } else {
+                    dom.libraryGrid.innerHTML = '<p class="text-gray-500">No images found in the folder.</p>';
+                }
+            } catch (err) {
+                dom.libraryGrid.innerHTML = '<p class="text-red-500">Error loading images. Check folder permissions.</p>';
+                console.error("Error loading library images:", err);
             }
         }
         
