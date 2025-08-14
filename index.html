@@ -156,6 +156,7 @@
         .swal2-popup { font-family: var(--font-body); background-color: var(--bg-secondary) !important; color: var(--text-primary) !important; }
         .swal2-title { color: var(--text-primary) !important; font-weight: 700; }
         .swal2-confirm { background-color: var(--accent-primary) !important; color: var(--text-primary) !important; font-weight: 600; }
+        .swal2-confirm.swal2-styled.swal2-default-outline:focus { box-shadow: none !important; }
 
         /* --- Responsive & Layout --- */
         @media (max-width: 1024px) {
@@ -195,9 +196,6 @@
                 </a>
                 <a href="#" id="nav-reports" class="sidebar-nav-link flex items-center gap-3 px-3 py-2.5 rounded-md">
                     <i data-lucide="bar-chart-2" class="w-5 h-5"></i><span>Reports</span>
-                </a>
-                <a href="#" id="imageNamerBtn" class="sidebar-nav-link flex items-center gap-3 px-3 py-2.5 rounded-md">
-                    <i data-lucide="tag" class="w-5 h-5"></i><span>Image Namer</span>
                 </a>
             </nav>
 
@@ -239,7 +237,13 @@
                         <h2 class="text-2xl font-extrabold mb-4">Analytics Overview</h2>
                         <div id="analytics-widgets" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                             <div class="brutalist-card p-5"><p class="text-sm font-medium text-[var(--text-secondary)]">Total Components</p><p id="total-components" class="text-4xl font-extrabold mt-2">0</p></div>
-                            <div class="brutalist-card p-5"><p class="text-sm font-medium text-[var(--text-secondary)]">Total Inventory Value</p><p id="total-value" class="text-4xl font-extrabold mt-2">₹0</p></div>
+                            <div class="brutalist-card p-5">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-sm font-medium text-[var(--text-secondary)]">Total Inventory Value</p>
+                                    <button id="toggle-value-visibility" class="text-gray-400 hover:text-gray-600"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                                </div>
+                                <p id="total-value" class="text-4xl font-extrabold mt-2 transition-all duration-300">₹0</p>
+                            </div>
                             <div class="brutalist-card p-5"><p class="text-sm font-medium text-[var(--text-secondary)]">Items Low on Stock</p><p id="low-stock" class="text-4xl font-extrabold text-red-600 mt-2">0</p></div>
                             <div class="brutalist-card p-5"><p class="text-sm font-medium text-[var(--text-secondary)]">Most Common Device</p><p id="common-device" class="text-4xl font-extrabold mt-2">-</p></div>
                         </div>
@@ -316,21 +320,6 @@
         </div>
     </div>
     
-    <!-- Image Namer Modal -->
-    <div id="imageNamerModal" class="modal-backdrop hidden fixed inset-0 z-50 justify-center items-center p-4">
-        <div class="brutalist-card w-full max-w-lg m-4">
-            <div class="flex justify-between items-center p-5 border-b border-[var(--border-primary)]"><h2 class="text-2xl font-bold">Image Name Generator</h2><button type="button" id="closeNamerModalBtn" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"><i data-lucide="x" class="w-6 h-6"></i></button></div>
-            <form id="imageNamerForm" class="p-6 space-y-4">
-                <div><label for="namer-model">Model*</label><input type="text" id="namer-model" required placeholder="e.g., EX 200" class="brutalist-input"></div>
-                <div><label for="namer-device">Device*</label><input type="text" id="namer-device" required placeholder="e.g., Travel Device" class="brutalist-input"></div>
-                <div><label for="namer-part-name">Part Name*</label><input type="text" id="namer-part-name" required placeholder="e.g., Shaft" class="brutalist-input"></div>
-                <div><label for="namer-image-count">Number of Images*</label><input type="number" id="namer-image-count" required value="1" min="1" class="brutalist-input"></div>
-                <div class="pt-4"><h3 class="text-lg font-semibold mb-2">Generated Names</h3><div id="generated-names-output" class="p-3 bg-gray-100 rounded-md space-y-2 text-sm font-mono h-32 overflow-y-auto border border-gray-200"></div></div>
-                <div class="flex justify-end"><button type="submit" class="btn btn-primary">Generate</button></div>
-            </form>
-        </div>
-    </div>
-    
     <script src="https://apis.google.com/js/api.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -385,10 +374,6 @@
             detailBackdrop: document.getElementById('detail-backdrop'),
             detailContent: document.getElementById('detail-content'),
             detailCloseBtn: document.getElementById('detail-close-btn'),
-            imageNamerBtn: document.getElementById('imageNamerBtn'),
-            imageNamerModal: document.getElementById('imageNamerModal'),
-            closeNamerModalBtn: document.getElementById('closeNamerModalBtn'),
-            imageNamerForm: document.getElementById('imageNamerForm'),
             filterDevice: document.getElementById('filter-device'),
             filterSize: document.getElementById('filter-size'),
             sortBy: document.getElementById('sort-by'),
@@ -398,6 +383,7 @@
             dashboardView: document.getElementById('dashboard-view'),
             reportsView: document.getElementById('reports-view'),
             layoutSwitcher: document.getElementById('layout-switcher'),
+            toggleValueVisibility: document.getElementById('toggle-value-visibility'),
         };
 
         const COLUMN_HEADERS = ['id', 'model', 'device', 'size', 'itemName', 'price', 'quantity', 'imageLinks', 'note', 'spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_width', 'spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_splineOd', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'];
@@ -430,12 +416,10 @@
         dom.detailBackdrop.addEventListener('click', closeDetailPanel);
         dom.searchResults.addEventListener('click', handleCardClick);
         dom.detailContent.addEventListener('click', handleDetailPanelClick);
-        dom.imageNamerBtn.addEventListener('click', () => dom.imageNamerModal.classList.remove('hidden'));
-        dom.closeNamerModalBtn.addEventListener('click', () => dom.imageNamerModal.classList.add('hidden'));
-        dom.imageNamerForm.addEventListener('submit', handleImageNamer);
         dom.paginationControls.addEventListener('click', handlePaginationClick);
         dom.navDashboard.addEventListener('click', (e) => { e.preventDefault(); switchView('dashboard'); });
         dom.navReports.addEventListener('click', (e) => { e.preventDefault(); switchView('reports'); });
+        dom.toggleValueVisibility.addEventListener('click', toggleValueVisibility);
 
         // --- Core Functions ---
         async function initializeGapiClient() {
@@ -841,22 +825,34 @@
         function populateDetailPanel(item) {
             const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
             
+            const specKeys = Object.keys(item)
+                .filter(key => key.startsWith('spec_') && item[key])
+                .sort((a, b) => {
+                    const aIsTeeth = a.toLowerCase().includes('teeth');
+                    const bIsTeeth = b.toLowerCase().includes('teeth');
+                    if (aIsTeeth && !bIsTeeth) return -1;
+                    if (!aIsTeeth && bIsTeeth) return 1;
+                    return a.localeCompare(b);
+                });
+
             let specsHtml = '';
-            Object.keys(item).forEach(key => {
-                if (key.startsWith('spec_') && item[key]) {
-                    const label = key.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-                    specsHtml += `<div class="flex justify-between py-2.5 border-b border-[var(--border-primary)]"><dt class="text-[var(--text-secondary)]">${label}</dt><dd class="font-semibold">${item[key]}</dd></div>`;
-                }
+            specKeys.forEach(key => {
+                const label = key.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                specsHtml += `<div class="flex justify-between py-2.5 border-b border-[var(--border-primary)]"><dt class="text-[var(--text-secondary)]">${label}</dt><dd class="font-semibold">${item[key]}</dd></div>`;
             });
-            if (!specsHtml) specsHtml = '<p class="text-[var(--text-secondary)] text-sm mt-2">No specifications provided.</p>';
+            if (specKeys.length === 0) specsHtml = '<p class="text-[var(--text-secondary)] text-sm mt-2">No specifications provided.</p>';
 
             dom.detailContent.innerHTML = `
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <!-- Left Column: Images & Key Info -->
                     <div class="lg:col-span-1 space-y-6">
-                         <div class="relative flex items-center justify-center bg-gray-100 rounded-md border border-gray-200 min-h-[250px]">
+                         <div id="detail-gallery-container" class="relative flex items-center justify-center bg-gray-100 rounded-md border border-gray-200 min-h-[250px]" data-images="${images.join(',')}" data-current-index="0">
                             ${images.length > 0 ? `
                                 <img src="${getDriveThumbnail(images[0])}" class="w-full h-full max-h-[40vh] object-contain rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/600x400/E9ECEF/6C757D?text=Invalid+Image';">
+                                ${images.length > 1 ? `
+                                <button class="detail-gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1.5 bg-white/50 hover:bg-white/90 backdrop-blur-sm rounded-full text-black shadow-md" data-direction="-1"><i data-lucide="chevron-left" class="pointer-events-none"></i></button>
+                                <button class="detail-gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-white/50 hover:bg-white/90 backdrop-blur-sm rounded-full text-black shadow-md" data-direction="1"><i data-lucide="chevron-right" class="pointer-events-none"></i></button>
+                                ` : ''}
                             ` : `<div class="flex items-center justify-center text-[var(--text-secondary)]">No Images</div>`}
                         </div>
                         <div>
@@ -902,6 +898,21 @@
         function handleDetailPanelClick(e) {
             const editBtn = e.target.closest('.edit-btn');
             const deleteBtn = e.target.closest('.delete-btn');
+            const arrowBtn = e.target.closest('.detail-gallery-arrow');
+
+            if (arrowBtn) {
+                const gallery = arrowBtn.closest('#detail-gallery-container');
+                const imgEl = gallery.querySelector('img');
+                const images = (gallery.dataset.images || '').split(',');
+                if (images.length <= 1) return;
+                
+                let currentIndex = parseInt(gallery.dataset.currentIndex || '0');
+                const direction = parseInt(arrowBtn.dataset.direction);
+                currentIndex = (currentIndex + direction + images.length) % images.length;
+                
+                imgEl.src = getDriveThumbnail(images[currentIndex]);
+                gallery.dataset.currentIndex = currentIndex;
+            }
 
             if (editBtn) {
                 const itemId = editBtn.dataset.id;
@@ -914,35 +925,29 @@
             if (deleteBtn) {
                 const itemId = deleteBtn.dataset.id;
                 Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
+                    title: 'Do you want to delete this item?',
+                    text: "This action cannot be undone.",
+                    icon: 'question',
                     showCancelButton: true,
-                    confirmButtonText: 'Yes, delete it!',
+                    confirmButtonText: 'Yes, delete it',
+                    cancelButtonText: 'Cancel'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        deleteComponent(itemId);
+                        Swal.fire({
+                            title: 'Are you absolutely sure?',
+                            text: "This is your final confirmation. The item will be permanently deleted.",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes, I am sure',
+                            confirmButtonColor: '#d33',
+                            cancelButtonText: 'No, take me back'
+                        }).then((finalResult) => {
+                            if (finalResult.isConfirmed) {
+                                deleteComponent(itemId);
+                            }
+                        });
                     }
                 });
-            }
-        }
-        
-        function handleImageNamer(e) {
-            e.preventDefault();
-            const form = e.target;
-            const model = form.querySelector('#namer-model').value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
-            const device = form.querySelector('#namer-device').value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
-            const partName = form.querySelector('#namer-part-name').value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
-            const count = parseInt(form.querySelector('#namer-image-count').value, 10);
-            const output = form.querySelector('#generated-names-output');
-            output.innerHTML = '';
-            for (let i = 1; i <= count; i++) {
-                const fileName = `${model}_${device}_${partName}_${i}.jpg`;
-                const el = document.createElement('div');
-                el.textContent = fileName;
-                el.className = 'p-2 bg-white rounded cursor-pointer hover:bg-amber-100 border border-transparent hover:border-amber-300';
-                el.onclick = () => { navigator.clipboard.writeText(fileName).then(() => { el.textContent = 'Copied!'; setTimeout(() => el.textContent = fileName, 1000); }); };
-                output.appendChild(el);
             }
         }
         
@@ -964,8 +969,16 @@
             const totalValue = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0), 0);
             document.getElementById('total-value').textContent = `₹${totalValue.toLocaleString('en-IN')}`;
 
+            const lowStockEl = document.getElementById('low-stock');
             const lowStockCount = items.filter(item => (parseInt(item.quantity) || 0) < 5).length;
-            document.getElementById('low-stock').textContent = lowStockCount;
+            lowStockEl.textContent = lowStockCount;
+            if (lowStockCount === 0) {
+                lowStockEl.classList.remove('text-red-600');
+                lowStockEl.classList.add('text-green-600');
+            } else {
+                lowStockEl.classList.remove('text-green-600');
+                lowStockEl.classList.add('text-red-600');
+            }
 
             const deviceCounts = items.reduce((acc, item) => {
                 if (item.device) {
@@ -996,6 +1009,18 @@
             }
         }
         
+        function toggleValueVisibility() {
+            const valueEl = document.getElementById('total-value');
+            const iconEl = dom.toggleValueVisibility.querySelector('i');
+            valueEl.classList.toggle('blur-sm');
+            if (valueEl.classList.contains('blur-sm')) {
+                iconEl.setAttribute('data-lucide', 'eye-off');
+            } else {
+                iconEl.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
         // --- View Switching ---
         function switchView(view) {
             document.querySelectorAll('.sidebar-nav-link').forEach(l => l.classList.remove('active'));
