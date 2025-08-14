@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Industries | Component Database</title>
+    <title>Vinayaka Industries | Component Database</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,7 +30,7 @@
             --premium-text-secondary: #8b949e;
             --premium-accent: #6366f1; /* Electric Indigo */
             --premium-accent-glow: rgba(99, 102, 241, 0.5);
-            --premium-surface-solid: #1e242a;
+            --premium-surface-solid: #161b22;
         }
         
         html:not(.dark) {
@@ -163,6 +163,7 @@
     </div>
 
     <div id="app-wrapper" class="relative min-h-screen hidden">
+        <!-- Sidebar -->
         <aside class="sidebar fixed top-0 left-0 w-[var(--sidebar-width)] z-40 flex flex-col">
             <div class="flex items-center gap-4 p-5 h-[var(--header-height)]">
                 <div class="bg-indigo-500 p-2.5 rounded-lg shadow-inner"><i data-lucide="gem" class="w-6 h-6 text-white"></i></div>
@@ -208,6 +209,7 @@
             </div>
         </aside>
 
+        <!-- Main Content -->
         <main class="main-content flex-1 flex flex-col min-h-screen">
             <header class="sticky top-0 z-30 h-[var(--header-height)] flex items-center justify-between p-4 lg:p-8">
                 <div class="flex items-center gap-2">
@@ -225,7 +227,9 @@
             </header>
 
             <div id="app" class="max-w-screen-2xl w-full p-4 sm:p-6 lg:p-8">
+                <!-- Dashboard View -->
                 <div id="dashboard-view">
+                    <!-- Analytics Section -->
                     <div class="mb-8">
                         <div id="analytics-toggle" class="flex justify-between items-center cursor-pointer mb-4">
                             <h2 class="text-2xl font-bold text-[--premium-text-primary]">Analytics Overview</h2>
@@ -239,6 +243,7 @@
                         </div>
                     </div>
 
+                    <!-- Filters and Search -->
                     <div class="glass-card rounded-xl p-4 mb-8">
                         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                             <div class="md:col-span-2"><div class="relative"><i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[--premium-text-secondary]"></i><input type="text" id="search" placeholder="Search by model, item name, brand, MPN..." class="w-full pl-12 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[--premium-accent] transition shadow-sm premium-input"></div></div>
@@ -252,9 +257,11 @@
                     <div id="searchResults" class="hidden"></div>
                     <div id="no-results" class="hidden text-center py-16 glass-card rounded-xl"><i data-lucide="search-x" class="w-16 h-16 mx-auto text-[--premium-text-secondary]"></i><h3 class="mt-4 text-2xl font-bold text-[--premium-text-primary]">No Components Found</h3><p class="mt-2 text-[--premium-text-secondary]">Your database is empty or your search returned no results.</p></div>
                 
+                    <!-- Pagination -->
                     <div id="pagination-controls" class="flex justify-center items-center gap-4 mt-8"></div>
                 </div>
 
+                <!-- Reports View -->
                 <div id="reports-view" class="hidden space-y-8">
                     <h2 class="text-3xl font-bold text-[--premium-text-primary]">Sales & Inventory Reports</h2>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -266,11 +273,13 @@
         </main>
     </div>
 
+    <!-- Add/Edit Modal -->
     <div id="formModal" class="modal-backdrop hidden fixed inset-0 z-50 justify-center items-center p-4">
         <div class="glass-card border border-[--premium-border] rounded-xl shadow-2xl w-full max-w-4xl m-4 max-h-[90vh] flex flex-col">
             <div class="flex justify-between items-center p-6 border-b border-[--premium-border]"><h2 id="form-title" class="text-2xl font-bold text-[--premium-text-primary]">Add New Component</h2><button type="button" id="closeFormModalBtn" class="text-[--premium-text-secondary] hover:text-[--premium-text-primary] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
             <form id="partForm" class="p-6 space-y-6 overflow-y-auto">
                 <input type="hidden" id="edit-id">
+                <!-- MODIFIED: Added Brand, MPN, Material, Weight to form -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div><label for="model" class="block text-sm font-medium text-[--premium-text-secondary]">Model*</label><input type="text" id="model" required class="mt-1 block w-full rounded-lg shadow-sm premium-input"></div>
                     <div><label for="device" class="block text-sm font-medium text-[--premium-text-secondary]">Device</label><select id="device" class="mt-1 block w-full rounded-lg shadow-sm premium-input"><option value="">(None)</option><option value="SWING DEVICE">Swing Device</option><option value="TRAVEL DEVICE">Travel Device</option></select></div>
@@ -293,6 +302,7 @@
         </div>
     </div>
 
+    <!-- ===== DETAIL MODAL (COMPLETELY REBUILT) ===== -->
     <div id="detail-modal" class="detail-modal fixed inset-0 z-50 justify-center items-start p-4 hidden opacity-0 scale-95 overflow-y-auto">
         <div class="fixed inset-0 bg-black/70 backdrop-blur-md" id="detail-backdrop"></div>
         <div class="relative bg-[--premium-surface-solid] w-full max-w-7xl rounded-2xl border border-[--premium-border] shadow-2xl my-8">
@@ -300,10 +310,12 @@
                  <button id="detail-close-btn" class="p-2 text-[--premium-text-secondary] hover:text-[--premium-text-primary] rounded-full hover:bg-white/5 transition-colors"><i data-lucide="x"></i></button>
             </div>
             <div id="detail-content" class="p-6 sm:p-8 lg:p-10">
-                </div>
+                <!-- Content will be injected here by populateDetailPanel() -->
+            </div>
         </div>
     </div>
     
+    <!-- Image Namer Modal -->
     <div id="imageNamerModal" class="modal-backdrop hidden fixed inset-0 z-50 justify-center items-center p-4">
         <div class="glass-card border border-[--premium-border] rounded-xl shadow-2xl w-full max-w-lg m-4">
             <div class="flex justify-between items-center p-6 border-b border-[--premium-border]"><h2 class="text-2xl font-bold text-[--premium-text-primary]">Image Name Generator</h2><button type="button" id="closeNamerModalBtn" class="text-[--premium-text-secondary] hover:text-[--premium-text-primary] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
@@ -326,7 +338,7 @@
         const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
         const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile";
         const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ'; 
-        const INVENTORY_RANGE = 'Sheet1!A:AC';
+        const INVENTORY_RANGE = 'Sheet1!A:AG'; // MODIFIED: Range extended for new columns
         const SALES_RANGE = 'SalesLog!A:D';
 
         let allItems = [];
@@ -569,7 +581,7 @@
             const updatedItem = collectFormData();
             updatedItem.id = id; // Preserve original ID
             const updatedRow = COLUMN_HEADERS.map(header => updatedItem[header] || "");
-            const updateRange = `Sheet1!A${itemToUpdate.rowIndex}:AC${itemToUpdate.rowIndex}`;
+            const updateRange = `Sheet1!A${itemToUpdate.rowIndex}:AG${itemToUpdate.rowIndex}`; // MODIFIED: Range extended
             try {
                 await gapi.client.sheets.spreadsheets.values.update({
                     spreadsheetId: SPREADSHEET_ID,
@@ -921,7 +933,7 @@
             // Create image thumbnails for the gallery
             let thumbnailsHtml = images.map((img, index) => `
                 <button class="detail-thumbnail-btn rounded-lg overflow-hidden border-2 ${index === 0 ? 'border-[--premium-accent]' : 'border-transparent'}" data-index="${index}">
-                    <img src="${getDriveThumbnail(img)}" class="w-16 h-16 object-cover">
+                    <img src="${getDriveThumbnail(img).replace('&sz=w1024-h1024', '&sz=w128-h128')}" class="w-16 h-16 object-cover">
                 </button>
             `).join('');
 
@@ -931,6 +943,7 @@
 
             dom.detailContent.innerHTML = `
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 xl:gap-12">
+                <!-- Left Column: Visuals -->
                 <div class="lg:col-span-2">
                     <div class="mb-4 border-b border-[--premium-border]">
                         <nav class="-mb-px flex gap-6">
@@ -940,6 +953,7 @@
                     </div>
 
                     <div id="detail-visuals-content">
+                        <!-- Photos Tab Content -->
                         <div id="tab-content-photos">
                             <div class="aspect-square bg-black/10 dark:bg-black/20 rounded-lg flex items-center justify-center mb-4">
                                 <img id="detail-main-image" src="${images.length > 0 ? getDriveThumbnail(images[0]) : `https://placehold.co/600x600/${dom.html.classList.contains('dark') ? '161b22/8b949e' : 'e5e7eb/4b5563'}?text=No+Image`}" class="max-w-full max-h-full object-contain">
@@ -948,6 +962,7 @@
                                 ${thumbnailsHtml}
                             </div>
                         </div>
+                        <!-- Schematics Tab Content (Hidden by default) -->
                         <div id="tab-content-schematics" class="hidden">
                             <div class="aspect-square bg-black/10 dark:bg-black/20 rounded-lg flex items-center justify-center text-center p-4">
                                 <p class="text-[--premium-text-secondary]">Technical Drawing for<br>${item.itemName}</p>
@@ -956,13 +971,16 @@
                     </div>
                 </div>
 
+                <!-- Right Column: Information -->
                 <div class="lg:col-span-3">
+                    <!-- Header -->
                     <div class="pb-4 border-b border-[--premium-border]">
                         <p class="font-semibold text-indigo-400 mb-1">${item.brand || 'Generic'}</p>
                         <h2 class="text-3xl font-bold text-[--premium-text-primary]">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h2>
                         <p class="text-[--premium-text-secondary] mt-1">Part No: ${item.mpn || 'N/A'}</p>
                     </div>
 
+                    <!-- Stock and Price -->
                     <div class="flex items-center justify-between gap-4 py-4 my-4 bg-black/10 dark:bg-black/20 rounded-lg px-6">
                         <div>
                              <p class="text-sm text-[--premium-text-secondary]">Price</p>
@@ -975,12 +993,14 @@
                         </div>
                     </div>
 
+                    <!-- Actions -->
                     <div class="grid grid-cols-3 gap-3 my-6">
                         <button data-id="${item.id}" class="add-to-quote-btn col-span-3 sm:col-span-1 bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-indigo-500 transition-all flex items-center justify-center gap-2"><i data-lucide="plus-circle"></i>Add to Quote</button>
                         <button data-id="${item.id}" class="edit-btn bg-black/10 dark:bg-white/10 text-[--premium-text-primary] font-semibold py-3 px-4 rounded-lg hover:bg-black/20 dark:hover:bg-white/20 transition-all flex items-center justify-center gap-2"><i data-lucide="edit"></i>Edit</button>
                         <button data-id="${item.id}" class="delete-btn text-red-500 border border-red-500/50 font-semibold py-3 px-4 rounded-lg hover:bg-red-500 hover:text-white hover:border-red-500 transition-all flex items-center justify-center gap-2"><i data-lucide="trash-2"></i>Delete</button>
                     </div>
                     
+                    <!-- Accordion-like Sections -->
                     <div class="space-y-4">
                         <div class="border border-[--premium-border] rounded-lg">
                            <h3 class="text-lg font-semibold p-4 border-b border-[--premium-border]">Technical Specifications</h3>
@@ -1037,7 +1057,7 @@
             if (thumbnailBtn) {
                 const mainImage = document.getElementById('detail-main-image');
                 if (mainImage) {
-                    mainImage.src = thumbnailBtn.querySelector('img').src.replace('w16-h16', 'w1024-h1024'); // Get high-res
+                    mainImage.src = thumbnailBtn.querySelector('img').src.replace('&sz=w128-h128', '&sz=w1024-h1024'); // Get high-res
                 }
                 // Update active state for thumbnail
                 document.querySelectorAll('.detail-thumbnail-btn').forEach(btn => btn.classList.remove('border-[--premium-accent]'));
