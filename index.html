@@ -427,16 +427,25 @@
         // --- Initial Setup ---
         initLayout();
         
+        // This function is called when the GAPI script is loaded
         function gapiLoaded() {
             gapi.load('client', initializeGapiClient);
         }
-        gapiLoaded();
 
+        // This function is called when the GIS script is loaded
         function gisLoaded() {
-            tokenClient = google.accounts.oauth2.initTokenClient({ client_id: CLIENT_ID, scope: SCOPES, callback: handleAuthResponse });
-            gisInited = true; maybeEnableButtons();
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: handleAuthResponse,
+            });
+            gisInited = true;
+            maybeEnableButtons();
         }
-        gisLoaded();
+
+        // Make functions available globally for script onload callbacks
+        window.gapiLoaded = gapiLoaded;
+        window.gisLoaded = gisLoaded;
 
         function initializeGapiClient() {
             gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS })
