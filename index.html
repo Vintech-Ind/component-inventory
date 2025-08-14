@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Industries | Component Database</title>
+    <title>Vinayaka Industries | Component Database</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -246,6 +246,12 @@
                             </div>
                             <div class="brutalist-card p-5"><p class="text-sm font-medium text-[var(--text-secondary)]">Items Low on Stock</p><p id="low-stock" class="text-4xl font-extrabold text-red-600 mt-2">0</p></div>
                             <div class="brutalist-card p-5"><p class="text-sm font-medium text-[var(--text-secondary)]">Most Common Device</p><p id="common-device" class="text-4xl font-extrabold mt-2">-</p></div>
+                            <!-- New Analytics Widgets -->
+                            <div class="brutalist-card p-5 md:col-span-2">
+                                <p class="text-sm font-medium text-[var(--text-secondary)]">Most Profitable Item</p>
+                                <p id="most-profitable" class="text-2xl xl:text-3xl font-extrabold mt-2 truncate">-</p>
+                            </div>
+                             <div class="brutalist-card p-5"><p class="text-sm font-medium text-[var(--text-secondary)]">Dust Collectors</p><p id="dust-collectors" class="text-4xl font-extrabold mt-2">0</p></div>
                         </div>
                     </div>
 
@@ -483,7 +489,7 @@
                 dom.userProfile.classList.remove('flex');
                 allItems = [];
                 allSales = [];
-                updateAnalytics([]);
+                updateAnalytics([], []);
             }
         }
         async function loadAllData() {
@@ -622,7 +628,7 @@
                     break;
             }
             
-            updateAnalytics(allItems); // Analytics should be based on all items, not filtered
+            updateAnalytics(allItems, allSales); // Analytics should be based on all items, not filtered
             renderItems();
         }
         function renderItems() {
@@ -963,7 +969,7 @@
             sizes.forEach(s => dom.filterSize.innerHTML += `<option value="${s}">${s}</option>`);
         }
 
-        function updateAnalytics(items) {
+        function updateAnalytics(items, sales) {
             document.getElementById('total-components').textContent = items.length;
             
             const totalValue = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0), 0);
@@ -988,6 +994,24 @@
             }, {});
             const commonDevice = Object.keys(deviceCounts).reduce((a, b) => deviceCounts[a] > deviceCounts[b] ? a : b, '-');
             document.getElementById('common-device').textContent = commonDevice;
+
+            // Most Profitable Item
+            const revenueByItem = sales.reduce((acc, sale) => {
+                const item = items.find(i => i.id === sale.itemId);
+                if (item) {
+                    const revenue = (sale.quantitySold || 0) * (sale.salePrice || 0);
+                    const itemName = [item.model, item.device, item.itemName].filter(Boolean).join(' ');
+                    acc[itemName] = (acc[itemName] || 0) + revenue;
+                }
+                return acc;
+            }, {});
+            const mostProfitable = Object.entries(revenueByItem).sort((a, b) => b[1] - a[1])[0];
+            document.getElementById('most-profitable').textContent = mostProfitable ? `${mostProfitable[0]} (₹${mostProfitable[1].toLocaleString('en-IN')})` : '-';
+
+            // Dust Collectors (Items with no sales)
+            const soldItemIds = new Set(sales.map(s => s.itemId));
+            const dustCollectorsCount = items.filter(item => !soldItemIds.has(item.id)).length;
+            document.getElementById('dust-collectors').textContent = dustCollectorsCount;
         }
 
         function renderPaginationControls() {
