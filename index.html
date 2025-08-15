@@ -1,1321 +1,855 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Vinayaka Industries | Component Database</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vinayaka Industries | Component Database</title>
 
-    <!-- Libraries -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- UI libs -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <style>
-        /* --- BRUTALIST INDUSTRIAL THEME --- */
-        :root {
-            --bg-primary: #F8F9FA;
-            --bg-secondary: #FFFFFF;
-            --bg-tertiary: #E9ECEF;
-            --text-primary: #212529;
-            --text-secondary: #6C757D;
-            --border-primary: #DEE2E6;
-            --border-secondary: #CED4DA;
-            --accent-primary: #FFC107; /* Industrial Yellow */
-            --accent-primary-darker: #E0A800;
-            --font-body: 'Inter', sans-serif;
-            --sidebar-width: 260px;
-            --header-height: 70px;
-        }
+  <style>
+    :root{
+      --bg-primary:#F8F9FA; --bg-secondary:#FFFFFF; --bg-tertiary:#E9ECEF;
+      --text-primary:#212529; --text-secondary:#6C757D;
+      --border-primary:#DEE2E6; --border-secondary:#CED4DA;
+      --accent-primary:#FFC107; --accent-primary-darker:#E0A800;
+      --font-body:'Inter',sans-serif; --sidebar-width:260px; --header-height:70px;
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font-body);background:var(--bg-primary);color:var(--text-primary)}
+    .main-content{transition:padding-left .3s cubic-bezier(.4,0,.2,1);padding-left:calc(var(--sidebar-width) + 1rem)}
+    h1,h2,h3{font-weight:800} h4,h5,h6{font-weight:700}
+    .sidebar{background:var(--bg-secondary);border-right:1px solid var(--border-primary);transition:transform .3s cubic-bezier(.4,0,.2,1);height:100vh}
+    .sidebar-nav-link{color:var(--text-secondary);font-weight:500;transition:.1s}
+    .sidebar-nav-link:hover{background:var(--bg-tertiary);color:var(--text-primary)}
+    .sidebar-nav-link.active{background:var(--accent-primary);color:var(--text-primary);font-weight:600}
+    .brutalist-card{background:var(--bg-secondary);border:1px solid var(--border-primary);border-radius:4px;transition:.2s}
+    .brutalist-card:hover{transform:translateY(-4px);border-color:var(--accent-primary);box-shadow:0 8px 16px -4px rgba(33,37,41,.08)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-weight:600;padding:.6rem 1.25rem;border-radius:4px;transition:.1s;cursor:pointer}
+    .btn-primary{background:var(--accent-primary);color:var(--text-primary);border:1px solid var(--accent-primary-darker);border-bottom:3px solid var(--accent-primary-darker)}
+    .btn-primary:hover{transform:translateY(-2px);border-bottom-width:5px;background:#ffca2c}
+    .btn-primary:active{transform:translateY(0);border-bottom-width:3px}
+    .btn-primary:disabled{background:#E9ECEF;color:#ADB5BD;border-color:#DEE2E6;border-bottom-color:#DEE2E6;cursor:not-allowed}
+    .btn-secondary{background:var(--bg-secondary);color:var(--text-secondary);border:1px solid var(--border-primary)}
+    .btn-secondary:hover{border-color:var(--text-primary);color:var(--text-primary)}
+    .btn-icon{padding:.5rem}.btn-icon:hover{background:var(--bg-tertiary)}
+    .brutalist-input,.brutalist-select{background:transparent;border:none;border-bottom:2px solid var(--border-secondary);border-radius:0;padding:8px 0;width:100%;font-weight:500;transition:border-color .2s}
+    .brutalist-input:focus,.brutalist-select:focus{outline:none;border-bottom-color:var(--accent-primary)}
+    label{font-size:.875rem;font-weight:500;color:var(--text-secondary)}
+    .modal-backdrop{background:rgba(0,0,0,.5);backdrop-filter:blur(4px)}
+    .swal2-popup{font-family:var(--font-body);background:var(--bg-secondary)!important;color:var(--text-primary)!important}
+    .swal2-title{color:var(--text-primary)!important;font-weight:700}
+    .swal2-confirm{background:var(--accent-primary)!important;color:var(--text-primary)!important;font-weight:600}
+    @media (max-width:1024px){.main-content{padding-left:1rem}.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}}
+  </style>
 
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: var(--font-body);
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        .main-content {
-            transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            padding-left: calc(var(--sidebar-width) + 1rem);
-        }
-        h1, h2, h3 { font-weight: 800; color: var(--text-primary); }
-        h4, h5, h6 { font-weight: 700; color: var(--text-primary); }
+  <script>
+    /* ===== GOOGLE AUTH BOOTSTRAP (GLOBAL) =====
+       Define these in the global scope so the <script onload="..."> can find them. */
+    let gapiInited = false;
+    let gisInited = false;
+    let tokenClient;
 
-        /* --- Sidebar --- */
-        .sidebar {
-            background-color: var(--bg-secondary);
-            border-right: 1px solid var(--border-primary);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            height: 100vh;
-        }
-        .sidebar-nav-link {
-            color: var(--text-secondary);
-            font-weight: 500;
-            transition: background-color 0.1s, color 0.1s;
-        }
-        .sidebar-nav-link:hover { background-color: var(--bg-tertiary); color: var(--text-primary); }
-        .sidebar-nav-link.active {
-            background-color: var(--accent-primary);
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-        .sidebar-nav-link.active:hover { background-color: var(--accent-primary-darker); }
+    const API_KEY   = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
+    const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com';
+    const DISCOVERY_DOCS = [
+      "https://sheets.googleapis.com/$discovery/rest?version=v4",
+      "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest",
+      "https://www.googleapis.com/discovery/v1/apis/oauth2/v2/rest"
+    ];
+    const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/drive.readonly";
 
-        /* --- Cards --- */
-        .brutalist-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-primary);
-            border-radius: 4px;
-            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-        }
-        .brutalist-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--accent-primary);
-            box-shadow: 0 8px 16px -4px rgba(33, 37, 41, 0.08);
-        }
+    // Called by https://apis.google.com/js/api.js
+    function gapiLoaded(){
+      gapi.load('client', async () => {
+        try{
+          await gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS });
+          gapiInited = true;
+        }catch(e){ console.error('GAPI init error', e); }
+      });
+    }
 
-        /* --- Buttons --- */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            padding: 0.6rem 1.25rem;
-            border-radius: 4px;
-            transition: transform 0.1s, border-bottom-width 0.1s, background-color 0.1s;
-            cursor: pointer;
-        }
-        .btn-primary {
-            background-color: var(--accent-primary);
-            color: var(--text-primary);
-            border: 1px solid var(--accent-primary-darker);
-            border-bottom: 3px solid var(--accent-primary-darker);
-        }
-        .btn-primary:hover { transform: translateY(-2px); border-bottom-width: 5px; background-color: #ffca2c; }
-        .btn-primary:active { transform: translateY(0); border-bottom-width: 3px; }
-        .btn-primary:disabled { background-color: #E9ECEF; color: #ADB5BD; border-color: #DEE2E6; border-bottom-color: #DEE2E6; cursor: not-allowed; }
-        .btn-secondary { background-color: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border-primary); }
-        .btn-secondary:hover { border-color: var(--text-primary); color: var(--text-primary); }
-        .btn-icon { padding: 0.5rem; }
-        .btn-icon:hover { background-color: var(--bg-tertiary); }
+    // Called by https://accounts.google.com/gsi/client
+    function gisLoaded(){
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: (resp) => handleAuthResponse(resp),
+      });
+      gisInited = true;
+    }
 
-        /* --- Forms & Inputs --- */
-        .brutalist-input, .brutalist-select {
-            background-color: transparent;
-            border: none;
-            border-bottom: 2px solid var(--border-secondary);
-            border-radius: 0;
-            padding: 8px 0;
-            width: 100%;
-            font-weight: 500;
-            transition: border-color 0.2s;
-        }
-        .brutalist-input:focus, .brutalist-select:focus { outline: none; border-bottom-color: var(--accent-primary); }
-        label { font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); }
+    // Make sure they exist on window (some hosts lock scope)
+    window.gapiLoaded = gapiLoaded;
+    window.gisLoaded  = gisLoaded;
 
-        /* --- Modals --- */
-        .modal-backdrop { background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
-        .swal2-popup { font-family: var(--font-body); background-color: var(--bg-secondary) !important; color: var(--text-primary) !important; }
-        .swal2-title { color: var(--text-primary) !important; font-weight: 700; }
-        .swal2-confirm { background-color: var(--accent-primary) !important; color: var(--text-primary) !important; font-weight: 600; }
-        .swal2-confirm.swal2-styled.swal2-default-outline:focus { box-shadow: none !important; }
-
-        /* --- Responsive & Layout --- */
-        @media (max-width: 1024px) {
-            .main-content { padding-left: 1rem; }
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.open { transform: translateX(0); }
-        }
-    </style>
+    function handleAuthResponse(resp){
+      if(resp && resp.access_token){
+        gapi.client.setToken({ access_token: resp.access_token });
+        // Let the app layer know we’re signed in
+        if (window.__onSignedIn) window.__onSignedIn();
+      }else{
+        Swal.fire({title:'Authentication Error', text:'Could not sign in. Please try again.', icon:'error'});
+      }
+    }
+  </script>
 </head>
 <body class="antialiased">
 
-    <!-- Login View -->
-    <div id="login-view" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-8 bg-gray-100">
-        <div class="text-center">
-            <div class="inline-block bg-zinc-800 p-4 rounded-lg shadow-sm mb-6">
-                <i data-lucide="gem" class="w-12 h-12 text-amber-400"></i>
-            </div>
-            <h1 class="text-4xl font-extrabold text-zinc-800">Welcome to Vinayaka DB</h1>
-            <p class="text-lg text-zinc-600 mt-2 mb-8">Your intelligent component inventory.</p>
-            <button id="signin-button-main" class="btn btn-primary text-lg">
-                <i data-lucide="shield-check"></i>
-                Sign In with Google
-            </button>
+  <!-- Login View -->
+  <div id="login-view" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-8 bg-gray-100">
+    <div class="text-center">
+      <div class="inline-block bg-zinc-800 p-4 rounded-lg shadow-sm mb-6">
+        <i data-lucide="gem" class="w-12 h-12 text-amber-400"></i>
+      </div>
+      <h1 class="text-4xl font-extrabold text-zinc-800">Welcome to Vinayaka DB</h1>
+      <p class="text-lg text-zinc-600 mt-2 mb-8">Your intelligent component inventory.</p>
+      <button id="signin-button-main" class="btn btn-primary text-lg">
+        <i data-lucide="shield-check"></i>
+        Sign In with Google
+      </button>
+    </div>
+  </div>
+
+  <div id="app-wrapper" class="relative min-h-screen hidden">
+    <!-- Sidebar -->
+    <aside class="sidebar fixed top-0 left-0 w-[var(--sidebar-width)] z-40 flex flex-col">
+      <div class="flex items-center gap-3 p-5 h-[var(--header-height)] border-b border-b-[var(--border-primary)]">
+        <div class="bg-zinc-800 p-2.5 rounded-md"><i data-lucide="gem" class="w-6 h-6 text-amber-400"></i></div>
+        <h1 class="text-xl font-bold">Vinayaka DB</h1>
+      </div>
+      <nav class="flex-1 px-3 py-4 space-y-1">
+        <a href="#" id="nav-dashboard" class="sidebar-nav-link active flex items-center gap-3 px-3 py-2.5 rounded-md"><i data-lucide="layout-grid" class="w-5 h-5"></i><span>Dashboard</span></a>
+        <a href="#" id="nav-reports" class="sidebar-nav-link flex items-center gap-3 px-3 py-2.5 rounded-md"><i data-lucide="bar-chart-2" class="w-5 h-5"></i><span>Reports</span></a>
+        <a href="#" id="nav-library" class="sidebar-nav-link flex items-center gap-3 px-3 py-2.5 rounded-md"><i data-lucide="folder-kanban" class="w-5 h-5"></i><span>Image Library</span></a>
+      </nav>
+      <div class="p-3 border-t border-t-[var(--border-primary)]">
+        <div id="user-profile-area" class="p-2 rounded-lg cursor-pointer group hover:bg-gray-100 transition-colors">
+          <div id="user-profile" class="hidden items-center gap-3">
+            <img id="user-dp" class="w-10 h-10 rounded-full" src="" alt="User"/>
+            <div><p id="user-name" class="font-semibold text-sm"></p><p class="text-xs text-green-600 font-medium">Online</p></div>
+          </div>
         </div>
-    </div>
+      </div>
+    </aside>
 
-    <div id="app-wrapper" class="relative min-h-screen hidden">
-        <!-- Sidebar -->
-        <aside class="sidebar fixed top-0 left-0 w-[var(--sidebar-width)] z-40 flex flex-col">
-            <div class="flex items-center gap-3 p-5 h-[var(--header-height)] border-b border-b-[var(--border-primary)]">
-                <div class="bg-zinc-800 p-2.5 rounded-md"><i data-lucide="gem" class="w-6 h-6 text-amber-400"></i></div>
-                <h1 class="text-xl font-bold">Vinayaka DB</h1>
-            </div>
-            <nav class="flex-1 px-3 py-4 space-y-1">
-                <a href="#" id="nav-dashboard" class="sidebar-nav-link active flex items-center gap-3 px-3 py-2.5 rounded-md">
-                    <i data-lucide="layout-grid" class="w-5 h-5"></i><span>Dashboard</span>
-                </a>
-                <a href="#" id="nav-reports" class="sidebar-nav-link flex items-center gap-3 px-3 py-2.5 rounded-md">
-                    <i data-lucide="bar-chart-2" class="w-5 h-5"></i><span>Reports</span>
-                </a>
-                <a href="#" id="nav-library" class="sidebar-nav-link flex items-center gap-3 px-3 py-2.5 rounded-md">
-                    <i data-lucide="folder-kanban" class="w-5 h-5"></i><span>Image Library</span>
-                </a>
-            </nav>
-
-            <div class="p-3 border-t border-t-[var(--border-primary)]">
-                <div id="user-profile-area" class="p-2 rounded-lg cursor-pointer group hover:bg-gray-100 transition-colors">
-                    <div id="user-profile" class="hidden items-center gap-3">
-                        <img id="user-dp" class="w-10 h-10 rounded-full" src="" alt="User"/>
-                        <div>
-                            <p id="user-name" class="font-semibold text-sm"></p>
-                            <p class="text-xs text-green-600 font-medium">Online</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content flex-1 flex flex-col min-h-screen">
-            <header class="sticky top-0 z-30 h-[var(--header-height)] flex items-center justify-between px-6 bg-[var(--bg-primary)]/80 backdrop-blur-sm border-b border-[var(--border-primary)]">
-                <div class="flex items-center gap-2">
-                     <button id="menuBtn" class="lg:hidden p-2 text-[var(--text-secondary)]"><i data-lucide="menu" class="w-6 h-6"></i></button>
-                </div>
-                <div class="flex items-center gap-4">
-                     <button id="refresh-btn" class="btn btn-secondary btn-icon" title="Refresh Data">
-                         <i data-lucide="rotate-cw" class="w-5 h-5"></i>
-                     </button>
-                     <div id="layout-switcher" class="flex items-center gap-1 bg-gray-200 p-1 rounded-md border border-[var(--border-primary)]">
-                         <button id="grid-view-btn" class="p-1.5 rounded-sm bg-white text-black shadow-sm" title="Grid View"><i data-lucide="layout-grid"></i></button>
-                         <button id="list-view-btn" class="p-1.5 rounded-sm text-gray-500" title="List View"><i data-lucide="list"></i></button>
-                         <button id="kanban-view-btn" class="p-1.5 rounded-sm text-gray-500" title="Kanban View"><i data-lucide="columns"></i></button>
-                         <button id="table-view-btn" class="p-1.5 rounded-sm text-gray-500" title="Table View"><i data-lucide="table"></i></button>
-                         <button id="compact-view-btn" class="p-1.5 rounded-sm text-gray-500" title="Compact View"><i data-lucide="layout-dashboard"></i></button>
-                     </div>
-                     <button id="addPartBtn" class="btn btn-primary" disabled>
-                         <i data-lucide="plus" class="w-5 h-5"></i><span class="hidden sm:inline">Add Component</span>
-                     </button>
-                </div>
-            </header>
-
-            <div id="app" class="w-full p-4 sm:p-6">
-                <!-- Dashboard View -->
-                <div id="dashboard-view">
-                    <!-- Analytics Section -->
-                    <div class="mb-8">
-                        <h2 class="text-2xl font-extrabold mb-4">Analytics Overview</h2>
-                        <div id="analytics-widgets" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-                            <div class="brutalist-card p-5"><p class="text-sm font-medium text-[var(--text-secondary)]">Total Components</p><p id="total-components" class="text-4xl font-extrabold mt-2">0</p></div>
-                            <div class="brutalist-card p-5">
-                                <div class="flex items-center justify-between">
-                                    <p class="text-sm font-medium text-[var(--text-secondary)]">Total Inventory Value</p>
-                                    <button id="toggle-value-visibility" class="text-gray-400 hover:text-gray-600"><i data-lucide="eye" class="w-4 h-4"></i></button>
-                                </div>
-                                <p id="total-value" class="text-4xl font-extrabold mt-2 transition-all duration-300">₹0</p>
-                            </div>
-                            <div class="brutalist-card p-5"><p class="text-sm font-medium text-[var(--text-secondary)]">Items Low on Stock</p><p id="low-stock" class="text-4xl font-extrabold text-red-600 mt-2">0</p></div>
-                            <div class="brutalist-card p-5"><p class="text-sm font-medium text-[var(--text-secondary)]">Most Common Device</p><p id="common-device" class="text-4xl font-extrabold mt-2">-</p></div>
-                            <!-- New Analytics Widgets -->
-                            <div class="brutalist-card p-5 md:col-span-2">
-                                <p class="text-sm font-medium text-[var(--text-secondary)]">Most Profitable Item</p>
-                                <p id="most-profitable" class="text-2xl xl:text-3xl font-extrabold mt-2 truncate">-</p>
-                            </div>
-                            <div class="brutalist-card p-5"><p class="text-sm font-medium text-[var(--text-secondary)]">Dust Collectors</p><p id="dust-collectors" class="text-4xl font-extrabold mt-2">0</p></div>
-                        </div>
-                    </div>
-
-                    <!-- Filters and Search -->
-                    <div class="brutalist-card p-4 mb-8">
-                        <div class="grid grid-cols-1 md:grid-cols-5 gap-x-6 gap-y-4">
-                            <div class="md:col-span-2 relative">
-                                <i data-lucide="search" class="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-secondary)]"></i>
-                                <input type="text" id="search" placeholder="Search by model, name, device..." class="w-full pl-8 brutalist-input"/>
-                            </div>
-                            <div><select id="filter-device" class="brutalist-select"><option value="">All Devices</option></select></div>
-                            <div><select id="filter-size" class="brutalist-select"><option value="">All Sizes</option></select></div>
-                            <div>
-                                <select id="sort-by" class="brutalist-select">
-                                    <option value="model-asc">Sort by Model (A–Z)</option>
-                                    <option value="price-desc">Sort by Price (High–Low)</option>
-                                    <option value="quantity-asc">Sort by Quantity (Low–High)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="skeleton-loader" class="hidden"></div>
-                    <div id="searchResults" class="hidden"></div>
-                    <div id="no-results" class="hidden text-center py-16 brutalist-card">
-                        <i data-lucide="search-x" class="w-16 h-16 mx-auto text-[var(--text-secondary)]"></i>
-                        <h3 class="mt-4 text-2xl font-bold">No Components Found</h3>
-                        <p class="mt-2 text-[var(--text-secondary)]">Your database is empty or your search returned no results.</p>
-                    </div>
-
-                    <!-- Pagination -->
-                    <div id="pagination-controls" class="flex justify-center items-center gap-4 mt-8"></div>
-                </div>
-
-                <!-- Reports View -->
-                <div id="reports-view" class="hidden space-y-8">
-                    <h2 class="text-3xl font-extrabold">Sales & Inventory Reports</h2>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="brutalist-card p-6"><h3 class="font-semibold mb-4">Monthly Revenue</h3><canvas id="revenue-chart"></canvas></div>
-                        <div class="brutalist-card p-6"><h3 class="font-semibold mb-4">Best Selling Items (by Quantity)</h3><canvas id="bestsellers-chart"></canvas></div>
-                    </div>
-                </div>
-
-                <!-- Image Library View -->
-                <div id="library-view" class="hidden">
-                    <h2 class="text-3xl font-extrabold mb-4">Image Library</h2>
-                    <div id="library-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Add/Edit Modal -->
-    <div id="formModal" class="modal-backdrop hidden fixed inset-0 z-50 justify-center items-center p-4">
-        <div class="brutalist-card w-full max-w-4xl m-4 max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center p-5 border-b border-[var(--border-primary)]">
-                <h2 id="form-title" class="text-2xl font-bold">Add New Component</h2>
-                <button type="button" id="closeFormModalBtn" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
-            </div>
-            <form id="partForm" class="p-6 space-y-6 overflow-y-auto">
-                <input type="hidden" id="edit-id"/>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div><label for="model">Model*</label><input type="text" id="model" required class="brutalist-input"/></div>
-                    <div><label for="device">Device</label>
-                        <select id="device" class="brutalist-select">
-                            <option value="">(None)</option>
-                            <option value="SWING DEVICE">Swing Device</option>
-                            <option value="TRAVEL DEVICE">Travel Device</option>
-                        </select>
-                    </div>
-                    <div><label for="size">Size</label>
-                        <select id="size" class="brutalist-select">
-                            <option value="">(None)</option>
-                            <option value="SMALL">Small</option>
-                            <option value="MIDDLE">Middle</option>
-                            <option value="BIG">Big</option>
-                        </select>
-                    </div>
-                    <div><label for="item-name-main">Item Name*</label>
-                        <select id="item-name-main" required class="brutalist-select">
-                            <option value="">Select item type...</option>
-                            <option value="Planetary Gear">Planetary Gear</option>
-                            <option value="Sun Gear">Sun Gear</option>
-                            <option value="Ring Gear">Ring Gear</option>
-                            <option value="Spline/Pinion Shaft">Spline/Pinion Shaft</option>
-                            <option value="Track Motor Shaft">Track Motor Shaft</option>
-                            <option value="Bearing">Bearing</option>
-                            <option value="Bushes">Bushes</option>
-                        </select>
-                    </div>
-                    <div><label for="price">Price</label><input type="number" id="price" placeholder="e.g., 4500" class="brutalist-input"/></div>
-                    <div><label for="quantity">Quantity*</label><input type="number" id="quantity" required value="1" min="0" class="brutalist-input"/></div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div><label for="image-links-input">Image Links</label><textarea id="image-links-input" name="image-link" placeholder="Paste one or more comma-separated Google Drive links here..." class="brutalist-input" rows="3"></textarea></div>
-                    <div><label for="note">Note</label><textarea id="note" rows="3" class="brutalist-input"></textarea></div>
-                </div>
-                <div id="spec-fields-container" class="hidden">
-                    <h3 class="text-lg font-semibold border-b border-[var(--border-primary)] pb-2 mb-4">Specifications</h3>
-                    <div id="spec-fields" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4"></div>
-                </div>
-            </form>
-            <div class="mt-auto p-4 border-t border-[var(--border-primary)] bg-gray-50 flex justify-end gap-3">
-                <button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button>
-                <button type="submit" form="partForm" class="btn btn-primary">Save Component</button>
-            </div>
+    <!-- Main Content -->
+    <main class="main-content flex-1 flex flex-col min-h-screen">
+      <header class="sticky top-0 z-30 h-[var(--header-height)] flex items-center justify-between px-6 bg-[var(--bg-primary)]/80 backdrop-blur-sm border-b border-[var(--border-primary)]">
+        <div class="flex items-center gap-2">
+          <button id="menuBtn" class="lg:hidden p-2 text-[var(--text-secondary)]"><i data-lucide="menu" class="w-6 h-6"></i></button>
         </div>
-    </div>
-
-    <!-- Detail Modal -->
-    <div id="detail-modal" class="modal-backdrop hidden fixed inset-0 z-50 justify-center items-center p-4">
-        <div id="detail-backdrop" class="fixed inset-0"></div>
-        <div class="relative brutalist-card w-full max-w-6xl max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center p-4 border-b border-[var(--border-primary)] flex-shrink-0">
-                <h2 class="text-xl font-bold">Component Datasheet</h2>
-                <button id="detail-close-btn" class="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full hover:bg-gray-100"><i data-lucide="x"></i></button>
-            </div>
-            <div id="detail-content" class="p-6 overflow-y-auto"></div>
+        <div class="flex items-center gap-4">
+          <button id="refresh-btn" class="btn btn-secondary btn-icon" title="Refresh Data"><i data-lucide="rotate-cw" class="w-5 h-5"></i></button>
+          <div id="layout-switcher" class="flex items-center gap-1 bg-gray-200 p-1 rounded-md border border-[var(--border-primary)]">
+            <button id="grid-view-btn" class="p-1.5 rounded-sm bg-white text-black shadow-sm" title="Grid View"><i data-lucide="layout-grid"></i></button>
+            <button id="list-view-btn" class="p-1.5 rounded-sm text-gray-500" title="List View"><i data-lucide="list"></i></button>
+            <button id="kanban-view-btn" class="p-1.5 rounded-sm text-gray-500" title="Kanban View"><i data-lucide="columns"></i></button>
+            <button id="table-view-btn" class="p-1.5 rounded-sm text-gray-500" title="Table View"><i data-lucide="table"></i></button>
+            <button id="compact-view-btn" class="p-1.5 rounded-sm text-gray-500" title="Compact View"><i data-lucide="layout-dashboard"></i></button>
+          </div>
+          <button id="addPartBtn" class="btn btn-primary" disabled><i data-lucide="plus" class="w-5 h-5"></i><span class="hidden sm:inline">Add Component</span></button>
         </div>
-    </div>
+      </header>
 
-    <script>
+      <div id="app" class="w-full p-4 sm:p-6">
+        <!-- Dashboard -->
+        <div id="dashboard-view">
+          <div class="mb-8">
+            <h2 class="text-2xl font-extrabold mb-4">Analytics Overview</h2>
+            <div id="analytics-widgets" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+              <div class="brutalist-card p-5"><p class="text-sm font-medium text-[var(--text-secondary)]">Total Components</p><p id="total-components" class="text-4xl font-extrabold mt-2">0</p></div>
+              <div class="brutalist-card p-5">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm font-medium text-[var(--text-secondary)]">Total Inventory Value</p>
+                  <button id="toggle-value-visibility" class="text-gray-400 hover:text-gray-600"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                </div>
+                <p id="total-value" class="text-4xl font-extrabold mt-2 transition-all duration-300">₹0</p>
+              </div>
+              <div class="brutalist-card p-5"><p class="text-sm font-medium text-[var(--text-secondary)]">Items Low on Stock</p><p id="low-stock" class="text-4xl font-extrabold text-red-600 mt-2">0</p></div>
+              <div class="brutalist-card p-5"><p class="text-sm font-medium text-[var(--text-secondary)]">Most Common Device</p><p id="common-device" class="text-4xl font-extrabold mt-2">-</p></div>
+              <div class="brutalist-card p-5 md:col-span-2"><p class="text-sm font-medium text-[var(--text-secondary)]">Most Profitable Item</p><p id="most-profitable" class="text-2xl xl:text-3xl font-extrabold mt-2 truncate">-</p></div>
+              <div class="brutalist-card p-5"><p class="text-sm font-medium text-[var(--text-secondary)]">Dust Collectors</p><p id="dust-collectors" class="text-4xl font-extrabold mt-2">0</p></div>
+            </div>
+          </div>
+
+          <!-- Filters -->
+          <div class="brutalist-card p-4 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-x-6 gap-y-4">
+              <div class="md:col-span-2 relative">
+                <i data-lucide="search" class="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-secondary)]"></i>
+                <input id="search" type="text" placeholder="Search by model, name, device..." class="w-full pl-8 brutalist-input"/>
+              </div>
+              <div><select id="filter-device" class="brutalist-select"><option value="">All Devices</option></select></div>
+              <div><select id="filter-size" class="brutalist-select"><option value="">All Sizes</option></select></div>
+              <div>
+                <select id="sort-by" class="brutalist-select">
+                  <option value="model-asc">Sort by Model (A–Z)</option>
+                  <option value="price-desc">Sort by Price (High–Low)</option>
+                  <option value="quantity-asc">Sort by Quantity (Low–High)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div id="skeleton-loader" class="hidden"></div>
+          <div id="searchResults" class="hidden"></div>
+          <div id="no-results" class="hidden text-center py-16 brutalist-card">
+            <i data-lucide="search-x" class="w-16 h-16 mx-auto text-[var(--text-secondary)]"></i>
+            <h3 class="mt-4 text-2xl font-bold">No Components Found</h3>
+            <p class="mt-2 text-[var(--text-secondary)]">Your database is empty or your search returned no results.</p>
+          </div>
+
+          <div id="pagination-controls" class="flex justify-center items-center gap-4 mt-8"></div>
+        </div>
+
+        <!-- Reports -->
+        <div id="reports-view" class="hidden space-y-8">
+          <h2 class="text-3xl font-extrabold">Sales & Inventory Reports</h2>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="brutalist-card p-6"><h3 class="font-semibold mb-4">Monthly Revenue</h3><canvas id="revenue-chart"></canvas></div>
+            <div class="brutalist-card p-6"><h3 class="font-semibold mb-4">Best Selling Items (by Quantity)</h3><canvas id="bestsellers-chart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Library -->
+        <div id="library-view" class="hidden">
+          <h2 class="text-3xl font-extrabold mb-4">Image Library</h2>
+          <div id="library-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div id="formModal" class="modal-backdrop hidden fixed inset-0 z-50 justify-center items-center p-4">
+    <div class="brutalist-card w-full max-w-4xl m-4 max-h-[90vh] flex flex-col">
+      <div class="flex justify-between items-center p-5 border-b border-[var(--border-primary)]">
+        <h2 id="form-title" class="text-2xl font-bold">Add New Component</h2>
+        <button type="button" id="closeFormModalBtn" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
+      </div>
+      <form id="partForm" class="p-6 space-y-6 overflow-y-auto">
+        <input type="hidden" id="edit-id"/>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div><label for="model">Model*</label><input id="model" type="text" required class="brutalist-input"/></div>
+          <div><label for="device">Device</label>
+            <select id="device" class="brutalist-select">
+              <option value="">(None)</option><option value="SWING DEVICE">Swing Device</option><option value="TRAVEL DEVICE">Travel Device</option>
+            </select>
+          </div>
+          <div><label for="size">Size</label>
+            <select id="size" class="brutalist-select">
+              <option value="">(None)</option><option value="SMALL">Small</option><option value="MIDDLE">Middle</option><option value="BIG">Big</option>
+            </select>
+          </div>
+          <div><label for="item-name-main">Item Name*</label>
+            <select id="item-name-main" required class="brutalist-select">
+              <option value="">Select item type...</option>
+              <option value="Planetary Gear">Planetary Gear</option><option value="Sun Gear">Sun Gear</option><option value="Ring Gear">Ring Gear</option>
+              <option value="Spline/Pinion Shaft">Spline/Pinion Shaft</option><option value="Track Motor Shaft">Track Motor Shaft</option>
+              <option value="Bearing">Bearing</option><option value="Bushes">Bushes</option>
+            </select>
+          </div>
+          <div><label for="price">Price</label><input id="price" type="number" placeholder="e.g., 4500" class="brutalist-input"/></div>
+          <div><label for="quantity">Quantity*</label><input id="quantity" type="number" required value="1" min="0" class="brutalist-input"/></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div><label for="image-links-input">Image Links</label><textarea id="image-links-input" rows="3" class="brutalist-input" placeholder="Comma-separated Google Drive links..."></textarea></div>
+          <div><label for="note">Note</label><textarea id="note" rows="3" class="brutalist-input"></textarea></div>
+        </div>
+        <div id="spec-fields-container" class="hidden">
+          <h3 class="text-lg font-semibold border-b border-[var(--border-primary)] pb-2 mb-4">Specifications</h3>
+          <div id="spec-fields" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4"></div>
+        </div>
+      </form>
+      <div class="mt-auto p-4 border-t border-[var(--border-primary)] bg-gray-50 flex justify-end gap-3">
+        <button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button>
+        <button type="submit" form="partForm" class="btn btn-primary">Save Component</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  <div id="detail-modal" class="modal-backdrop hidden fixed inset-0 z-50 justify-center items-center p-4">
+    <div id="detail-backdrop" class="fixed inset-0"></div>
+    <div class="relative brutalist-card w-full max-w-6xl max-h-[90vh] flex flex-col">
+      <div class="flex justify-between items-center p-4 border-b border-[var(--border-primary)] flex-shrink-0">
+        <h2 class="text-xl font-bold">Component Datasheet</h2>
+        <button id="detail-close-btn" class="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full hover:bg-gray-100"><i data-lucide="x"></i></button>
+      </div>
+      <div id="detail-content" class="p-6 overflow-y-auto"></div>
+    </div>
+  </div>
+
+  <script>
+    /* ===== APP CODE (DOM-DEPENDENT) ===== */
     document.addEventListener('DOMContentLoaded', () => {
-        // ====== CONFIG ======
-        const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
-        const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com';
-        const DISCOVERY_DOCS = [
-            "https://sheets.googleapis.com/$discovery/rest?version=v4",
-            "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest",
-            "https://www.googleapis.com/discovery/v1/apis/oauth2/v2/rest" // <-- Needed for userinfo
-        ];
-        const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/drive.readonly";
+      const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ';
+      const IMAGE_FOLDER_ID = '1o3i8aVtpFb2EZd4-014OrxPB1H6ncGu0';
+      const INVENTORY_RANGE = 'Sheet1!A:AC';
+      const SALES_RANGE = 'SalesLog!A:D';
 
-        const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ';
-        const IMAGE_FOLDER_ID = '1o3i8aVtpFb2EZd4-014OrxPB1H6ncGu0';
-        const INVENTORY_RANGE = 'Sheet1!A:AC';
-        const SALES_RANGE = 'SalesLog!A:D';
+      let allItems = [], allSales = [], filteredItems = [];
+      let currentLayout = 'grid', currentPage = 1; const ITEMS_PER_PAGE = 10;
+      let revenueChart, bestsellersChart;
 
-        // ====== STATE ======
-        let allItems = [];
-        let allSales = [];
-        let filteredItems = [];
-        let gapiInited = false;
-        let gisInited = false;
-        let tokenClient;
-        let currentLayout = 'grid';
-        let currentPage = 1;
-        const ITEMS_PER_PAGE = 10;
-        let revenueChart, bestsellersChart;
+      // DOM cache (same as before) ...
+      const dom = {
+        appWrapper: document.getElementById('app-wrapper'),
+        loginView: document.getElementById('login-view'),
+        addPartBtn: document.getElementById('addPartBtn'),
+        searchResults: document.getElementById('searchResults'),
+        noResults: document.getElementById('no-results'),
+        userProfileArea: document.getElementById('user-profile-area'),
+        userProfile: document.getElementById('user-profile'),
+        userDp: document.getElementById('user-dp'),
+        userName: document.getElementById('user-name'),
+        signInButtonMain: document.getElementById('signin-button-main'),
+        partForm: document.getElementById('partForm'),
+        formTitle: document.getElementById('form-title'),
+        editId: document.getElementById('edit-id'),
+        itemNameSelect: document.getElementById('item-name-main'),
+        specFieldsContainer: document.getElementById('spec-fields-container'),
+        specFields: document.getElementById('spec-fields'),
+        search: document.getElementById('search'),
+        formModal: document.getElementById('formModal'),
+        closeFormModalBtn: document.getElementById('closeFormModalBtn'),
+        cancelBtn: document.getElementById('cancelBtn'),
+        imageLinksInput: document.getElementById('image-links-input'),
+        skeletonLoader: document.getElementById('skeleton-loader'),
+        menuBtn: document.getElementById('menuBtn'),
+        sidebar: document.querySelector('.sidebar'),
+        gridViewBtn: document.getElementById('grid-view-btn'),
+        listViewBtn: document.getElementById('list-view-btn'),
+        kanbanViewBtn: document.getElementById('kanban-view-btn'),
+        tableViewBtn: document.getElementById('table-view-btn'),
+        compactViewBtn: document.getElementById('compact-view-btn'),
+        detailModal: document.getElementById('detail-modal'),
+        detailBackdrop: document.getElementById('detail-backdrop'),
+        detailContent: document.getElementById('detail-content'),
+        detailCloseBtn: document.getElementById('detail-close-btn'),
+        filterDevice: document.getElementById('filter-device'),
+        filterSize: document.getElementById('filter-size'),
+        sortBy: document.getElementById('sort-by'),
+        paginationControls: document.getElementById('pagination-controls'),
+        navDashboard: document.getElementById('nav-dashboard'),
+        navReports: document.getElementById('nav-reports'),
+        navLibrary: document.getElementById('nav-library'),
+        dashboardView: document.getElementById('dashboard-view'),
+        reportsView: document.getElementById('reports-view'),
+        libraryView: document.getElementById('library-view'),
+        libraryGrid: document.getElementById('library-grid'),
+        layoutSwitcher: document.getElementById('layout-switcher'),
+        toggleValueVisibility: document.getElementById('toggle-value-visibility'),
+        refreshBtn: document.getElementById('refresh-btn'),
+      };
 
-        // ====== DOM ======
-        const dom = {
-            html: document.documentElement,
-            appWrapper: document.getElementById('app-wrapper'),
-            loginView: document.getElementById('login-view'),
-            addPartBtn: document.getElementById('addPartBtn'),
-            searchResults: document.getElementById('searchResults'),
-            noResults: document.getElementById('no-results'),
-            userProfileArea: document.getElementById('user-profile-area'),
-            userProfile: document.getElementById('user-profile'),
-            userDp: document.getElementById('user-dp'),
-            userName: document.getElementById('user-name'),
-            signInButtonMain: document.getElementById('signin-button-main'),
-            partForm: document.getElementById('partForm'),
-            formTitle: document.getElementById('form-title'),
-            editId: document.getElementById('edit-id'),
-            itemNameSelect: document.getElementById('item-name-main'),
-            specFieldsContainer: document.getElementById('spec-fields-container'),
-            specFields: document.getElementById('spec-fields'),
-            search: document.getElementById('search'),
-            formModal: document.getElementById('formModal'),
-            closeFormModalBtn: document.getElementById('closeFormModalBtn'),
-            cancelBtn: document.getElementById('cancelBtn'),
-            imageLinksInput: document.getElementById('image-links-input'),
-            skeletonLoader: document.getElementById('skeleton-loader'),
-            menuBtn: document.getElementById('menuBtn'),
-            sidebar: document.querySelector('.sidebar'),
-            gridViewBtn: document.getElementById('grid-view-btn'),
-            listViewBtn: document.getElementById('list-view-btn'),
-            kanbanViewBtn: document.getElementById('kanban-view-btn'),
-            tableViewBtn: document.getElementById('table-view-btn'),
-            compactViewBtn: document.getElementById('compact-view-btn'),
-            detailModal: document.getElementById('detail-modal'),
-            detailBackdrop: document.getElementById('detail-backdrop'),
-            detailContent: document.getElementById('detail-content'),
-            detailCloseBtn: document.getElementById('detail-close-btn'),
-            filterDevice: document.getElementById('filter-device'),
-            filterSize: document.getElementById('filter-size'),
-            sortBy: document.getElementById('sort-by'),
-            paginationControls: document.getElementById('pagination-controls'),
-            navDashboard: document.getElementById('nav-dashboard'),
-            navReports: document.getElementById('nav-reports'),
-            navLibrary: document.getElementById('nav-library'),
-            dashboardView: document.getElementById('dashboard-view'),
-            reportsView: document.getElementById('reports-view'),
-            libraryView: document.getElementById('library-view'),
-            libraryGrid: document.getElementById('library-grid'),
-            layoutSwitcher: document.getElementById('layout-switcher'),
-            toggleValueVisibility: document.getElementById('toggle-value-visibility'),
-            refreshBtn: document.getElementById('refresh-btn'),
+      const COLUMN_HEADERS = ['id','model','device','size','itemName','price','quantity','imageLinks','note','spec_innerDiameter','spec_outerDiameter','spec_length','spec_width','spec_teeth','spec_numberOfTeeth','spec_numberOfTeethInOd','spec_numberOfTeethInId','spec_stepOd','spec_bigTeethOd','spec_bigTeeth','spec_bigTeethLength','spec_smallTeethOd','spec_smallTeeth','spec_smallTeethLength','spec_splineOd','spec_teethOd','spec_outsideTeeth','spec_insideTeeth','spec_insideOd'];
+
+      const specDefinitions = {
+        'Planetary Gear':['spec_innerDiameter','spec_outerDiameter','spec_length','spec_numberOfTeeth'],
+        'Sun Gear':['spec_innerDiameter','spec_outerDiameter','spec_length','spec_numberOfTeethInOd','spec_numberOfTeethInId','spec_stepOd'],
+        'Ring Gear':['spec_teeth','spec_outerDiameter','spec_innerDiameter'],
+        'Spline/Pinion Shaft':['spec_bigTeethOd','spec_bigTeeth','spec_bigTeethLength','spec_smallTeethOd','spec_smallTeeth','spec_smallTeethLength','spec_length','spec_splineOd'],
+        'Track Motor Shaft':['spec_length','spec_outerDiameter','spec_teethOd','spec_outsideTeeth','spec_insideTeeth','spec_insideOd'],
+        'Bearing':['spec_innerDiameter','spec_outerDiameter','spec_width'],
+        'Bushes':['spec_innerDiameter','spec_outerDiameter','spec_length']
+      };
+
+      // Expose a hook the auth bootstrap calls after token arrives
+      window.__onSignedIn = () => {
+        dom.loginView.classList.add('hidden');
+        dom.appWrapper.classList.remove('hidden');
+        dom.addPartBtn.disabled = false;
+        dom.userProfile.classList.remove('hidden');
+        dom.userProfile.classList.add('flex');
+        showSkeletonLoader(true);
+        loadProfile().then(loadAllData);
+      };
+
+      async function loadProfile(){
+        try{
+          const userInfo = await gapi.client.oauth2.userinfo.get();
+          dom.userName.textContent = userInfo.result.name || 'User';
+          dom.userDp.src = userInfo.result.picture || `https://placehold.co/44x44/212529/F8F9FA?text=U`;
+        }catch(_){
+          dom.userName.textContent = "User";
+          dom.userDp.src = `https://placehold.co/44x44/212529/F8F9FA?text=U`;
+        }
+      }
+
+      function requireLibsOrToast(){
+        if(!gapiInited || !gisInited){
+          Swal.fire('Loading...', 'Google libraries are still loading. Try again in a moment.', 'info');
+          return false;
+        }
+        return true;
+      }
+
+      // Sign in/out click (works even if libs still loading; we guard inside)
+      dom.userProfileArea.addEventListener('click', authClick);
+      dom.signInButtonMain.addEventListener('click', authClick);
+      function authClick(){
+        if(!requireLibsOrToast()) return;
+        if (gapi.client.getToken() === null) {
+          tokenClient.requestAccessToken({ prompt: 'consent' });
+        } else {
+          Swal.fire({title:'Sign Out', text:'Are you sure you want to sign out?', icon:'warning', showCancelButton:true, confirmButtonText:'Yes, sign out'})
+            .then(r => { if(r.isConfirmed){ gapi.client.setToken(null); resetToSignedOut(); }});
+        }
+      }
+
+      function resetToSignedOut(){
+        dom.loginView.classList.remove('hidden');
+        dom.appWrapper.classList.add('hidden');
+        dom.addPartBtn.disabled = true;
+        dom.userProfile.classList.add('hidden');
+        dom.userProfile.classList.remove('flex');
+        allItems=[]; allSales=[]; updateAnalytics([],[]);
+      }
+
+      // Events for the rest of the app (unchanged behavior)
+      dom.partForm.addEventListener('submit', handleFormSubmit);
+      [dom.search, dom.filterDevice, dom.filterSize, dom.sortBy].forEach(el => el.addEventListener('input', () => { currentPage = 1; processAndRenderItems(); }));
+      dom.addPartBtn.addEventListener('click', openAddModal);
+      dom.closeFormModalBtn.addEventListener('click', closeFormModal);
+      dom.cancelBtn.addEventListener('click', closeFormModal);
+      dom.menuBtn.addEventListener('click', () => dom.sidebar.classList.toggle('open'));
+      dom.itemNameSelect.addEventListener('change', updateSpecFields);
+      dom.gridViewBtn.addEventListener('click', () => switchLayout('grid'));
+      dom.listViewBtn.addEventListener('click', () => switchLayout('list'));
+      dom.kanbanViewBtn.addEventListener('click', () => switchLayout('kanban'));
+      dom.tableViewBtn.addEventListener('click', () => switchLayout('table'));
+      dom.compactViewBtn.addEventListener('click', () => switchLayout('compact'));
+      dom.detailCloseBtn.addEventListener('click', closeDetailPanel);
+      dom.detailBackdrop.addEventListener('click', closeDetailPanel);
+      dom.searchResults.addEventListener('click', handleCardClick);
+      dom.detailContent.addEventListener('click', handleDetailPanelClick);
+      dom.paginationControls.addEventListener('click', handlePaginationClick);
+      dom.navDashboard.addEventListener('click', (e)=>{e.preventDefault(); switchView('dashboard');});
+      dom.navReports.addEventListener('click', (e)=>{e.preventDefault(); switchView('reports');});
+      dom.navLibrary.addEventListener('click', (e)=>{e.preventDefault(); switchView('library');});
+      dom.toggleValueVisibility.addEventListener('click', toggleValueVisibility);
+      dom.refreshBtn.addEventListener('click', loadAllData);
+
+      initLayout();
+      lucide.createIcons();
+
+      /* ====== Data / Charts / UI functions
+         (same as earlier version, unchanged for brevity) ====== */
+
+      async function loadAllData(){
+        try{
+          const [invRes, salesRes] = await Promise.all([
+            gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: INVENTORY_RANGE }),
+            gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: SALES_RANGE })
+          ]);
+
+          const inventoryValues = invRes.result.values;
+          allItems = (inventoryValues && inventoryValues.length > 1)
+            ? inventoryValues.slice(1).map((row, index) => {
+                const item = inventoryValues[0].reduce((obj, header, i) => ({ ...obj, [header]: row[i] }), {});
+                item.rowIndex = index + 2;
+                return item;
+              }).filter(item => item.id && item.id.trim() !== '')
+            : [];
+
+          const salesValues = salesRes.result.values;
+          allSales = (salesValues && salesValues.length > 1)
+            ? salesValues.slice(1).map(row => ({ itemId: row[0], quantitySold: parseInt(row[1],10), salePrice: parseFloat(row[2]), date: row[3] }))
+            : [];
+        }catch(err){
+          const msg = err?.result?.error?.message || 'Unknown error';
+          Swal.fire({ title: 'Data Loading Error', text: `Could not load data. Check Sheet ID and permissions. Error: ${msg}`, icon: 'error' });
+          resetToSignedOut();
+        }finally{
+          showSkeletonLoader(false);
+          populateFilters();
+          processAndRenderItems();
+          renderReportCharts();
+        }
+      }
+
+      async function handleFormSubmit(e){
+        e.preventDefault();
+        const editId = dom.editId.value;
+        if (editId) { await updateComponent(editId); } else { await addComponent(); }
+      }
+
+      async function addComponent(){
+        const newItem = collectFormData();
+        newItem.id = Date.now().toString();
+        const newRow = COLUMN_HEADERS.map(h => newItem[h] || "");
+        await gapi.client.sheets.spreadsheets.values.append({
+          spreadsheetId: SPREADSHEET_ID, range: INVENTORY_RANGE, valueInputOption: 'USER_ENTERED', resource: { values: [newRow] }
+        });
+        Swal.fire({ title:'Success!', text:'Component added successfully.', icon:'success' });
+        closeFormModal();
+        loadAllData();
+      }
+
+      async function updateComponent(id){
+        const itemToUpdate = allItems.find(i => i.id === id);
+        if(!itemToUpdate){ Swal.fire('Error','Could not find the component to update.','error'); return; }
+        const updated = collectFormData(); updated.id = id;
+        const row = COLUMN_HEADERS.map(h => updated[h] || "");
+        const updateRange = `Sheet1!A${itemToUpdate.rowIndex}:AC${itemToUpdate.rowIndex}`;
+        await gapi.client.sheets.spreadsheets.values.update({
+          spreadsheetId: SPREADSHEET_ID, range: updateRange, valueInputOption:'USER_ENTERED', resource:{ values:[row] }
+        });
+        Swal.fire('Success!','Component updated successfully.','success');
+        closeFormModal();
+        loadAllData();
+      }
+
+      async function deleteComponent(id){
+        const itemToDelete = allItems.find(i => i.id === id);
+        if(!itemToDelete){ Swal.fire('Error','Could not find the component to delete.','error'); return; }
+        await gapi.client.sheets.spreadsheets.batchUpdate({
+          spreadsheetId: SPREADSHEET_ID,
+          resource: { requests:[{ deleteDimension:{ range:{ sheetId:0, dimension:'ROWS', startIndex:itemToDelete.rowIndex-1, endIndex:itemToDelete.rowIndex } } }] }
+        });
+        Swal.fire('Deleted!','The component has been deleted.','success');
+        closeDetailPanel();
+        loadAllData();
+      }
+
+      function processAndRenderItems(){
+        if (!gapiInited) return;
+        const s = dom.search.value.toLowerCase();
+        const d = dom.filterDevice.value;
+        const z = dom.filterSize.value;
+        const sort = dom.sortBy.value;
+
+        filteredItems = allItems.filter(item => {
+          const searchMatch = Object.values(item).join(' ').toLowerCase().includes(s);
+          const deviceMatch = !d || item.device === d;
+          const sizeMatch   = !z || item.size === z;
+          return searchMatch && deviceMatch && sizeMatch;
+        });
+
+        switch (sort){
+          case 'price-desc': filteredItems.sort((a,b)=>(+b.price||0)-(+a.price||0)); break;
+          case 'quantity-asc': filteredItems.sort((a,b)=>(+a.quantity||0)-(+b.quantity||0)); break;
+          default: filteredItems.sort((a,b)=>(a.model||'').localeCompare(b.model||'')); break;
+        }
+
+        updateAnalytics(allItems, allSales);
+        renderItems();
+      }
+
+      function renderItems(){
+        if(!gapiInited || !gapi.client || typeof gapi.client.getToken !== 'function'){
+          dom.searchResults.innerHTML=''; dom.noResults.classList.add('hidden'); dom.searchResults.classList.add('hidden'); return;
+        }
+        dom.searchResults.innerHTML='';
+        dom.noResults.classList.toggle('hidden', filteredItems.length > 0 || !gapi.client.getToken());
+        dom.searchResults.classList.toggle('hidden', filteredItems.length === 0);
+
+        const pageItems = filteredItems.slice((currentPage-1)*ITEMS_PER_PAGE, currentPage*ITEMS_PER_PAGE);
+        if(pageItems.length===0 && currentPage>1){ currentPage=1; renderItems(); return; }
+
+        if(currentLayout==='grid'){
+          dom.searchResults.className='grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5';
+          pageItems.forEach(i=>dom.searchResults.insertAdjacentHTML('beforeend', createGridCard(i)));
+        }else if(currentLayout==='list'){
+          dom.searchResults.className='space-y-3';
+          pageItems.forEach(i=>dom.searchResults.insertAdjacentHTML('beforeend', createListCard(i)));
+        }else if(currentLayout==='kanban'){ renderKanbanView();
+        }else if(currentLayout==='table'){ renderTableView();
+        }else if(currentLayout==='compact'){
+          dom.searchResults.className='grid gap-4 grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10';
+          pageItems.forEach(i=>dom.searchResults.insertAdjacentHTML('beforeend', createCompactCard(i)));
+        }
+        lucide.createIcons(); renderPaginationControls();
+      }
+
+      function createGridCard(item){
+        const imgLinks = (item.imageLinks||'').split(',').map(s=>s.trim()).filter(Boolean);
+        const first = getDriveThumb(imgLinks[0]) || `https://placehold.co/600x400/E9ECEF/6C757D?text=${encodeURIComponent(item.itemName||'No Image')}`;
+        const q = parseInt(item.quantity,10);
+        const color = q>10?'bg-green-100 text-green-800': q>0?'bg-yellow-100 text-yellow-800':'bg-red-100 text-red-800';
+        const status = q>0?`${q} in Stock`:'Out of Stock';
+        return `<div class="brutalist-card overflow-hidden flex flex-col group">
+          <div class="relative bg-gray-100">
+            <img src="${first}" class="w-full h-48 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/600x400/E9ECEF/6C757D?text=Invalid+Image'">
+            <div class="absolute top-3 right-3 ${color} text-xs font-bold px-2 py-1 rounded">${status}</div>
+          </div>
+          <div class="p-4 flex-grow flex flex-col">
+            <h3 class="font-bold text-base leading-tight">${[item.model,item.device,item.size,item.itemName].filter(Boolean).join(' ')}</h3>
+            <p class="text-sm text-[var(--text-secondary)] mt-1">Price: ₹${item.price||'N/A'}</p>
+            <div class="mt-auto pt-4 text-right">
+              <button class="view-details-btn text-sm font-semibold" data-id="${item.id}">View Details &rarr;</button>
+            </div>
+          </div>
+        </div>`;
+      }
+      function createListCard(item){
+        const img = getDriveThumb((item.imageLinks||'').split(',')[0]) || `https://placehold.co/100x100/E9ECEF/6C757D?text=Img`;
+        const q = parseInt(item.quantity,10);
+        const color = q>10?'text-green-600': q>0?'text-yellow-600':'text-red-600';
+        return `<div class="brutalist-card p-3 flex items-center gap-4 hover:border-[var(--accent-primary)]">
+          <img src="${img}" class="w-16 h-16 rounded-sm object-contain flex-shrink-0 bg-gray-100" onerror="this.onerror=null;this.src='https://placehold.co/100x100/E9ECEF/6C757D?text=Err'">
+          <div class="flex-1 grid grid-cols-5 gap-4 items-center">
+            <h3 class="col-span-2 font-semibold">${[item.model,item.device,item.size,item.itemName].filter(Boolean).join(' ')}</h3>
+            <p class="text-[var(--text-secondary)]">₹${item.price||'N/A'}</p>
+            <p class="${color} font-medium">${q>0?`${q} in Stock`:'Out of Stock'}</p>
+            <div class="text-right"><button class="view-details-btn text-sm font-semibold" data-id="${item.id}">Details</button></div>
+          </div>
+        </div>`;
+      }
+      function createCompactCard(item){
+        const img = getDriveThumb((item.imageLinks||'').split(',')[0]) || `https://placehold.co/100x100/E9ECEF/6C757D?text=Img`;
+        return `<div class="brutalist-card text-center p-2 group">
+          <img src="${img}" class="w-full h-20 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/100x100/E9ECEF/6C757D?text=Err'">
+          <p class="text-xs font-semibold mt-2 truncate">${item.model||item.itemName}</p>
+          <button class="view-details-btn absolute inset-0" data-id="${item.id}"></button>
+        </div>`;
+      }
+      function renderKanbanView(){
+        const statuses = {
+          'In Stock': i => parseInt(i.quantity)>10,
+          'Low Stock': i => parseInt(i.quantity)>0 && parseInt(i.quantity)<=10,
+          'Out of Stock': i => parseInt(i.quantity)===0,
         };
-
-        const COLUMN_HEADERS = ['id','model','device','size','itemName','price','quantity','imageLinks','note','spec_innerDiameter','spec_outerDiameter','spec_length','spec_width','spec_teeth','spec_numberOfTeeth','spec_numberOfTeethInOd','spec_numberOfTeethInId','spec_stepOd','spec_bigTeethOd','spec_bigTeeth','spec_bigTeethLength','spec_smallTeethOd','spec_smallTeeth','spec_smallTeethLength','spec_splineOd','spec_teethOd','spec_outsideTeeth','spec_insideTeeth','spec_insideOd'];
-
-        const specDefinitions = {
-            'Planetary Gear': ['spec_innerDiameter','spec_outerDiameter','spec_length','spec_numberOfTeeth'],
-            'Sun Gear': ['spec_innerDiameter','spec_outerDiameter','spec_length','spec_numberOfTeethInOd','spec_numberOfTeethInId','spec_stepOd'],
-            'Ring Gear': ['spec_teeth','spec_outerDiameter','spec_innerDiameter'],
-            'Spline/Pinion Shaft': ['spec_bigTeethOd','spec_bigTeeth','spec_bigTeethLength','spec_smallTeethOd','spec_smallTeeth','spec_smallTeethLength','spec_length','spec_splineOd'],
-            'Track Motor Shaft': ['spec_length','spec_outerDiameter','spec_teethOd','spec_outsideTeeth','spec_insideTeeth','spec_insideOd'],
-            'Bearing': ['spec_innerDiameter','spec_outerDiameter','spec_width'],
-            'Bushes': ['spec_innerDiameter','spec_outerDiameter','spec_length'],
-        };
-
-        // --- Initial Setup ---
-        initLayout();
-
-        // Make auth click available immediately (so the button responds even if libs still loading)
-        dom.userProfileArea.addEventListener('click', handleAuthClick);
-        dom.signInButtonMain.addEventListener('click', handleAuthClick);
-
-        // These functions are called by the external Google scripts (see tags at bottom)
-        function gapiLoaded() {
-            gapi.load('client', initializeGapiClient);
-        }
-        function gisLoaded() {
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CLIENT_ID,
-                scope: SCOPES,
-                callback: handleAuthResponse,
-            });
-            gisInited = true;
-        }
-        // Expose for onload attributes
-        window.gapiLoaded = gapiLoaded;
-        window.gisLoaded = gisLoaded;
-
-        async function initializeGapiClient() {
-            try {
-                await gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS });
-                gapiInited = true;
-            } catch (err) {
-                console.error("Error initializing GAPI client", err);
-            }
-        }
-
-        // --- Event Listeners ---
-        dom.partForm.addEventListener('submit', handleFormSubmit);
-        [dom.search, dom.filterDevice, dom.filterSize, dom.sortBy].forEach(el =>
-            el.addEventListener('input', () => { currentPage = 1; processAndRenderItems(); })
-        );
-        dom.addPartBtn.addEventListener('click', openAddModal);
-        dom.closeFormModalBtn.addEventListener('click', closeFormModal);
-        dom.cancelBtn.addEventListener('click', closeFormModal);
-        dom.menuBtn.addEventListener('click', () => dom.sidebar.classList.toggle('open'));
-        dom.itemNameSelect.addEventListener('change', updateSpecFields);
-        dom.gridViewBtn.addEventListener('click', () => switchLayout('grid'));
-        dom.listViewBtn.addEventListener('click', () => switchLayout('list'));
-        dom.kanbanViewBtn.addEventListener('click', () => switchLayout('kanban'));
-        dom.tableViewBtn.addEventListener('click', () => switchLayout('table'));
-        dom.compactViewBtn.addEventListener('click', () => switchLayout('compact'));
-        dom.detailCloseBtn.addEventListener('click', closeDetailPanel);
-        dom.detailBackdrop.addEventListener('click', closeDetailPanel);
-        dom.searchResults.addEventListener('click', handleCardClick);
-        dom.detailContent.addEventListener('click', handleDetailPanelClick);
-        dom.paginationControls.addEventListener('click', handlePaginationClick);
-        dom.navDashboard.addEventListener('click', (e) => { e.preventDefault(); switchView('dashboard'); });
-        dom.navReports.addEventListener('click', (e) => { e.preventDefault(); switchView('reports'); });
-        dom.navLibrary.addEventListener('click', (e) => { e.preventDefault(); switchView('library'); });
-        dom.toggleValueVisibility.addEventListener('click', toggleValueVisibility);
-        dom.refreshBtn.addEventListener('click', loadAllData);
-
-        // --- Auth Flow ---
-        function handleAuthResponse(resp) {
-            if (resp.error !== undefined) {
-                Swal.fire({ title: 'Authentication Error', text: 'Could not sign in. Please try again.', icon: 'error' });
-                updateAuthStatus(false);
-                return;
-            }
-            // Set token explicitly with access_token
-            gapi.client.setToken({ access_token: resp.access_token });
-            updateAuthStatus(true);
-        }
-
-        function handleAuthClick() {
-            if (!gapiInited || !gisInited) {
-                Swal.fire('Loading...', 'Google libraries are still loading. Try again in a moment.', 'info');
-                return;
-            }
-            if (gapi.client.getToken() === null) {
-                tokenClient?.requestAccessToken({ prompt: 'consent' });
-            } else {
-                Swal.fire({
-                    title: 'Sign Out',
-                    text: 'Are you sure you want to sign out?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, sign out'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        gapi.client.setToken(null);
-                        updateAuthStatus(false);
-                    }
-                });
-            }
-        }
-
-        async function updateAuthStatus(isSignedIn) {
-            if (isSignedIn) {
-                document.getElementById('login-view').classList.add('hidden');
-                document.getElementById('app-wrapper').classList.remove('hidden');
-                dom.addPartBtn.disabled = false;
-                dom.userProfile.classList.remove('hidden');
-                dom.userProfile.classList.add('flex');
-
-                showSkeletonLoader(true);
-                try {
-                    // Fetch profile (requires oauth2 discovery doc + userinfo.profile scope)
-                    const userInfo = await gapi.client.oauth2.userinfo.get();
-                    dom.userName.textContent = userInfo.result.name || 'User';
-                    dom.userDp.src = userInfo.result.picture || `https://placehold.co/44x44/212529/F8F9FA?text=U`;
-                } catch (e) {
-                    dom.userName.textContent = "User";
-                    dom.userDp.src = `https://placehold.co/44x44/212529/F8F9FA?text=U`;
-                }
-                loadAllData();
-            } else {
-                document.getElementById('login-view').classList.remove('hidden');
-                document.getElementById('app-wrapper').classList.add('hidden');
-                dom.addPartBtn.disabled = true;
-                dom.userProfile.classList.add('hidden');
-                dom.userProfile.classList.remove('flex');
-                allItems = [];
-                allSales = [];
-                updateAnalytics([], []);
-            }
-        }
-
-        // --- Data Load ---
-        async function loadAllData() {
-            showSkeletonLoader(true);
-            try {
-                const [invRes, salesRes] = await Promise.all([
-                    gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: INVENTORY_RANGE }),
-                    gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: SALES_RANGE })
-                ]);
-
-                const inventoryValues = invRes.result.values;
-                allItems = (inventoryValues && inventoryValues.length > 1)
-                    ? inventoryValues.slice(1).map((row, index) => {
-                        const item = inventoryValues[0].reduce((obj, header, i) => ({ ...obj, [header]: row[i] }), {});
-                        item.rowIndex = index + 2;
-                        return item;
-                    }).filter(item => item.id && item.id.trim() !== '')
-                    : [];
-
-                const salesValues = salesRes.result.values;
-                allSales = (salesValues && salesValues.length > 1)
-                    ? salesValues.slice(1).map(row => ({
-                        itemId: row[0],
-                        quantitySold: parseInt(row[1], 10),
-                        salePrice: parseFloat(row[2]),
-                        date: row[3]
-                    }))
-                    : [];
-            } catch (err) {
-                const msg = (err && err.result && err.result.error && err.result.error.message) ? err.result.error.message : 'Unknown error';
-                Swal.fire({ title: 'Data Loading Error', text: `Could not load data. Check Sheet ID and permissions. Error: ${msg}`, icon: 'error' });
-                updateAuthStatus(false);
-            } finally {
-                showSkeletonLoader(false);
-                populateFilters();
-                processAndRenderItems();
-                renderReportCharts();
-            }
-        }
-
-        // --- CRUD ---
-        async function handleFormSubmit(e) {
-            e.preventDefault();
-            const editId = dom.editId.value;
-            if (editId) { await updateComponent(editId); } else { await addComponent(); }
-        }
-
-        async function addComponent() {
-            const newItem = collectFormData();
-            newItem.id = Date.now().toString();
-            const newRow = COLUMN_HEADERS.map(header => newItem[header] || "");
-            try {
-                await gapi.client.sheets.spreadsheets.values.append({
-                    spreadsheetId: SPREADSHEET_ID,
-                    range: INVENTORY_RANGE,
-                    valueInputOption: 'USER_ENTERED',
-                    resource: { values: [newRow] }
-                });
-                Swal.fire({ title: 'Success!', text: 'Component added successfully.', icon: 'success' });
-                closeFormModal();
-                loadAllData();
-            } catch (err) {
-                const msg = err?.result?.error?.message || 'Unknown error';
-                Swal.fire({ title: 'Save Error', text: `Could not save the component. Error: ${msg}`, icon: 'error' });
-            }
-        }
-
-        async function updateComponent(id) {
-            const itemToUpdate = allItems.find(item => item.id === id);
-            if (!itemToUpdate) { Swal.fire('Error', 'Could not find the component to update.', 'error'); return; }
-            const updatedItem = collectFormData();
-            updatedItem.id = id;
-            const updatedRow = COLUMN_HEADERS.map(header => updatedItem[header] || "");
-            const updateRange = `Sheet1!A${itemToUpdate.rowIndex}:AC${itemToUpdate.rowIndex}`;
-            try {
-                await gapi.client.sheets.spreadsheets.values.update({
-                    spreadsheetId: SPREADSHEET_ID,
-                    range: updateRange,
-                    valueInputOption: 'USER_ENTERED',
-                    resource: { values: [updatedRow] }
-                });
-                Swal.fire('Success!', 'Component updated successfully.', 'success');
-                closeFormModal();
-                loadAllData();
-            } catch (err) {
-                const msg = err?.result?.error?.message || 'Unknown error';
-                Swal.fire('Update Error', `Could not update the component. Error: ${msg}`, 'error');
-            }
-        }
-
-        async function deleteComponent(id) {
-            const itemToDelete = allItems.find(item => item.id === id);
-            if (!itemToDelete) { Swal.fire('Error', 'Could not find the component to delete.', 'error'); return; }
-            try {
-                await gapi.client.sheets.spreadsheets.batchUpdate({
-                    spreadsheetId: SPREADSHEET_ID,
-                    resource: {
-                        requests: [{
-                            deleteDimension: {
-                                range: {
-                                    sheetId: 0, // NOTE: assumes first sheet is Sheet1
-                                    dimension: 'ROWS',
-                                    startIndex: itemToDelete.rowIndex - 1,
-                                    endIndex: itemToDelete.rowIndex
-                                }
-                            }
-                        }]
-                    }
-                });
-                Swal.fire('Deleted!', 'The component has been deleted.', 'success');
-                closeDetailPanel();
-                loadAllData();
-            } catch (err) {
-                const msg = err?.result?.error?.message || 'Unknown error';
-                Swal.fire('Delete Error', `Could not delete the component. Error: ${msg}`, 'error');
-            }
-        }
-
-        // --- Listing / Filters / Pagination ---
-        function processAndRenderItems() {
-            if (!gapiInited) return;
-            const searchTerm = dom.search.value.toLowerCase();
-            const deviceFilter = dom.filterDevice.value;
-            const sizeFilter = dom.filterSize.value;
-            const sortBy = dom.sortBy.value;
-
-            filteredItems = allItems.filter(item => {
-                const searchMatch = Object.values(item).join(' ').toLowerCase().includes(searchTerm);
-                const deviceMatch = !deviceFilter || item.device === deviceFilter;
-                const sizeMatch = !sizeFilter || item.size === sizeFilter;
-                return searchMatch && deviceMatch && sizeMatch;
-            });
-
-            switch (sortBy) {
-                case 'price-desc':
-                    filteredItems.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0));
-                    break;
-                case 'quantity-asc':
-                    filteredItems.sort((a, b) => (parseInt(a.quantity) || 0) - (parseInt(b.quantity) || 0));
-                    break;
-                case 'model-asc':
-                default:
-                    filteredItems.sort((a, b) => (a.model || '').localeCompare(b.model || ''));
-                    break;
-            }
-
-            updateAnalytics(allItems, allSales);
-            renderItems();
-        }
-
-        function renderItems() {
-            if (!gapiInited || !gapi.client || (typeof gapi.client.getToken !== 'function')) {
-                dom.searchResults.innerHTML = '';
-                dom.noResults.classList.toggle('hidden', true);
-                dom.searchResults.classList.toggle('hidden', true);
-                return;
-            }
-            dom.searchResults.innerHTML = '';
-            dom.noResults.classList.toggle('hidden', filteredItems.length > 0 || !gapi.client.getToken());
-            dom.searchResults.classList.toggle('hidden', filteredItems.length === 0);
-
-            const paginatedItems = filteredItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
-            if (paginatedItems.length === 0 && currentPage > 1) { currentPage = 1; renderItems(); return; }
-
-            if (currentLayout === 'grid') {
-                dom.searchResults.className = 'grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5';
-                paginatedItems.forEach(item => dom.searchResults.insertAdjacentHTML('beforeend', createGridCard(item)));
-            } else if (currentLayout === 'list') {
-                dom.searchResults.className = 'space-y-3';
-                paginatedItems.forEach(item => dom.searchResults.insertAdjacentHTML('beforeend', createListCard(item)));
-            } else if (currentLayout === 'kanban') {
-                renderKanbanView();
-            } else if (currentLayout === 'table') {
-                renderTableView();
-            } else if (currentLayout === 'compact') {
-                dom.searchResults.className = 'grid gap-4 grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10';
-                paginatedItems.forEach(item => dom.searchResults.insertAdjacentHTML('beforeend', createCompactCard(item)));
-            }
-            lucide.createIcons();
-            renderPaginationControls();
-        }
-
-        function createGridCard(item) {
-            const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
-            const firstImage = getDriveThumbnail(images[0]) || `https://placehold.co/600x400/E9ECEF/6C757D?text=${encodeURIComponent(item.itemName || 'No Image')}`;
-            const quantity = parseInt(item.quantity, 10);
-            const statusColor = quantity > 10 ? 'bg-green-100 text-green-800' : quantity > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800';
-            const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
-            return `<div class="brutalist-card overflow-hidden flex flex-col group">
-                        <div class="relative bg-gray-100">
-                            <img src="${firstImage}" alt="${item.itemName}" class="w-full h-48 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/600x400/E9ECEF/6C757D?text=Invalid+Image';">
-                            <div class="absolute top-3 right-3 ${statusColor} text-xs font-bold px-2 py-1 rounded">${statusText}</div>
-                        </div>
-                        <div class="p-4 flex-grow flex flex-col">
-                            <h3 class="font-bold text-base leading-tight">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
-                            <p class="text-sm text-[var(--text-secondary)] mt-1">Price: ₹${item.price || 'N/A'}</p>
-                            <div class="mt-auto pt-4 text-right">
-                                <button class="view-details-btn text-sm font-semibold text-[var(--text-primary)] hover:text-[var(--accent-primary)]" data-id="${item.id}">View Details &rarr;</button>
-                            </div>
-                        </div>
+        let html = '<div class="grid grid-cols-1 md:grid-cols-3 gap-6">';
+        for(const status in statuses){
+          html += `<div class="bg-gray-100 rounded-lg p-3"><h3 class="font-bold mb-3 px-2">${status}</h3><div class="space-y-3">`;
+          filteredItems.filter(statuses[status]).forEach(item => {
+            html += `<div class="brutalist-card p-3 text-sm">
+                      <p class="font-bold">${item.model||item.itemName}</p>
+                      <p class="text-xs text-gray-500">${item.device||''}</p>
+                      <button class="view-details-btn absolute inset-0" data-id="${item.id}"></button>
                     </div>`;
+          });
+          html += `</div></div>`;
         }
+        html += '</div>'; dom.searchResults.innerHTML = html;
+      }
+      function renderTableView(){
+        let html = `<div class="overflow-x-auto brutalist-card"><table class="w-full text-sm text-left">
+          <thead class="bg-gray-50 border-b border-gray-200"><tr>
+            <th class="p-3">Model</th><th class="p-3">Item Name</th><th class="p-3">Device</th><th class="p-3">Price</th><th class="p-3">Quantity</th><th class="p-3"></th>
+          </tr></thead><tbody>`;
+        filteredItems.forEach(item=>{
+          html += `<tr class="border-b border-gray-200 hover:bg-gray-50">
+            <td class="p-3 font-semibold">${item.model||''}</td>
+            <td class="p-3">${item.itemName||''}</td>
+            <td class="p-3">${item.device||''}</td>
+            <td class="p-3">₹${item.price||'N/A'}</td>
+            <td class="p-3">${item.quantity||'0'}</td>
+            <td class="p-3 text-right"><button class="view-details-btn text-sm font-semibold" data-id="${item.id}">Details</button></td>
+          </tr>`;
+        });
+        html += `</tbody></table></div>`;
+        dom.searchResults.innerHTML = html;
+      }
 
-        function createListCard(item) {
-            const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://placehold.co/100x100/E9ECEF/6C757D?text=Img`;
-            const quantity = parseInt(item.quantity, 10);
-            const statusColor = quantity > 10 ? 'text-green-600' : quantity > 0 ? 'text-yellow-600' : 'text-red-600';
-            return `<div class="brutalist-card p-3 flex items-center gap-4 hover:border-[var(--accent-primary)]">
-                        <img src="${image}" class="w-16 h-16 rounded-sm object-contain flex-shrink-0 bg-gray-100" onerror="this.onerror=null;this.src='https://placehold.co/100x100/E9ECEF/6C757D?text=Err';">
-                        <div class="flex-1 grid grid-cols-5 gap-4 items-center">
-                            <h3 class="col-span-2 font-semibold">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
-                            <p class="text-[var(--text-secondary)]">₹${item.price || 'N/A'}</p>
-                            <p class="${statusColor} font-medium">${quantity > 0 ? `${quantity} in Stock` : 'Out of Stock'}</p>
-                            <div class="text-right"><button class="view-details-btn text-sm font-semibold text-[var(--text-primary)] hover:text-[var(--accent-primary)]" data-id="${item.id}">Details</button></div>
-                        </div>
-                    </div>`;
-        }
+      function renderPaginationControls(){
+        const totalPages = Math.ceil(filteredItems.length/ITEMS_PER_PAGE);
+        dom.paginationControls.innerHTML=''; if(totalPages<=1) return;
+        dom.paginationControls.innerHTML = `
+          <button data-page="${currentPage-1}" class="btn btn-secondary" ${currentPage===1?'disabled':''}>&larr; Prev</button>
+          <span class="font-medium text-[var(--text-secondary)]">Page ${currentPage} of ${totalPages}</span>
+          <button data-page="${currentPage+1}" class="btn btn-secondary" ${currentPage===totalPages?'disabled':''}>Next &rarr;</button>`;
+      }
+      function handlePaginationClick(e){
+        const b = e.target.closest('button'); if(b && !b.disabled){ currentPage = parseInt(b.dataset.page,10); renderItems(); }
+      }
 
-        function createCompactCard(item) {
-            const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://placehold.co/100x100/E9ECEF/6C757D?text=Img`;
-            return `<div class="brutalist-card text-center p-2 group">
-                        <img src="${image}" class="w-full h-20 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/100x100/E9ECEF/6C757D?text=Err';">
-                        <p class="text-xs font-semibold mt-2 truncate">${item.model || item.itemName}</p>
-                        <button class="view-details-btn absolute inset-0" data-id="${item.id}"></button>
-                    </div>`;
-        }
-
-        function renderKanbanView() {
-            const statuses = {
-                'In Stock': items => parseInt(items.quantity) > 10,
-                'Low Stock': items => parseInt(items.quantity) > 0 && parseInt(items.quantity) <= 10,
-                'Out of Stock': items => parseInt(items.quantity) === 0,
-            };
-            let html = '<div class="grid grid-cols-1 md:grid-cols-3 gap-6">';
-            for (const status in statuses) {
-                html += `<div class="bg-gray-100 rounded-lg p-3">
-                            <h3 class="font-bold mb-3 px-2">${status}</h3>
-                            <div class="space-y-3">`;
-                const itemsInStatus = filteredItems.filter(statuses[status]);
-                itemsInStatus.forEach(item => {
-                    html += `<div class="brutalist-card p-3 text-sm">
-                                <p class="font-bold">${item.model || item.itemName}</p>
-                                <p class="text-xs text-gray-500">${item.device || ''}</p>
-                                <button class="view-details-btn absolute inset-0" data-id="${item.id}"></button>
-                            </div>`;
-                });
-                html += `</div></div>`;
-            }
-            html += '</div>';
-            dom.searchResults.innerHTML = html;
-        }
-
-        function renderTableView() {
-            let html = `<div class="overflow-x-auto brutalist-card"><table class="w-full text-sm text-left">
-                            <thead class="bg-gray-50 border-b border-gray-200">
-                                <tr>
-                                    <th class="p-3">Model</th>
-                                    <th class="p-3">Item Name</th>
-                                    <th class="p-3">Device</th>
-                                    <th class="p-3">Price</th>
-                                    <th class="p-3">Quantity</th>
-                                    <th class="p-3"></th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
-            filteredItems.forEach(item => {
-                html += `<tr class="border-b border-gray-200 hover:bg-gray-50">
-                            <td class="p-3 font-semibold">${item.model || ''}</td>
-                            <td class="p-3">${item.itemName || ''}</td>
-                            <td class="p-3">${item.device || ''}</td>
-                            <td class="p-3">₹${item.price || 'N/A'}</td>
-                            <td class="p-3">${item.quantity || '0'}</td>
-                            <td class="p-3 text-right"><button class="view-details-btn text-sm font-semibold text-[var(--text-primary)] hover:text-[var(--accent-primary)]" data-id="${item.id}">Details</button></td>
-                        </tr>`;
-            });
-            html += `</tbody></table></div>`;
-            dom.searchResults.innerHTML = html;
-        }
-
-        function switchLayout(layout) {
-            currentLayout = layout;
-            localStorage.setItem('layout', layout);
-            ['grid','list','kanban','table','compact'].forEach(l => {
-                const btn = dom[`${l}ViewBtn`];
-                if (!btn) return;
-                if (l === layout) { btn.classList.add('bg-white','text-black','shadow-sm'); }
-                else { btn.classList.remove('bg-white','text-black','shadow-sm'); }
-            });
-            processAndRenderItems();
-        }
-
-        function showSkeletonLoader(show) {
-            dom.skeletonLoader.classList.toggle('hidden', !show);
-            dom.searchResults.classList.add('hidden');
-            dom.noResults.classList.add('hidden');
-            if (show) {
-                let skeletonHtml = '';
-                for (let i = 0; i < 10; i++) {
-                    skeletonHtml += `<div class="brutalist-card p-4 space-y-4">
-                                        <div class="h-40 rounded bg-gray-200 animate-pulse"></div>
-                                        <div class="space-y-2">
-                                            <div class="h-6 w-3/4 rounded bg-gray-200 animate-pulse"></div>
-                                            <div class="h-4 w-1/2 rounded bg-gray-200 animate-pulse"></div>
-                                        </div>
-                                     </div>`;
-                }
-                dom.skeletonLoader.innerHTML = `<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">${skeletonHtml}</div>`;
-            }
-        }
-
-        function initLayout() {
-            const savedLayout = localStorage.getItem('layout') || 'grid';
-            switchLayout(savedLayout);
-        }
-
-        function getDriveThumbnail(url) {
-            if (!url) return null;
-            const match = url.match(/file\/d\/([a-zA-Z0-9_-]+)/);
-            return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w512-h512` : url;
-        }
-
-        // --- Modal & Form ---
-        function openAddModal() {
-            dom.formTitle.textContent = 'Add New Component';
-            dom.editId.value = '';
-            dom.partForm.reset();
-            dom.specFieldsContainer.classList.add('hidden');
-            dom.specFields.innerHTML = '';
-            dom.formModal.classList.remove('hidden');
-            dom.formModal.classList.add('flex');
-        }
-
-        function openEditModal(item) {
-            dom.formTitle.textContent = 'Edit Component';
-            dom.editId.value = item.id;
-            dom.partForm.querySelector('#model').value = item.model || '';
-            dom.partForm.querySelector('#device').value = item.device || '';
-            dom.partForm.querySelector('#size').value = item.size || '';
-            dom.itemNameSelect.value = item.itemName || '';
-            dom.partForm.querySelector('#price').value = item.price || '';
-            dom.partForm.querySelector('#quantity').value = item.quantity || '0';
-            dom.imageLinksInput.value = item.imageLinks || '';
-            dom.partForm.querySelector('#note').value = item.note || '';
-
-            updateSpecFields();
-            Object.keys(item).forEach(key => {
-                if (key.startsWith('spec_')) {
-                    const input = dom.partForm.querySelector(`[name="${key}"]`);
-                    if (input) input.value = item[key];
-                }
-            });
-
-            dom.formModal.classList.remove('hidden');
-            dom.formModal.classList.add('flex');
-        }
-
-        function closeFormModal() {
-            dom.formModal.classList.add('hidden'); dom.formModal.classList.remove('flex');
-            dom.partForm.reset();
-            dom.specFieldsContainer.classList.add('hidden');
-            dom.specFields.innerHTML = '';
-        }
-
-        function collectFormData() {
-            const formData = {
-                model: dom.partForm.querySelector('#model').value,
-                device: dom.partForm.querySelector('#device').value,
-                size: dom.partForm.querySelector('#size').value,
-                itemName: dom.itemNameSelect.value,
-                price: dom.partForm.querySelector('#price').value,
-                quantity: dom.partForm.querySelector('#quantity').value,
-                imageLinks: dom.imageLinksInput.value,
-                note: dom.partForm.querySelector('#note').value,
-            };
-            dom.partForm.querySelectorAll('#spec-fields input').forEach(input => {
-                formData[input.name] = input.value;
-            });
-            return formData;
-        }
-
-        function updateSpecFields() {
-            const selectedType = dom.itemNameSelect.value;
-            dom.specFields.innerHTML = '';
-            if (selectedType && specDefinitions[selectedType]) {
-                dom.specFieldsContainer.classList.remove('hidden');
-                specDefinitions[selectedType].forEach(specName => {
-                    dom.specFields.appendChild(createSpecInput(specName));
-                });
-            } else {
-                dom.specFieldsContainer.classList.add('hidden');
-            }
-        }
-
-        function createSpecInput(specName) {
-            const id = specName.replace(/_/g, '-');
-            const wrapper = document.createElement('div');
-            const label = document.createElement('label');
-            label.htmlFor = id;
-            label.textContent = specName.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-            const input = document.createElement('input');
-            input.type = 'text'; input.id = id; input.name = specName; input.className = 'brutalist-input';
-            wrapper.appendChild(label); wrapper.appendChild(input);
-            return wrapper;
-        }
-
-        // --- Detail Panel ---
-        function handleCardClick(e) {
-            const viewBtn = e.target.closest('.view-details-btn');
-            if (viewBtn) {
-                const itemId = viewBtn.dataset.id;
-                const item = allItems.find(i => i.id === itemId);
-                if (item) openDetailPanel(item);
-            }
-        }
-
-        function openDetailPanel(item) { populateDetailPanel(item); dom.detailModal.classList.remove('hidden'); dom.detailModal.classList.add('flex'); }
-        function closeDetailPanel() { dom.detailModal.classList.add('hidden'); dom.detailModal.classList.remove('flex'); }
-
-        function populateDetailPanel(item) {
-            const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
-
-            const specKeys = Object.keys(item)
-                .filter(key => key.startsWith('spec_') && item[key])
-                .sort((a, b) => {
-                    const aIsTeeth = a.toLowerCase().includes('teeth');
-                    const bIsTeeth = b.toLowerCase().includes('teeth');
-                    if (aIsTeeth && !bIsTeeth) return -1;
-                    if (!aIsTeeth && bIsTeeth) return 1;
-                    return a.localeCompare(b);
-                });
-
-            let specsHtml = '';
-            specKeys.forEach(key => {
-                const label = key.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-                specsHtml += `<div class="flex justify-between py-2.5 border-b border-[var(--border-primary)]"><dt class="text-[var(--text-secondary)]">${label}</dt><dd class="font-semibold">${item[key]}</dd></div>`;
-            });
-            if (specKeys.length === 0) specsHtml = '<p class="text-[var(--text-secondary)] text-sm mt-2">No specifications provided.</p>';
-
-            dom.detailContent.innerHTML = `
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="lg:col-span-1 space-y-6">
-                         <div id="detail-gallery-container" class="relative flex items-center justify-center bg-gray-100 rounded-md border border-gray-200 min-h-[250px]" data-images="${images.join(',')}" data-current-index="0">
-                            ${images.length > 0 ? `
-                                <img src="${getDriveThumbnail(images[0])}" class="w-full h-full max-h-[40vh] object-contain rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/600x400/E9ECEF/6C757D?text=Invalid+Image';">
-                                ${images.length > 1 ? `
-                                <button class="detail-gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1.5 bg-white/50 hover:bg-white/90 backdrop-blur-sm rounded-full text-black shadow-md" data-direction="-1"><i data-lucide="chevron-left" class="pointer-events-none"></i></button>
-                                <button class="detail-gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-white/50 hover:bg-white/90 backdrop-blur-sm rounded-full text-black shadow-md" data-direction="1"><i data-lucide="chevron-right" class="pointer-events-none"></i></button>
-                                ` : ''}
-                            ` : `<div class="flex items-center justify-center text-[var(--text-secondary)]">No Images</div>`}
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-2">Note</h4>
-                            <p class="text-gray-700 p-3 bg-gray-100 rounded-md border border-gray-200">${item.note || 'None'}</p>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-2 space-y-6">
-                        <div>
-                            <span class="text-sm font-bold text-gray-500">${[item.device, item.size].filter(Boolean).join(' / ')}</span>
-                            <h3 class="text-3xl font-extrabold mt-1">${item.itemName || 'Unnamed Item'}</h3>
-                            <p class="text-lg text-gray-500 font-semibold">${item.model || 'No Model'}</p>
-                        </div>
-
-                        <div class="bg-[var(--bg-tertiary)] p-4 rounded-md border border-[var(--border-primary)]">
-                            <h4 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3">Stock & Actions</h4>
-                            <div class="flex items-center justify-between gap-4">
-                                <div class="text-center">
-                                    <div class="text-xs text-gray-600">Price</div>
-                                    <div class="text-2xl font-bold">₹${item.price || 'N/A'}</div>
-                                </div>
-                                <div class="text-center">
-                                    <div class="text-xs text-gray-600">Quantity</div>
-                                    <div class="text-2xl font-bold">${item.quantity || '0'}</div>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <button data-id="${item.id}" class="edit-btn btn btn-secondary"><i data-lucide="edit"></i>Edit</button>
-                                    <button data-id="${item.id}" class="delete-btn btn btn-secondary !border-red-500/50 !text-red-600 hover:!bg-red-50"><i data-lucide="trash-2"></i>Delete</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h4 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-2">Specifications</h4>
-                            <dl class="text-sm">${specsHtml}</dl>
-                        </div>
-                    </div>
-                </div>
-            `;
-            lucide.createIcons();
-        }
-
-        function handleDetailPanelClick(e) {
-            const editBtn = e.target.closest('.edit-btn');
-            const deleteBtn = e.target.closest('.delete-btn');
-            const arrowBtn = e.target.closest('.detail-gallery-arrow');
-
-            if (arrowBtn) {
-                const gallery = arrowBtn.closest('#detail-gallery-container');
-                const imgEl = gallery.querySelector('img');
-                const images = (gallery.dataset.images || '').split(',');
-                if (images.length <= 1) return;
-                let currentIndex = parseInt(gallery.dataset.currentIndex || '0');
-                const direction = parseInt(arrowBtn.dataset.direction);
-                currentIndex = (currentIndex + direction + images.length) % images.length;
-                imgEl.src = getDriveThumbnail(images[currentIndex]);
-                gallery.dataset.currentIndex = currentIndex;
-            }
-
-            if (editBtn) {
-                const itemId = editBtn.dataset.id;
-                const item = allItems.find(i => i.id === itemId);
-                if (item) { closeDetailPanel(); openEditModal(item); }
-            }
-
-            if (deleteBtn) {
-                const itemId = deleteBtn.dataset.id;
-                Swal.fire({
-                    title: 'Do you want to delete this item?',
-                    text: "This action cannot be undone.",
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, delete it',
-                    cancelButtonText: 'Cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            title: 'Are you absolutely sure?',
-                            text: "This is your final confirmation. The item will be permanently deleted.",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonText: 'Yes, I am sure',
-                            confirmButtonColor: '#d33',
-                            cancelButtonText: 'No, take me back'
-                        }).then((finalResult) => {
-                            if (finalResult.isConfirmed) { deleteComponent(itemId); }
-                        });
-                    }
-                });
-            }
-        }
-
-        // --- Analytics & Filters ---
-        function populateFilters() {
-            const devices = [...new Set(allItems.map(item => item.device).filter(Boolean))];
-            const sizes = [...new Set(allItems.map(item => item.size).filter(Boolean))];
-
-            dom.filterDevice.innerHTML = '<option value="">All Devices</option>';
-            devices.forEach(d => dom.filterDevice.innerHTML += `<option value="${d}">${d}</option>`);
-
-            dom.filterSize.innerHTML = '<option value="">All Sizes</option>';
-            sizes.forEach(s => dom.filterSize.innerHTML += `<option value="${s}">${s}</option>`);
-        }
-
-        function updateAnalytics(items, sales) {
-            document.getElementById('total-components').textContent = items.length;
-
-            const totalValue = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0), 0);
-            document.getElementById('total-value').textContent = `₹${totalValue.toLocaleString('en-IN')}`;
-
-            const lowStockEl = document.getElementById('low-stock');
-            const lowStockCount = items.filter(item => (parseInt(item.quantity) || 0) < 5).length;
-            lowStockEl.textContent = lowStockCount;
-            if (lowStockCount === 0) {
-                lowStockEl.classList.remove('text-red-600');
-                lowStockEl.classList.add('text-green-600');
-            } else {
-                lowStockEl.classList.remove('text-green-600');
-                lowStockEl.classList.add('text-red-600');
-            }
-
-            const deviceCounts = items.reduce((acc, item) => {
-                if (item.device) acc[item.device] = (acc[item.device] || 0) + 1;
-                return acc;
-            }, {});
-            const commonDevice = Object.keys(deviceCounts).reduce((a, b) => deviceCounts[a] > deviceCounts[b] ? a : b, '-') || '-';
-            document.getElementById('common-device').textContent = commonDevice;
-
-            // Most Profitable Item
-            const revenueByItem = sales.reduce((acc, sale) => {
-                const item = items.find(i => i.id === sale.itemId);
-                if (item) {
-                    const revenue = (sale.quantitySold || 0) * (sale.salePrice || 0);
-                    const itemName = [item.model, item.device, item.itemName].filter(Boolean).join(' ');
-                    acc[itemName] = (acc[itemName] || 0) + revenue;
-                }
-                return acc;
-            }, {});
-            const mostProfitable = Object.entries(revenueByItem).sort((a, b) => b[1] - a[1])[0];
-            document.getElementById('most-profitable').textContent = mostProfitable ? `${mostProfitable[0]} (₹${mostProfitable[1].toLocaleString('en-IN')})` : '-';
-
-            // Dust Collectors (no sales)
-            const soldItemIds = new Set(sales.map(s => s.itemId));
-            const dustCollectorsCount = items.filter(item => !soldItemIds.has(item.id)).length;
-            document.getElementById('dust-collectors').textContent = dustCollectorsCount;
-        }
-
-        function renderPaginationControls() {
-            const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
-            dom.paginationControls.innerHTML = '';
-            if (totalPages <= 1) return;
-
-            let html = `<button data-page="${currentPage - 1}" class="btn btn-secondary" ${currentPage === 1 ? 'disabled' : ''}>&larr; Prev</button>`;
-            html += `<span class="font-medium text-[var(--text-secondary)]">Page ${currentPage} of ${totalPages}</span>`;
-            html += `<button data-page="${currentPage + 1}" class="btn btn-secondary" ${currentPage === totalPages ? 'disabled' : ''}>Next &rarr;</button>`;
-            dom.paginationControls.innerHTML = html;
-        }
-
-        function handlePaginationClick(e) {
-            const button = e.target.closest('button');
-            if (button && !button.disabled) {
-                currentPage = parseInt(button.dataset.page);
-                renderItems();
-            }
-        }
-
-        function toggleValueVisibility() {
-            const valueEl = document.getElementById('total-value');
-            const iconEl = dom.toggleValueVisibility.querySelector('i');
-            valueEl.classList.toggle('blur-sm');
-            if (valueEl.classList.contains('blur-sm')) {
-                iconEl.setAttribute('data-lucide', 'eye-off');
-            } else {
-                iconEl.setAttribute('data-lucide', 'eye');
-            }
-            lucide.createIcons();
-        }
-
-        // --- View Switching ---
-        function switchView(view) {
-            document.querySelectorAll('.sidebar-nav-link').forEach(l => l.classList.remove('active'));
-            ['dashboard','reports','library'].forEach(v => { dom[`${v}View`].classList.add('hidden'); });
-
-            if (view === 'dashboard') {
-                dom.navDashboard.classList.add('active');
-                dom.dashboardView.classList.remove('hidden');
-                dom.layoutSwitcher.classList.remove('hidden');
-            } else if (view === 'reports') {
-                dom.navReports.classList.add('active');
-                dom.reportsView.classList.remove('hidden');
-                dom.layoutSwitcher.classList.add('hidden');
-            } else if (view === 'library') {
-                dom.navLibrary.classList.add('active');
-                dom.libraryView.classList.remove('hidden');
-                dom.layoutSwitcher.classList.add('hidden');
-                loadLibraryImages();
-            }
-        }
-
-        async function loadLibraryImages() {
-            dom.libraryGrid.innerHTML = '<p class="text-gray-500">Loading images...</p>';
-            try {
-                const response = await gapi.client.drive.files.list({
-                    q: `'${IMAGE_FOLDER_ID}' in parents and mimeType contains 'image/'`,
-                    fields: 'files(id, name, webViewLink, thumbnailLink)',
-                    pageSize: 100
-                });
-                const files = response.result.files;
-                if (files && files.length > 0) {
-                    let html = '';
-                    files.forEach(file => {
-                        const whatsappLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(file.webViewLink)}`;
-                        html += `<div class="brutalist-card p-2">
-                                    <img src="${file.thumbnailLink.replace('s220', 's400')}" class="w-full h-32 object-cover rounded-sm">
-                                    <p class="text-xs font-semibold truncate mt-2">${file.name}</p>
-                                    <div class="flex items-center gap-2 mt-2">
-                                        <a href="${whatsappLink}" target="_blank" class="flex-1 btn btn-secondary btn-icon !p-1.5" title="Share to WhatsApp"><i data-lucide="share-2" class="w-4 h-4"></i></a>
-                                        <button class="copy-link-btn flex-1 btn btn-secondary btn-icon !p-1.5" data-link="${file.webViewLink}" title="Copy Link"><i data-lucide="link" class="w-4 h-4"></i></button>
-                                    </div>
-                                </div>`;
-                    });
-                    dom.libraryGrid.innerHTML = html;
-                    lucide.createIcons();
-                    dom.libraryGrid.querySelectorAll('.copy-link-btn').forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            navigator.clipboard.writeText(btn.dataset.link);
-                            Swal.fire({ title: 'Copied!', text: 'Image link copied to clipboard.', icon: 'success', timer: 1500, showConfirmButton: false });
-                        });
-                    });
-                } else {
-                    dom.libraryGrid.innerHTML = '<p class="text-gray-500">No images found in the folder.</p>';
-                }
-            } catch (err) {
-                dom.libraryGrid.innerHTML = '<p class="text-red-500">Error loading images. Check folder permissions.</p>';
-                console.error("Error loading library images:", err);
-            }
-        }
-
-        // --- Charts ---
-        function renderReportCharts() {
-            const monthlyRevenue = allSales.reduce((acc, sale) => {
-                const month = new Date(sale.date).toLocaleString('default', { month: 'short', year: 'numeric' });
-                const revenue = sale.quantitySold * sale.salePrice;
-                acc[month] = (acc[month] || 0) + revenue;
-                return acc;
-            }, {});
-
-            const bestSellers = allSales.reduce((acc, sale) => {
-                const item = allItems.find(i => i.id === sale.itemId);
-                if (item) {
-                    const itemName = [item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ');
-                    acc[itemName] = (acc[itemName] || 0) + sale.quantitySold;
-                }
-                return acc;
-            }, {});
-            const sortedBestSellers = Object.entries(bestSellers).sort((a, b) => b[1] - a[1]).slice(0, 5);
-
-            const chartOptions = {
-                plugins: { legend: { labels: { color: 'var(--text-secondary)' } } },
-                scales: {
-                    x: { ticks: { color: 'var(--text-secondary)' }, grid: { color: 'var(--border-primary)' } },
-                    y: { ticks: { color: 'var(--text-secondary)' }, grid: { color: 'var(--border-primary)' } }
-                }
-            };
-
-            if (revenueChart) revenueChart.destroy();
-            revenueChart = new Chart(document.getElementById('revenue-chart'), {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(monthlyRevenue),
-                    datasets: [{
-                        label: 'Monthly Revenue',
-                        data: Object.values(monthlyRevenue),
-                        backgroundColor: 'rgba(255, 193, 7, 0.5)',
-                        borderColor: 'var(--accent-primary)',
-                        borderWidth: 1
-                    }]
-                },
-                options: chartOptions
-            });
-
-            if (bestsellersChart) bestsellersChart.destroy();
-            bestsellersChart = new Chart(document.getElementById('bestsellers-chart'), {
-                type: 'doughnut',
-                data: {
-                    labels: sortedBestSellers.map(item => item[0]),
-                    datasets: [{
-                        label: 'Quantity Sold',
-                        data: sortedBestSellers.map(item => item[1]),
-                        backgroundColor: ['#FFC107', '#FFCA2C', '#FFD35B', '#FFDD8A', '#FFE5B9'],
-                    }]
-                },
-                options: { plugins: { legend: { position: 'right', labels: { color: 'var(--text-secondary)' } } } }
-            });
-        }
-
+      function toggleValueVisibility(){
+        const el = document.getElementById('total-value');
+        const ic = dom.toggleValueVisibility.querySelector('i');
+        el.classList.toggle('blur-sm');
+        ic.setAttribute('data-lucide', el.classList.contains('blur-sm') ? 'eye-off' : 'eye');
         lucide.createIcons();
-    });
-    </script>
+      }
 
-    <!-- Required Google scripts: keep these AFTER the inline script so onload handlers exist -->
-    <script src="https://apis.google.com/js/api.js" async defer onload="gapiLoaded()"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer onload="gisLoaded()"></script>
+      function switchView(view){
+        document.querySelectorAll('.sidebar-nav-link').forEach(l=>l.classList.remove('active'));
+        ['dashboard','reports','library'].forEach(v=>dom[`${v}View`].classList.add('hidden'));
+        if(view==='dashboard'){ dom.navDashboard.classList.add('active'); dom.dashboardView.classList.remove('hidden'); dom.layoutSwitcher.classList.remove('hidden'); }
+        else if(view==='reports'){ dom.navReports.classList.add('active'); dom.reportsView.classList.remove('hidden'); dom.layoutSwitcher.classList.add('hidden'); }
+        else { dom.navLibrary.classList.add('active'); dom.libraryView.classList.remove('hidden'); dom.layoutSwitcher.classList.add('hidden'); loadLibraryImages(); }
+      }
+
+      async function loadLibraryImages(){
+        const grid = dom.libraryGrid; grid.innerHTML = '<p class="text-gray-500">Loading images...</p>';
+        try{
+          const res = await gapi.client.drive.files.list({
+            q: `'${IMAGE_FOLDER_ID}' in parents and mimeType contains 'image/'`,
+            fields:'files(id,name,webViewLink,thumbnailLink)', pageSize:100
+          });
+          const files = res.result.files || [];
+          if(!files.length){ grid.innerHTML = '<p class="text-gray-500">No images found in the folder.</p>'; return; }
+          grid.innerHTML = files.map(file => {
+            const wa = `https://api.whatsapp.com/send?text=${encodeURIComponent(file.webViewLink)}`;
+            return `<div class="brutalist-card p-2">
+              <img src="${file.thumbnailLink.replace('s220','s400')}" class="w-full h-32 object-cover rounded-sm">
+              <p class="text-xs font-semibold truncate mt-2">${file.name}</p>
+              <div class="flex items-center gap-2 mt-2">
+                <a href="${wa}" target="_blank" class="flex-1 btn btn-secondary btn-icon !p-1.5" title="Share to WhatsApp"><i data-lucide="share-2" class="w-4 h-4"></i></a>
+                <button class="copy-link-btn flex-1 btn btn-secondary btn-icon !p-1.5" data-link="${file.webViewLink}" title="Copy Link"><i data-lucide="link" class="w-4 h-4"></i></button>
+              </div>
+            </div>`;
+          }).join('');
+          lucide.createIcons();
+          grid.querySelectorAll('.copy-link-btn').forEach(btn=>{
+            btn.addEventListener('click',()=>{ navigator.clipboard.writeText(btn.dataset.link); Swal.fire({title:'Copied!',text:'Image link copied to clipboard.',icon:'success',timer:1500,showConfirmButton:false}); });
+          });
+        }catch(err){
+          grid.innerHTML = '<p class="text-red-500">Error loading images. Check folder permissions.</p>';
+          console.error(err);
+        }
+      }
+
+      function populateFilters(){
+        const devices = [...new Set(allItems.map(i=>i.device).filter(Boolean))];
+        const sizes   = [...new Set(allItems.map(i=>i.size).filter(Boolean))];
+        dom.filterDevice.innerHTML = '<option value="">All Devices</option>' + devices.map(d=>`<option value="${d}">${d}</option>`).join('');
+        dom.filterSize.innerHTML   = '<option value="">All Sizes</option>' + sizes.map(s=>`<option value="${s}">${s}</option>`).join('');
+      }
+
+      function updateAnalytics(items, sales){
+        document.getElementById('total-components').textContent = items.length;
+        const totalValue = items.reduce((s,i)=>s + (parseFloat(i.price)||0)*(parseInt(i.quantity)||0), 0);
+        document.getElementById('total-value').textContent = `₹${totalValue.toLocaleString('en-IN')}`;
+        const low = items.filter(i => (parseInt(i.quantity)||0) < 5).length;
+        const el = document.getElementById('low-stock'); el.textContent = low;
+        el.classList.toggle('text-green-600', low===0); el.classList.toggle('text-red-600', low!==0);
+        const counts = items.reduce((a,i)=>{ if(i.device){ a[i.device]=(a[i.device]||0)+1; } return a; },{});
+        const common = Object.keys(counts).reduce((a,b)=> counts[a]>counts[b]?a:b, '-') || '-';
+        document.getElementById('common-device').textContent = common;
+
+        const revenueByItem = sales.reduce((acc,s)=>{
+          const it = items.find(i=>i.id===s.itemId); if(!it) return acc;
+          const name = [it.model,it.device,it.itemName].filter(Boolean).join(' ');
+          acc[name] = (acc[name]||0) + (s.quantitySold||0)*(s.salePrice||0); return acc;
+        },{});
+        const top = Object.entries(revenueByItem).sort((a,b)=>b[1]-a[1])[0];
+        document.getElementById('most-profitable').textContent = top ? `${top[0]} (₹${top[1].toLocaleString('en-IN')})` : '-';
+
+        const soldIds = new Set(sales.map(s=>s.itemId));
+        document.getElementById('dust-collectors').textContent = items.filter(i=>!soldIds.has(i.id)).length;
+      }
+
+      function renderReportCharts(){
+        const monthlyRevenue = allSales.reduce((acc, s)=>{
+          const m = new Date(s.date).toLocaleString('default', { month:'short', year:'numeric' });
+          acc[m] = (acc[m]||0) + (s.quantitySold*s.salePrice); return acc;
+        },{});
+        const best = allSales.reduce((acc, s)=>{
+          const it = allItems.find(i=>i.id===s.itemId);
+          if(it){ const name = [it.model,it.device,it.size,it.itemName].filter(Boolean).join(' '); acc[name]=(acc[name]||0)+s.quantitySold; }
+          return acc;
+        },{});
+        const top = Object.entries(best).sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+        const opts = { plugins:{ legend:{ labels:{ color:'var(--text-secondary)' } } }, scales:{ x:{ ticks:{ color:'var(--text-secondary)'}, grid:{color:'var(--border-primary)'} }, y:{ ticks:{ color:'var(--text-secondary)'}, grid:{color:'var(--border-primary)'} } } };
+
+        if(revenueChart) revenueChart.destroy();
+        revenueChart = new Chart(document.getElementById('revenue-chart'), {
+          type:'bar',
+          data:{ labels:Object.keys(monthlyRevenue), datasets:[{ label:'Monthly Revenue', data:Object.values(monthlyRevenue), backgroundColor:'rgba(255,193,7,.5)', borderColor:'var(--accent-primary)', borderWidth:1 }] },
+          options:opts
+        });
+
+        if(bestsellersChart) bestsellersChart.destroy();
+        bestsellersChart = new Chart(document.getElementById('bestsellers-chart'), {
+          type:'doughnut',
+          data:{ labels:top.map(x=>x[0]), datasets:[{ label:'Quantity Sold', data:top.map(x=>x[1]), backgroundColor:['#FFC107','#FFCA2C','#FFD35B','#FFDD8A','#FFE5B9'] }] },
+          options:{ plugins:{ legend:{ position:'right', labels:{ color:'var(--text-secondary)' } } } }
+        });
+      }
+
+      function showSkeletonLoader(show){
+        dom.skeletonLoader.classList.toggle('hidden', !show);
+        dom.searchResults.classList.add('hidden'); dom.noResults.classList.add('hidden');
+        if(show){
+          let s=''; for(let i=0;i<10;i++){ s += `<div class="brutalist-card p-4 space-y-4"><div class="h-40 rounded bg-gray-200 animate-pulse"></div><div class="space-y-2"><div class="h-6 w-3/4 rounded bg-gray-200 animate-pulse"></div><div class="h-4 w-1/2 rounded bg-gray-200 animate-pulse"></div></div></div>`;}
+          dom.skeletonLoader.innerHTML = `<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">${s}</div>`;
+        }
+      }
+      function getDriveThumb(url){ if(!url) return null; const m = url.match(/file\/d\/([a-zA-Z0-9_-]+)/); return m ? `https://drive.google.com/thumbnail?id=${m[1]}&sz=w512-h512` : url; }
+      function openAddModal(){ dom.formTitle.textContent='Add New Component'; dom.editId.value=''; dom.partForm.reset(); dom.specFieldsContainer.classList.add('hidden'); dom.specFields.innerHTML=''; dom.formModal.classList.remove('hidden'); dom.formModal.classList.add('flex'); }
+      function openEditModal(item){ dom.formTitle.textContent='Edit Component'; dom.editId.value=item.id; dom.partForm.querySelector('#model').value=item.model||''; dom.partForm.querySelector('#device').value=item.device||''; dom.partForm.querySelector('#size').value=item.size||''; dom.itemNameSelect.value=item.itemName||''; dom.partForm.querySelector('#price').value=item.price||''; dom.partForm.querySelector('#quantity').value=item.quantity||'0'; dom.imageLinksInput.value=item.imageLinks||''; dom.partForm.querySelector('#note').value=item.note||''; updateSpecFields(); Object.keys(item).forEach(k=>{ if(k.startsWith('spec_')){ const input=dom.partForm.querySelector(`[name="${k}"]`); if(input) input.value=item[k]; }}); dom.formModal.classList.remove('hidden'); dom.formModal.classList.add('flex'); }
+      function closeFormModal(){ dom.formModal.classList.add('hidden'); dom.formModal.classList.remove('flex'); dom.partForm.reset(); dom.specFieldsContainer.classList.add('hidden'); dom.specFields.innerHTML=''; }
+      function collectFormData(){ const data={ model:val('#model'), device:val('#device'), size:val('#size'), itemName:dom.itemNameSelect.value, price:val('#price'), quantity:val('#quantity'), imageLinks:dom.imageLinksInput.value, note:val('#note') }; dom.partForm.querySelectorAll('#spec-fields input').forEach(i=>data[i.name]=i.value); return data; }
+      function val(sel){ return dom.partForm.querySelector(sel).value; }
+      function updateSpecFields(){ const t = dom.itemNameSelect.value; dom.specFields.innerHTML=''; if(t && specDefinitions[t]){ dom.specFieldsContainer.classList.remove('hidden'); specDefinitions[t].forEach(n=>{ const id=n.replace(/_/g,'-'); const w=document.createElement('div'); const lab=document.createElement('label'); lab.htmlFor=id; lab.textContent=n.replace('spec_','').replace(/([A-Z])/g,' $1').replace(/^./,s=>s.toUpperCase()); const input=document.createElement('input'); input.type='text'; input.id=id; input.name=n; input.className='brutalist-input'; w.appendChild(lab); w.appendChild(input); dom.specFields.appendChild(w); }); } else { dom.specFieldsContainer.classList.add('hidden'); } }
+      function handleCardClick(e){ const b = e.target.closest('.view-details-btn'); if(b){ const it = allItems.find(i=>i.id===b.dataset.id); if(it) openDetailPanel(it); } }
+      function openDetailPanel(item){ populateDetailPanel(item); dom.detailModal.classList.remove('hidden'); dom.detailModal.classList.add('flex'); }
+      function closeDetailPanel(){ dom.detailModal.classList.add('hidden'); dom.detailModal.classList.remove('flex'); }
+      function populateDetailPanel(item){
+        const images=(item.imageLinks||'').split(',').map(s=>s.trim()).filter(Boolean);
+        const specKeys = Object.keys(item).filter(k=>k.startsWith('spec_') && item[k]).sort((a,b)=>{ const at=a.toLowerCase().includes('teeth'), bt=b.toLowerCase().includes('teeth'); if(at&&!bt) return -1; if(!at&&bt) return 1; return a.localeCompare(b); });
+        const specHtml = specKeys.length? specKeys.map(k=>{ const lab=k.replace('spec_','').replace(/([A-Z])/g,' $1').replace(/^./,s=>s.toUpperCase()); return `<div class="flex justify-between py-2.5 border-b border-[var(--border-primary)]"><dt class="text-[var(--text-secondary)]">${lab}</dt><dd class="font-semibold">${item[k]}</dd></div>`;}).join('') : '<p class="text-[var(--text-secondary)] text-sm mt-2">No specifications provided.</p>';
+        dom.detailContent.innerHTML = `
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1 space-y-6">
+              <div id="detail-gallery-container" class="relative flex items-center justify-center bg-gray-100 rounded-md border border-gray-200 min-h-[250px]" data-images="${images.join(',')}" data-current-index="0">
+                ${images.length? `
+                  <img src="${getDriveThumb(images[0])}" class="w-full h-full max-h-[40vh] object-contain rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/600x400/E9ECEF/6C757D?text=Invalid+Image'">
+                  ${images.length>1? `
+                    <button class="detail-gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1.5 bg-white/50 hover:bg-white/90 backdrop-blur-sm rounded-full text-black shadow-md" data-direction="-1"><i data-lucide="chevron-left"></i></button>
+                    <button class="detail-gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-white/50 hover:bg-white/90 backdrop-blur-sm rounded-full text-black shadow-md" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}` : `<div class="flex items-center justify-center text-[var(--text-secondary)]">No Images</div>`}
+              </div>
+              <div><h4 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-2">Note</h4><p class="text-gray-700 p-3 bg-gray-100 rounded-md border border-gray-200">${item.note||'None'}</p></div>
+            </div>
+            <div class="lg:col-span-2 space-y-6">
+              <div><span class="text-sm font-bold text-gray-500">${[item.device,item.size].filter(Boolean).join(' / ')}</span><h3 class="text-3xl font-extrabold mt-1">${item.itemName||'Unnamed Item'}</h3><p class="text-lg text-gray-500 font-semibold">${item.model||'No Model'}</p></div>
+              <div class="bg-[var(--bg-tertiary)] p-4 rounded-md border border-[var(--border-primary)]">
+                <h4 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3">Stock & Actions</h4>
+                <div class="flex items-center justify-between gap-4">
+                  <div class="text-center"><div class="text-xs text-gray-600">Price</div><div class="text-2xl font-bold">₹${item.price||'N/A'}</div></div>
+                  <div class="text-center"><div class="text-xs text-gray-600">Quantity</div><div class="text-2xl font-bold">${item.quantity||'0'}</div></div>
+                  <div class="flex items-center gap-2">
+                    <button data-id="${item.id}" class="edit-btn btn btn-secondary"><i data-lucide="edit"></i>Edit</button>
+                    <button data-id="${item.id}" class="delete-btn btn btn-secondary !border-red-500/50 !text-red-600 hover:!bg-red-50"><i data-lucide="trash-2"></i>Delete</button>
+                  </div>
+                </div>
+              </div>
+              <div><h4 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-2">Specifications</h4><dl class="text-sm">${specHtml}</dl></div>
+            </div>
+          </div>`;
+        lucide.createIcons();
+      }
+      function handleDetailPanelClick(e){
+        const editBtn = e.target.closest('.edit-btn');
+        const delBtn = e.target.closest('.delete-btn');
+        const arrow = e.target.closest('.detail-gallery-arrow');
+
+        if(arrow){
+          const g = arrow.closest('#detail-gallery-container'); const img = g.querySelector('img');
+          const images = (g.dataset.images||'').split(','); if(images.length<=1) return;
+          let idx = parseInt(g.dataset.currentIndex||'0',10); const dir = parseInt(arrow.dataset.direction,10);
+          idx = (idx + dir + images.length) % images.length; img.src = getDriveThumb(images[idx]); g.dataset.currentIndex = idx;
+        }
+        if(editBtn){ const it = allItems.find(i=>i.id===editBtn.dataset.id); if(it){ closeDetailPanel(); openEditModal(it); } }
+        if(delBtn){
+          const id = delBtn.dataset.id;
+          Swal.fire({title:'Do you want to delete this item?', text:'This action cannot be undone.', icon:'question', showCancelButton:true, confirmButtonText:'Yes, delete it', cancelButtonText:'Cancel'})
+            .then(r=>{ if(r.isConfirmed){ Swal.fire({title:'Are you absolutely sure?', text:'Final confirmation.', icon:'warning', showCancelButton:true, confirmButtonText:'Yes, I am sure', confirmButtonColor:'#d33'}).then(fr=>{ if(fr.isConfirmed){ deleteComponent(id); } }); }});
+        }
+      }
+
+      function populateFilters(){} // already defined above
+      function switchLayout(layout){ currentLayout = layout; localStorage.setItem('layout', layout); ['grid','list','kanban','table','compact'].forEach(l=>{ const b=dom[`${l}ViewBtn`]; if(!b) return; b.classList.toggle('bg-white', l===layout); b.classList.toggle('text-black', l===layout); b.classList.toggle('shadow-sm', l===layout); }); processAndRenderItems(); }
+      function initLayout(){ const saved = localStorage.getItem('layout')||'grid'; switchLayout(saved); }
+
+      function renderPaginationControls(){} // defined earlier
+    });
+  </script>
+
+  <!-- Load Google libraries LAST; they call gapiLoaded()/gisLoaded() above -->
+  <script src="https://apis.google.com/js/api.js" async defer onload="gapiLoaded()"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer onload="gisLoaded()"></script>
 </body>
 </html>
