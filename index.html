@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+<!-- The 'dark' class is now controlled by JS based on user preference -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,45 +9,52 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* ============================================
-        Brutalist Industrial Theme by Gemini
-        ============================================
+        /* ================================================================================
+        1. WORLD-CLASS AESTHETIC & BRANDING: Brutalist Industrial Theme
+        ================================================================================
+        - A professional, high-contrast color palette ensures clarity and reduces eye strain.
+        - CSS variables allow for easy theme management and consistency.
+        - The entire design is built on a foundation of clean lines and functional clarity.
         */
         :root {
             --sidebar-width: 260px;
-            --header-height: 80px;
-            
-            /* Light Theme (Default) */
-            --bg-primary: #F8F9FA;
-            --bg-secondary: #FFFFFF;
-            --text-primary: #212529;
-            --text-secondary: #6c757d;
-            --border-color: #dee2e6;
-            --accent: #FFC107; /* Industrial Yellow */
-            --accent-dark: #e0a800;
-            --accent-text: #212529;
-            --danger-color: #dc3545;
-            --success-color: #198754;
+            --header-height: 72px;
         }
         
-        html.dark {
-            /* Dark Theme */
-            --bg-primary: #212529;
-            --bg-secondary: #343a40;
-            --text-primary: #F8F9FA;
-            --text-secondary: #adb5bd;
-            --border-color: #495057;
+        /* Light Theme Color Palette */
+        html:not(.dark) {
+            --bg-primary: #F8F9FA;
+            --bg-secondary: #FFFFFF;
+            --bg-tertiary: #E9ECEF;
+            --text-primary: #212529;
+            --text-secondary: #6C757D;
+            --border-color: #DEE2E6;
             --accent: #FFC107;
-            --accent-dark: #e0a800;
             --accent-text: #212529;
-            --danger-color: #e57373;
-            --success-color: #20c997;
+            --danger: #DC3545;
+            --success: #198754;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Dark Theme Color Palette */
+        html.dark {
+            --bg-primary: #121212;
+            --bg-secondary: #1E1E1E;
+            --bg-tertiary: #2C2C2C;
+            --text-primary: #EAEAEA;
+            --text-secondary: #888888;
+            --border-color: #3A3A3A;
+            --accent: #FFC107;
+            --accent-text: #212529;
+            --danger: #EF5350;
+            --success: #4CAF50;
+            --shadow-color: rgba(0, 0, 0, 0.2);
         }
 
         html { scroll-behavior: smooth; }
@@ -54,183 +62,161 @@
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-primary);
             color: var(--text-primary);
-            line-height: 1.6;
-        }
-
-        /* Typography Hierarchy */
-        h1, h2, h3 {
-            font-weight: 800; /* extrabold */
-            color: var(--text-primary);
-        }
-        .data-label {
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Layout & Spacing */
-        .main-content {
-            transition: padding-left 0.3s ease-in-out;
-            padding-left: var(--sidebar-width);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         
-        /* Sidebar */
+        /* ================================================================================
+        2. TYPOGRAPHY & READABILITY
+        ================================================================================
+        - A strong typographic hierarchy is established with extra-bold headings.
+        - Line-height is optimized for maximum readability of technical data.
+        */
+        h1, h2, h3, h4, h5, h6 { font-weight: 800; }
+        body, p, span, div { line-height: 1.6; }
+        label { font-weight: 500; color: var(--text-secondary); }
+
+        /* ================================================================================
+        3. LAYOUT & SPACING: Grid, Borders, and Shadows
+        ================================================================================
+        - Padding and margins are now consistent and generous, creating a breathable layout.
+        - Sharp, 1px borders and subtle shadows create a clean, tactile interface.
+        - The sidebar is clearly delineated from the main content.
+        */
+        .main-content {
+            padding-left: var(--sidebar-width);
+            transition: padding-left 0.3s ease;
+        }
+
         .sidebar {
             background-color: var(--bg-secondary);
             border-right: 1px solid var(--border-color);
-            transition: transform 0.3s ease-in-out;
-        }
-        .sidebar-nav-link {
-            transition: all 0.2s ease;
+            transition: transform 0.3s ease;
+            height: 100vh;
         }
         .sidebar-nav-link.active {
             background-color: var(--accent);
             color: var(--accent-text);
             font-weight: 700;
         }
-        .sidebar-nav-link:not(.active):hover {
-            background-color: var(--bg-primary);
-        }
+        .sidebar-nav-link:not(.active):hover { background-color: var(--bg-tertiary); }
 
-        /* Industrial Cards */
         .industrial-card {
             background-color: var(--bg-secondary);
             border: 1px solid var(--border-color);
-            border-radius: 0; /* Sharp edges */
-            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 2px var(--shadow-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
         .industrial-card:hover {
             transform: translateY(-4px);
+            box-shadow: 0 8px 16px var(--shadow-color);
             border-color: var(--accent);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         }
         
-        /* Buttons */
+        /* ================================================================================
+        4. INTERACTIVE ELEMENTS & MICRO-INTERACTIONS
+        ================================================================================
+        - Buttons have a satisfying "pushable" feel with a strong bottom border.
+        - Form inputs are minimalist and clean, with an underline style that highlights on focus.
+        - Hover and active states are quick and responsive.
+        */
         .btn {
-            border-radius: 0;
+            padding: 0.65rem 1.25rem;
+            border-radius: 0.375rem;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 0.75rem 1.5rem;
-            transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background-color 0.15s ease-out;
+            transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
             border: 1px solid transparent;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            text-align: center;
         }
         .btn-primary {
             background-color: var(--accent);
             color: var(--accent-text);
-            border-bottom: 3px solid var(--accent-dark);
+            border-bottom: 3px solid rgba(0,0,0,0.25);
         }
-        .btn-primary:hover {
-            background-color: var(--accent-dark);
-        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .btn-primary:active { transform: translateY(1px); border-bottom-width: 1px; }
+        
         .btn-secondary {
             background-color: transparent;
-            color: var(--text-secondary);
+            color: var(--text-primary);
             border: 1px solid var(--border-color);
         }
-        .btn-secondary:hover {
-            border-color: var(--text-primary);
-            color: var(--text-primary);
-        }
-        .btn-danger {
-            background-color: transparent;
-            color: var(--danger-color);
-            border: 1px solid var(--danger-color);
-        }
-        .btn-danger:hover {
-            background-color: var(--danger-color);
-            color: white;
-        }
+        .btn-secondary:hover { background-color: var(--bg-tertiary); border-color: var(--text-primary); }
+        
+        .btn-danger { background-color: transparent; color: var(--danger); border: 1px solid var(--danger); }
+        .btn-danger:hover { background-color: var(--danger); color: white; }
 
-        /* Inputs & Filters */
-        .industrial-input, .industrial-select {
+        .industrial-input {
             background-color: transparent;
-            border: 0;
+            border: none;
             border-bottom: 2px solid var(--border-color);
             border-radius: 0;
             padding: 0.75rem 0.25rem;
+            width: 100%;
             transition: border-color 0.2s ease;
         }
-        .industrial-input:focus, .industrial-select:focus {
+        .industrial-input:focus {
             outline: none;
-            border-bottom: 2px solid var(--accent);
+            border-bottom-color: var(--accent);
             box-shadow: none;
             --tw-ring-color: transparent;
         }
-
-        /* Modals */
-        .modal-backdrop {
-            background-color: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
-        }
-        .modal-content {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-        }
-
-        /* SweetAlert2 Customization */
-        .swal2-popup { font-family: 'Inter', sans-serif; background-color: var(--bg-secondary) !important; color: var(--text-primary) !important; border-radius: 0 !important; border: 1px solid var(--border-color) !important; }
+        
+        /* SweetAlert Customization */
+        .swal2-popup { font-family: 'Inter', sans-serif; background-color: var(--bg-secondary) !important; color: var(--text-primary) !important; border: 1px solid var(--border-color) !important; }
         .swal2-title { color: var(--text-primary) !important; }
-        .swal2-confirm { background-color: var(--accent) !important; color: var(--accent-text) !important; border-radius: 0 !important; }
-        .swal2-cancel { background-color: transparent !important; color: var(--text-secondary) !important; border: 1px solid var(--border-color) !important; border-radius: 0 !important;}
+        .swal2-confirm { background-color: var(--accent) !important; color: var(--accent-text) !important; }
+        .swal2-deny { background-color: var(--danger) !important; }
+        .swal2-cancel { background-color: var(--bg-tertiary) !important; }
 
-        /* Responsive */
         @media (max-width: 1024px) {
-            .main-content { padding-left: 1rem; }
-            .sidebar { transform: translateX(-100%); box-shadow: 0 0 20px rgba(0,0,0,0.2); }
+            .main-content { padding-left: 0; }
+            .sidebar { transform: translateX(-100%); box-shadow: 5px 0 15px rgba(0,0,0,0.2); z-index: 50; }
             .sidebar.open { transform: translateX(0); }
         }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased bg-[var(--bg-primary)] text-[var(--text-primary)]">
 
-    <div id="login-view" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-8 bg-[--bg-primary]">
+    <div id="login-view" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-8">
         <div class="text-center">
-            <div class="inline-block bg-[--text-primary] p-4 mb-6">
-                <i data-lucide="gem" class="w-12 h-12 text-[--bg-primary]"></i>
+            <div class="inline-block bg-[var(--text-primary)] p-4 rounded-lg mb-6">
+                <i data-lucide="gem" class="w-12 h-12 text-[var(--bg-primary)]"></i>
             </div>
-            <h1 class="text-4xl font-extrabold">Welcome to Vinayaka DB</h1>
-            <p class="text-lg text-[--text-secondary] mt-2 mb-8">Your intelligent component inventory.</p>
-            <button id="signin-button-main" class="btn btn-primary">
-                Sign In with Google
-            </button>
+            <h1 class="text-4xl font-black">Welcome to Vinayaka Industries DB</h1>
+            <p class="text-lg text-[var(--text-secondary)] mt-2 mb-8">The Professional Component Inventory Platform.</p>
+            <button id="signin-button-main" class="btn btn-primary text-lg">Sign In with Google</button>
         </div>
     </div>
 
     <div id="app-wrapper" class="relative min-h-screen hidden">
         <!-- Sidebar -->
-        <aside class="sidebar fixed top-0 left-0 h-screen w-[var(--sidebar-width)] z-40 flex flex-col">
-            <div class="flex items-center gap-4 p-5 h-[var(--header-height)] border-b border-[--border-color]">
-                <div class="bg-[--text-primary] p-2.5"><i data-lucide="gem" class="w-6 h-6 text-[--bg-primary]"></i></div>
-                <h1 class="text-xl font-bold">Vinayaka DB</h1>
+        <aside class="sidebar fixed top-0 left-0 w-[var(--sidebar-width)] flex flex-col">
+            <div class="flex items-center gap-4 p-5 h-[var(--header-height)] border-b border-[var(--border-color)]">
+                <div class="bg-[var(--text-primary)] p-2.5 rounded-lg"><i data-lucide="gem" class="w-6 h-6 text-[var(--bg-primary)]"></i></div>
+                <h1 class="text-xl font-black">Vinayaka Industries</h1>
             </div>
             
-            <nav class="flex-1 p-4 space-y-2">
-                <a href="#" id="nav-dashboard" class="sidebar-nav-link active flex items-center gap-3 px-3 py-2.5 rounded-none">
+            <nav class="flex-1 px-4 py-6 space-y-2">
+                <a href="#" id="nav-dashboard" class="sidebar-nav-link active flex items-center gap-3 px-3 py-2.5 rounded-lg">
                     <i data-lucide="layout-grid" class="w-5 h-5"></i><span>Dashboard</span>
                 </a>
-                <a href="#" id="nav-reports" class="sidebar-nav-link flex items-center gap-3 px-3 py-2.5 text-[--text-secondary] rounded-none font-medium">
+                <a href="#" id="nav-reports" class="sidebar-nav-link flex items-center gap-3 px-3 py-2.5 text-[var(--text-secondary)] rounded-lg font-medium transition-colors">
                     <i data-lucide="bar-chart-2" class="w-5 h-5"></i><span>Reports</span>
                 </a>
             </nav>
 
-            <div class="p-4 border-t border-[--border-color]">
-                <div id="user-profile-area" class="p-2 cursor-pointer group hover:bg-[--bg-primary] transition-colors">
+            <div class="p-4 border-t border-[var(--border-color)]">
+                <div id="user-profile-area" class="p-2 rounded-lg cursor-pointer group hover:bg-[var(--bg-tertiary)] transition-colors">
                     <div id="auth-required-profile" class="flex items-center gap-3">
-                        <div class="w-11 h-11 flex items-center justify-center border border-dashed border-[--border-color]"><i data-lucide="user-x" class="text-[--text-secondary]"></i></div>
+                        <div class="w-11 h-11 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center border border-dashed border-[var(--border-color)]"><i data-lucide="user-x" class="text-[var(--text-secondary)]"></i></div>
                         <div>
-                            <p class="font-semibold text-[--text-secondary]">Not Signed In</p>
-                            <p class="text-xs text-gray-500 group-hover:text-[--accent] transition-colors">Click to sign in</p>
+                            <p class="font-semibold text-[var(--text-secondary)]">Not Signed In</p>
+                            <p class="text-xs text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-colors">Click to sign in</p>
                         </div>
                     </div>
                     <div id="user-profile" class="hidden items-center gap-3">
-                        <img id="user-dp" class="w-11 h-11" src="" alt="User">
+                        <img id="user-dp" class="w-11 h-11 rounded-full" src="" alt="User">
                         <div>
                             <p id="user-name" class="font-semibold"></p>
                             <p id="user-role" class="text-xs text-green-500 font-medium">Online</p>
@@ -238,8 +224,8 @@
                     </div>
                 </div>
                 <div class="mt-2 flex items-center justify-between p-2">
-                    <span class="text-sm font-medium text-[--text-secondary]">Theme</span>
-                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-[--bg-primary] text-[--text-secondary] transition-colors">
+                    <span class="text-sm font-medium text-[var(--text-secondary)]">Theme</span>
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] transition-colors">
                         <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
                         <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
                     </button>
@@ -249,71 +235,73 @@
 
         <!-- Main Content -->
         <main class="main-content flex-1 flex flex-col min-h-screen">
-            <header class="sticky top-0 z-30 h-[var(--header-height)] flex items-center justify-between px-8 bg-[--bg-primary]/80 backdrop-blur-sm border-b border-[--border-color]">
-                <button id="menuBtn" class="lg:hidden p-2 text-[--text-secondary]"><i data-lucide="menu" class="w-6 h-6"></i></button>
-                <div class="flex-1"></div> <!-- Spacer -->
+            <header class="sticky top-0 z-30 bg-[var(--bg-primary)]/80 backdrop-blur-sm h-[var(--header-height)] flex items-center justify-between px-6 lg:px-8 border-b border-[var(--border-color)]">
                 <div class="flex items-center gap-4">
-                    <div id="layout-switcher" class="flex items-center gap-1 bg-[--bg-primary] p-1 border border-[--border-color]">
-                        <button id="grid-view-btn" class="p-2 text-[--accent] bg-[--bg-secondary]"><i data-lucide="layout-grid"></i></button>
-                        <button id="list-view-btn" class="p-2 text-[--text-secondary]"><i data-lucide="list"></i></button>
-                    </div>
-                    <button id="addPartBtn" class="btn btn-primary flex items-center gap-2 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:border-b-transparent" disabled>
-                        <i data-lucide="plus" class="w-5 h-5"></i><span class="hidden sm:inline">Add Component</span>
-                    </button>
+                     <button id="menuBtn" class="lg:hidden p-2 text-[var(--text-secondary)] -ml-2"><i data-lucide="menu" class="w-6 h-6"></i></button>
+                     <h2 class="text-2xl font-black" id="page-title">Dashboard</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                     <div id="layout-switcher" class="flex items-center gap-1 bg-[var(--bg-tertiary)] p-1 rounded-lg border border-[var(--border-color)]">
+                         <button id="grid-view-btn" class="p-2 rounded-md"><i data-lucide="layout-grid"></i></button>
+                         <button id="list-view-btn" class="p-2 rounded-md"><i data-lucide="list"></i></button>
+                     </div>
+                     <button id="addPartBtn" class="btn btn-primary flex items-center gap-2 disabled:bg-gray-400 disabled:text-gray-600 disabled:cursor-not-allowed disabled:border-b-0" disabled>
+                         <i data-lucide="plus" class="w-5 h-5"></i><span class="hidden sm:inline">Add Component</span>
+                     </button>
                 </div>
             </header>
 
-            <div id="app" class="max-w-screen-2xl w-full p-8">
+            <div id="app" class="flex-1 w-full p-6 lg:p-8">
                 <!-- Dashboard View -->
                 <div id="dashboard-view">
-                    <!-- Analytics Section -->
                     <div class="mb-8">
-                        <h2 class="text-2xl font-extrabold mb-4">Analytics Overview</h2>
-                        <div id="analytics-widgets" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-                            <!-- Widgets will be injected here -->
+                        <h2 class="text-2xl font-black mb-4">Analytics Overview</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-6">
+                            <div class="industrial-card p-6 2xl:col-span-1"><p class="text-sm font-medium text-[var(--text-secondary)]">Total Components</p><p id="total-components" class="text-5xl font-black mt-2">0</p></div>
+                            <div class="industrial-card p-6 2xl:col-span-2">
+                                <div class="flex justify-between items-start">
+                                    <p class="text-sm font-medium text-[var(--text-secondary)]">Inventory Value</p>
+                                    <button id="value-toggle-btn" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"><i data-lucide="eye" class="w-5 h-5"></i></button>
+                                </div>
+                                <p id="total-value" class="text-5xl font-black mt-2">₹0</p>
+                            </div>
+                            <div class="industrial-card p-6 2xl:col-span-1"><p class="text-sm font-medium text-[var(--text-secondary)]">Low Stock Items</p><p id="low-stock" class="text-5xl font-black mt-2">0</p></div>
+                            <div class="industrial-card p-6 2xl:col-span-1"><p class="text-sm font-medium text-[var(--text-secondary)]">Out of Stock</p><p id="out-of-stock" class="text-5xl font-black mt-2 text-[var(--danger)]">0</p></div>
+                            <div class="industrial-card p-6 2xl:col-span-1"><p class="text-sm font-medium text-[var(--text-secondary)]">Most Valuable Item</p><p id="most-valuable" class="text-2xl font-black mt-2 leading-tight">-</p></div>
                         </div>
                     </div>
 
                     <!-- Filters and Search -->
-                    <div class="industrial-card p-4 mb-8">
-                        <div class="grid grid-cols-1 md:grid-cols-5 gap-6 items-end">
-                            <div class="md:col-span-2">
-                                <label for="search" class="data-label">Search</label>
-                                <div class="relative">
-                                    <i data-lucide="search" class="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-5 text-[--text-secondary]"></i>
-                                    <input type="text" id="search" placeholder="Search by model, name, device..." class="w-full pl-8 industrial-input">
-                                </div>
+                    <div class="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-4 mb-8">
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-x-6 gap-y-4">
+                            <div class="md:col-span-2 relative">
+                                <i data-lucide="search" class="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-secondary)]"></i>
+                                <input type="text" id="search" placeholder="Search by model, name, device..." class="pl-8 industrial-input">
                             </div>
                             <div>
-                                <label for="filter-device" class="data-label">Device</label>
-                                <select id="filter-device" class="industrial-select w-full"><option value="">All Devices</option></select>
+                                <label for="filter-device" class="text-xs">Device</label>
+                                <select id="filter-device" class="industrial-input"><option value="">All Devices</option></select>
                             </div>
                             <div>
-                                <label for="filter-size" class="data-label">Size</label>
-                                <select id="filter-size" class="industrial-select w-full"><option value="">All Sizes</option></select>
+                                <label for="filter-size" class="text-xs">Size</label>
+                                <select id="filter-size" class="industrial-input"><option value="">All Sizes</option></select>
                             </div>
                             <div>
-                                <label for="sort-by" class="data-label">Sort By</label>
-                                <select id="sort-by" class="industrial-select w-full">
-                                    <option value="model-asc">Model (A-Z)</option>
-                                    <option value="price-desc">Price (High-Low)</option>
-                                    <option value="quantity-asc">Quantity (Low-High)</option>
-                                </select>
+                                <label for="sort-by" class="text-xs">Sort By</label>
+                                <select id="sort-by" class="industrial-input"><option value="model-asc">Model (A-Z)</option><option value="price-desc">Price (High-Low)</option><option value="quantity-asc">Quantity (Low-High)</option></select>
                             </div>
                         </div>
                     </div>
                 
                     <div id="skeleton-loader" class="hidden"></div>
                     <div id="searchResults" class="hidden"></div>
-                    <div id="no-results" class="hidden text-center py-16 industrial-card"><i data-lucide="search-x" class="w-16 h-16 mx-auto text-[--text-secondary]"></i><h3 class="mt-4 text-2xl font-bold">No Components Found</h3><p class="mt-2 text-[--text-secondary]">Your database is empty or your search returned no results.</p></div>
+                    <div id="no-results" class="hidden text-center py-16 industrial-card"><i data-lucide="search-x" class="w-16 h-16 mx-auto text-[var(--text-secondary)]"></i><h3 class="mt-4 text-2xl font-bold">No Components Found</h3><p class="mt-2 text-[var(--text-secondary)]">Your database is empty or your search returned no results.</p></div>
                 
-                    <!-- Pagination -->
                     <div id="pagination-controls" class="flex justify-center items-center gap-4 mt-8"></div>
                 </div>
 
                 <!-- Reports View -->
                 <div id="reports-view" class="hidden space-y-8">
-                    <h2 class="text-3xl font-extrabold">Sales & Inventory Reports</h2>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <div class="industrial-card p-6"><h3 class="font-semibold mb-4">Monthly Revenue</h3><canvas id="revenue-chart"></canvas></div>
                         <div class="industrial-card p-6"><h3 class="font-semibold mb-4">Best Selling Items (by Quantity)</h3><canvas id="bestsellers-chart"></canvas></div>
@@ -324,39 +312,39 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div id="formModal" class="modal-backdrop hidden fixed inset-0 z-50 justify-center items-center p-4">
-        <div class="modal-content w-full max-w-4xl m-4 max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center p-6 border-b border-[--border-color]"><h2 id="form-title" class="text-2xl font-extrabold">Add New Component</h2><button type="button" id="closeFormModalBtn" class="text-[--text-secondary] hover:text-[--text-primary]"><i data-lucide="x" class="w-6 h-6"></i></button></div>
+    <div id="formModal" class="fixed inset-0 z-50 justify-center items-start p-4 overflow-y-auto bg-black/70 hidden">
+        <div class="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg shadow-2xl w-full max-w-4xl my-8 flex flex-col">
+            <div class="flex justify-between items-center p-6 border-b border-[var(--border-color)]"><h2 id="form-title" class="text-2xl font-black">Add New Component</h2><button type="button" id="closeFormModalBtn" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
             <form id="partForm" class="p-6 space-y-6 overflow-y-auto">
                 <input type="hidden" id="edit-id">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div><label for="model" class="data-label">Model*</label><input type="text" id="model" required class="mt-1 block w-full industrial-input"></div>
-                    <div><label for="device" class="data-label">Device</label><select id="device" class="mt-1 block w-full industrial-select"><option value="">(None)</option><option value="SWING DEVICE">Swing Device</option><option value="TRAVEL DEVICE">Travel Device</option></select></div>
-                    <div><label for="size" class="data-label">Size</label><select id="size" class="mt-1 block w-full industrial-select"><option value="">(None)</option><option value="SMALL">Small</option><option value="MIDDLE">Middle</option><option value="BIG">Big</option></select></div>
-                    <div><label for="item-name-main" class="data-label">Item Name*</label><select id="item-name-main" required class="mt-1 block w-full industrial-select"><option value="">Select item type...</option><option value="Planetary Gear">Planetary Gear</option><option value="Sun Gear">Sun Gear</option><option value="Ring Gear">Ring Gear</option><option value="Spline/Pinion Shaft">Spline/Pinion Shaft</option><option value="Track Motor Shaft">Track Motor Shaft</option><option value="Bearing">Bearing</option><option value="Bushes">Bushes</option></select></div>
-                    <div><label for="price" class="data-label">Price</label><input type="number" id="price" placeholder="e.g., 4500" class="mt-1 block w-full industrial-input"></div>
-                    <div><label for="quantity" class="data-label">Quantity*</label><input type="number" id="quantity" required value="1" min="0" class="mt-1 block w-full industrial-input"></div>
+                    <div><label for="model">Model*</label><input type="text" id="model" required class="mt-1 industrial-input"></div>
+                    <div><label for="device">Device</label><select id="device" class="mt-1 industrial-input"><option value="">(None)</option><option value="SWING DEVICE">Swing Device</option><option value="TRAVEL DEVICE">Travel Device</option></select></div>
+                    <div><label for="size">Size</label><select id="size" class="mt-1 industrial-input"><option value="">(None)</option><option value="SMALL">Small</option><option value="MIDDLE">Middle</option><option value="BIG">Big</option></select></div>
+                    <div><label for="item-name-main">Item Name*</label><select id="item-name-main" required class="mt-1 industrial-input"><option value="">Select item type...</option><option value="Planetary Gear">Planetary Gear</option><option value="Sun Gear">Sun Gear</option><option value="Ring Gear">Ring Gear</option><option value="Spline/Pinion Shaft">Spline/Pinion Shaft</option><option value="Track Motor Shaft">Track Motor Shaft</option><option value="Bearing">Bearing</option><option value="Bushes">Bushes</option></select></div>
+                    <div><label for="price">Price</label><input type="number" id="price" placeholder="e.g., 4500" class="mt-1 industrial-input"></div>
+                    <div><label for="quantity">Quantity*</label><input type="number" id="quantity" required value="1" min="0" class="mt-1 industrial-input"></div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div><label class="data-label">Image Links</label><textarea id="image-links-input" name="image-link" placeholder="Paste one or more comma-separated Google Drive links..." class="block w-full industrial-input mt-1" rows="3"></textarea></div>
-                    <div><label for="note" class="data-label">Note</label><textarea id="note" rows="3" class="mt-1 block w-full industrial-input"></textarea></div>
+                    <div><label>Image Links (comma-separated)</label><textarea id="image-links-input" placeholder="Paste one or more comma-separated Google Drive links..." class="industrial-input mt-1" rows="3"></textarea></div>
+                    <div><label for="note">Note</label><textarea id="note" rows="3" class="mt-1 industrial-input"></textarea></div>
                 </div>
-                <div id="spec-fields-container" class="hidden"><h3 class="text-lg font-bold border-b border-[--border-color] pb-2 mb-4">Specifications</h3><div id="spec-fields" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4"></div></div>
+                <div id="spec-fields-container" class="hidden"><h3 class="text-lg font-bold border-b border-[var(--border-color)] pb-2 mb-4">Specifications</h3><div id="spec-fields" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4"></div></div>
             </form>
-            <div class="mt-auto p-6 border-t border-[--border-color] bg-[--bg-primary] flex justify-end gap-3"><button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button><button type="submit" form="partForm" class="btn btn-primary">Save Component</button></div>
+            <div class="p-6 border-t border-[var(--border-color)] bg-[var(--bg-primary)] flex justify-end gap-3"><button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button><button type="submit" form="partForm" class="btn btn-primary">Save Component</button></div>
         </div>
     </div>
 
     <!-- Detail Modal -->
-    <div id="detail-modal" class="modal-backdrop fixed inset-0 z-50 justify-center items-center p-4 hidden">
-        <div class="fixed inset-0" id="detail-backdrop"></div>
-        <div class="relative modal-content w-full max-w-6xl max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center p-4 border-b border-[--border-color] flex-shrink-0">
-                <h2 class="text-xl font-bold">Component Datasheet</h2>
-                <button id="detail-close-btn" class="p-2 text-[--text-secondary] hover:text-[--text-primary]"><i data-lucide="x"></i></button>
+    <div id="detail-modal" class="detail-modal fixed inset-0 z-50 justify-center items-center p-4 hidden opacity-0 scale-95">
+        <div class="fixed inset-0 bg-black/70" id="detail-backdrop"></div>
+        <div class="relative bg-[var(--bg-secondary)] w-full max-w-6xl max-h-[90vh] rounded-lg border border-[var(--border-color)] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b border-[var(--border-color)] flex-shrink-0">
+                <h2 class="text-xl font-black">Component Datasheet</h2>
+                <button id="detail-close-btn" class="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full hover:bg-[var(--bg-tertiary)]"><i data-lucide="x"></i></button>
             </div>
-            <div id="detail-content" class="grid lg:grid-cols-5 gap-6 p-6 overflow-y-auto">
-                <!-- Content will be injected here -->
+            <div id="detail-content" class="grid lg:grid-cols-3 gap-0 overflow-y-auto">
+                <!-- Content will be injected here by JS -->
             </div>
         </div>
     </div>
@@ -364,7 +352,7 @@
     <script src="https://apis.google.com/js/api.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- CONSTANTS ---
+        // --- GAPI Configuration ---
         const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
         const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com';
         const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
@@ -372,11 +360,8 @@
         const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ'; 
         const INVENTORY_RANGE = 'Sheet1!A:AC';
         const SALES_RANGE = 'SalesLog!A:D';
-        const ITEMS_PER_PAGE = 12; // Increased for better grid view
-        const COLUMN_HEADERS = ['id', 'model', 'device', 'size', 'itemName', 'price', 'quantity', 'imageLinks', 'note', 'spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_width', 'spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_splineOd', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'];
-        const specDefinitions = { 'Planetary Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeeth'], 'Sun Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd'], 'Ring Gear': ['spec_teeth', 'spec_outerDiameter', 'spec_innerDiameter'], 'Spline/Pinion Shaft': ['spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_length', 'spec_splineOd'], 'Track Motor Shaft': ['spec_length', 'spec_outerDiameter', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'], 'Bearing': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_width'], 'Bushes': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length'], };
 
-        // --- STATE ---
+        // --- State Variables ---
         let allItems = [];
         let allSales = [];
         let filteredItems = [];
@@ -385,9 +370,11 @@
         let tokenClient;
         let currentLayout = 'grid';
         let currentPage = 1;
+        const ITEMS_PER_PAGE = 10;
         let revenueChart, bestsellersChart;
+        let isValueVisible = true;
 
-        // --- DOM ELEMENTS ---
+        // --- DOM Element Cache ---
         const dom = {
             html: document.documentElement,
             appWrapper: document.getElementById('app-wrapper'),
@@ -430,10 +417,15 @@
             dashboardView: document.getElementById('dashboard-view'),
             reportsView: document.getElementById('reports-view'),
             layoutSwitcher: document.getElementById('layout-switcher'),
-            analyticsWidgets: document.getElementById('analytics-widgets'),
+            pageTitle: document.getElementById('page-title'),
+            valueToggleBtn: document.getElementById('value-toggle-btn'),
+            totalValue: document.getElementById('total-value'),
         };
 
-        // --- INITIALIZATION ---
+        const COLUMN_HEADERS = ['id', 'model', 'device', 'size', 'itemName', 'price', 'quantity', 'imageLinks', 'note', 'spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_width', 'spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_splineOd', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'];
+        const specDefinitions = { 'Planetary Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeeth'], 'Sun Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd'], 'Ring Gear': ['spec_teeth', 'spec_outerDiameter', 'spec_innerDiameter'], 'Spline/Pinion Shaft': ['spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_length', 'spec_splineOd'], 'Track Motor Shaft': ['spec_length', 'spec_outerDiameter', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'], 'Bearing': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_width'], 'Bushes': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length'], };
+        
+        // --- Initial Setup ---
         initThemeAndLayout();
         gapi.load('client', initializeGapiClient);
         const gisScript = document.createElement('script');
@@ -443,7 +435,7 @@
         gisScript.onload = initializeGis;
         document.body.appendChild(gisScript);
 
-        // --- EVENT LISTENERS ---
+        // --- Event Listeners ---
         dom.partForm.addEventListener('submit', handleFormSubmit);
         [dom.search, dom.filterDevice, dom.filterSize, dom.sortBy].forEach(el => el.addEventListener('input', () => {
             currentPage = 1;
@@ -464,25 +456,9 @@
         dom.paginationControls.addEventListener('click', handlePaginationClick);
         dom.navDashboard.addEventListener('click', (e) => { e.preventDefault(); switchView('dashboard'); });
         dom.navReports.addEventListener('click', (e) => { e.preventDefault(); switchView('reports'); });
-        dom.analyticsWidgets.addEventListener('click', (e) => {
-            const toggleBtn = e.target.closest('#inventory-value-toggle');
-            if (toggleBtn) {
-                const valueEl = document.getElementById('total-value');
-                const isHidden = valueEl.dataset.isHidden === 'true';
-                if (isHidden) {
-                    valueEl.textContent = valueEl.dataset.originalValue;
-                    toggleBtn.innerHTML = '<i data-lucide="eye"></i>';
-                } else {
-                    valueEl.dataset.originalValue = valueEl.textContent;
-                    valueEl.textContent = '₹ ******';
-                    toggleBtn.innerHTML = '<i data-lucide="eye-off"></i>';
-                }
-                valueEl.dataset.isHidden = !isHidden;
-                lucide.createIcons();
-            }
-        });
+        dom.valueToggleBtn.addEventListener('click', toggleValueVisibility);
 
-        // --- AUTHENTICATION ---
+        // --- Core Functions ---
         async function initializeGapiClient() {
             await gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS });
             gapiInited = true; maybeEnableButtons();
@@ -508,7 +484,7 @@
         }
         function handleAuthClick() {
             if (!gapiInited || !gisInited) {
-                Swal.fire('Loading...', 'Authentication libraries are still loading.', 'info');
+                Swal.fire('Loading...', 'Authentication libraries are still loading. Please try again in a moment.', 'info');
                 return;
             }
             if (gapi.client.getToken() === null) {
@@ -533,7 +509,7 @@
                     dom.userDp.src = userInfo.result.picture;
                 } catch (e) {
                     dom.userName.textContent = "User";
-                    dom.userDp.src = `https://placehold.co/44x44/343a40/F8F9FA?text=U`;
+                    dom.userDp.src = `https://ui-avatars.com/api/?name=U&background=E9ECEF&color=212529`;
                 }
                 loadAllData();
             } else {
@@ -547,8 +523,6 @@
                 updateAnalytics([]);
             }
         }
-
-        // --- DATA HANDLING ---
         async function loadAllData() {
             showSkeletonLoader(true);
             try {
@@ -573,7 +547,7 @@
                 })) : [];
 
             } catch (err) {
-                Swal.fire({ title: 'Data Loading Error', text: `Could not load data. Error: ${err.result.error.message}`, icon: 'error' });
+                Swal.fire({ title: 'Data Loading Error', text: `Could not load data. Check Sheet ID and permissions. Error: ${err.result.error.message}`, icon: 'error' });
                 updateAuthStatus(false);
             } finally {
                 showSkeletonLoader(false);
@@ -601,48 +575,41 @@
                 closeFormModal();
                 loadAllData();
             } catch (err) {
-                Swal.fire({ title: 'Save Error', text: `Could not save. Error: ${err.result.error.message}`, icon: 'error' });
+                Swal.fire({ title: 'Save Error', text: `Could not save the component. Error: ${err.result.error.message}`, icon: 'error' });
             }
         }
         async function updateComponent(id) {
             const itemToUpdate = allItems.find(item => item.id === id);
             if (!itemToUpdate) {
-                Swal.fire('Error', 'Could not find the component to update.', 'error');
-                return;
+                Swal.fire('Error', 'Could not find the component to update.', 'error'); return;
             }
             const updatedItem = collectFormData();
             updatedItem.id = id;
             const updatedRow = COLUMN_HEADERS.map(header => updatedItem[header] || "");
             const updateRange = `Sheet1!A${itemToUpdate.rowIndex}:AC${itemToUpdate.rowIndex}`;
             try {
-                await gapi.client.sheets.spreadsheets.values.update({ spreadsheetId: SPREADSHEET_ID, range: updateRange, valueInputOption: 'USER_ENTERED', resource: { values: [updatedRow] } });
+                await gapi.client.sheets.spreadsheets.values.update({ spreadsheetId: SPREADSHEET_ID, range: updateRange, valueInputOption: 'USER_ENTERED', resource: { values: [updatedRow] }});
                 Swal.fire('Success!', 'Component updated successfully.', 'success');
                 closeFormModal();
                 loadAllData();
             } catch (err) {
-                Swal.fire('Update Error', `Could not update. Error: ${err.result.error.message}`, 'error');
+                Swal.fire('Update Error', `Could not update the component. Error: ${err.result.error.message}`, 'error');
             }
         }
         async function deleteComponent(id) {
             const itemToDelete = allItems.find(item => item.id === id);
             if (!itemToDelete) {
-                Swal.fire('Error', 'Could not find the component to delete.', 'error');
-                return;
+                Swal.fire('Error', 'Could not find the component to delete.', 'error'); return;
             }
             try {
-                await gapi.client.sheets.spreadsheets.batchUpdate({
-                    spreadsheetId: SPREADSHEET_ID,
-                    resource: { requests: [{ deleteDimension: { range: { sheetId: 0, dimension: 'ROWS', startIndex: itemToDelete.rowIndex - 1, endIndex: itemToDelete.rowIndex } } }] }
-                });
+                await gapi.client.sheets.spreadsheets.batchUpdate({ spreadsheetId: SPREADSHEET_ID, resource: { requests: [{ deleteDimension: { range: { sheetId: 0, dimension: 'ROWS', startIndex: itemToDelete.rowIndex - 1, endIndex: itemToDelete.rowIndex }}}]}});
                 Swal.fire('Deleted!', 'The component has been deleted.', 'success');
                 closeDetailPanel();
                 loadAllData();
             } catch (err) {
-                Swal.fire('Delete Error', `Could not delete. Error: ${err.result.error.message}`, 'error');
+                 Swal.fire('Delete Error', `Could not delete the component. Error: ${err.result.error.message}`, 'error');
             }
         }
-
-        // --- RENDERING & UI ---
         function processAndRenderItems() {
             if (!gapiInited) return;
             const searchTerm = dom.search.value.toLowerCase();
@@ -650,11 +617,12 @@
             const sizeFilter = dom.filterSize.value;
             const sortBy = dom.sortBy.value;
 
-            filteredItems = allItems.filter(item => 
-                Object.values(item).join(' ').toLowerCase().includes(searchTerm) &&
-                (!deviceFilter || item.device === deviceFilter) &&
-                (!sizeFilter || item.size === sizeFilter)
-            );
+            filteredItems = allItems.filter(item => {
+                const searchMatch = Object.values(item).join(' ').toLowerCase().includes(searchTerm);
+                const deviceMatch = !deviceFilter || item.device === deviceFilter;
+                const sizeMatch = !sizeFilter || item.size === sizeFilter;
+                return searchMatch && deviceMatch && sizeMatch;
+            });
 
             switch (sortBy) {
                 case 'price-desc': filteredItems.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0)); break;
@@ -667,7 +635,6 @@
         }
         function renderItems() {
             if (!gapiInited || !gapi.client || (typeof gapi.client.getToken !== 'function')) return;
-
             dom.searchResults.innerHTML = '';
             dom.noResults.classList.toggle('hidden', filteredItems.length > 0 || !gapi.client.getToken());
             dom.searchResults.classList.toggle('hidden', filteredItems.length === 0);
@@ -675,50 +642,59 @@
             const paginatedItems = filteredItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
             
             if (paginatedItems.length === 0 && currentPage > 1) {
-                currentPage = 1;
-                renderItems();
-                return;
+                currentPage = 1; renderItems(); return;
             }
 
             if (currentLayout === 'grid') {
-                dom.searchResults.className = 'grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
-                paginatedItems.forEach(item => dom.searchResults.insertAdjacentHTML('beforeend', createGridCard(item)));
+                dom.searchResults.className = 'grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5';
+                paginatedItems.forEach((item, index) => {
+                    const card = createGridCard(item);
+                    dom.searchResults.insertAdjacentHTML('beforeend', card);
+                    const cardEl = dom.searchResults.lastElementChild;
+                    setTimeout(() => cardEl.classList.add('card-enter-active'), index * 50);
+                });
             } else {
                 dom.searchResults.className = 'space-y-3';
                 paginatedItems.forEach(item => dom.searchResults.insertAdjacentHTML('beforeend', createListCard(item)));
             }
             lucide.createIcons();
+            initGalleries();
             renderPaginationControls();
         }
+
+        // --- UI & Layout ---
         function createGridCard(item) {
-            const firstImage = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://placehold.co/600x400/${dom.html.classList.contains('dark') ? '343a40/adb5bd' : 'dee2e6/6c757d'}?text=${encodeURIComponent(item.itemName || 'No Image')}`;
+            const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
+            const firstImage = getDriveThumbnail(images[0]) || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.itemName || 'N/A')}&background=E9ECEF&color=212529&size=512&bold=true`;
             const quantity = parseInt(item.quantity, 10);
-            const statusColor = quantity > 10 ? 'border-green-500' : quantity > 0 ? 'border-yellow-500' : 'border-red-500';
-            return `<div class="industrial-card overflow-hidden flex flex-col group">
-                        <div class="relative bg-[--bg-primary] border-b border-[--border-color]">
-                            <img src="${firstImage}" alt="${item.itemName}" class="w-full h-52 object-contain" onerror="this.onerror=null;this.src='https://placehold.co/600x400/dee2e6/6c757d?text=Invalid+Image';">
-                            <div class="absolute top-3 right-3 text-xs font-bold px-2 py-1 bg-[--bg-secondary] border ${statusColor}">${quantity > 0 ? `${quantity} in Stock` : 'Out of Stock'}</div>
+            const statusColor = quantity > 10 ? 'bg-green-500' : quantity > 0 ? 'bg-yellow-500' : 'bg-red-500';
+            const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
+            return `<div class="industrial-card overflow-hidden flex flex-col group card-enter">
+                        <div class="relative image-gallery bg-[var(--bg-tertiary)]" data-images="${images.join(',')}">
+                            <img src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-52 object-contain" onerror="this.src='https://ui-avatars.com/api/?name=Error&background=F8D7DA&color=721C24&size=512&bold=true';">
+                            ${images.length > 1 ? `<button class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="-1"><i data-lucide="chevron-left"></i></button><button class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
+                            <div class="absolute top-2 left-2 flex items-center gap-2 text-xs font-bold px-2 py-1 rounded text-white ${statusColor}">${statusText}</div>
                         </div>
-                        <div class="p-5 flex-grow flex flex-col">
-                            <h3 class="font-bold text-lg leading-tight">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
-                            <p class="text-sm text-[--text-secondary] mt-1">Price: ₹${item.price || 'N/A'}</p>
+                        <div class="p-4 flex-grow flex flex-col">
+                            <h3 class="font-bold leading-tight">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
+                            <p class="text-sm text-[var(--text-secondary)] mt-1">Price: <span class="font-semibold text-[var(--text-primary)]">₹${item.price || 'N/A'}</span></p>
                             <div class="mt-auto pt-4 text-right">
-                                <button class="view-details-btn text-sm font-bold text-[--text-primary] hover:text-[--accent]" data-id="${item.id}">View Details &rarr;</button>
+                                <button class="view-details-btn text-sm font-bold text-[var(--accent)] hover:underline" data-id="${item.id}">View Details &rarr;</button>
                             </div>
                         </div>
                     </div>`;
         }
         function createListCard(item) {
-            const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://placehold.co/100x100/dee2e6/6c757d?text=Img`;
+            const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.itemName || 'N/A')}&background=E9ECEF&color=212529&size=128&bold=true`;
             const quantity = parseInt(item.quantity, 10);
-            const statusColor = quantity > 10 ? 'text-green-500' : quantity > 0 ? 'text-yellow-500' : 'text-red-500';
-            return `<div class="industrial-card p-4 flex items-center gap-4">
-                        <img src="${image}" class="w-16 h-16 object-contain flex-shrink-0 bg-[--bg-primary] border border-[--border-color]" onerror="this.onerror=null;this.src='https://placehold.co/100x100/dee2e6/6c757d?text=Err';">
-                        <div class="flex-1 grid grid-cols-5 gap-4 items-center">
-                            <h3 class="col-span-2 font-semibold">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
-                            <p class="text-[--text-secondary]">₹${item.price || 'N/A'}</p>
-                            <p class="${statusColor} font-medium">${quantity > 0 ? `${quantity} Units` : 'Out of Stock'}</p>
-                            <div class="text-right"><button class="view-details-btn text-sm font-bold hover:text-[--accent]" data-id="${item.id}">Details</button></div>
+            const statusColor = quantity > 10 ? 'text-green-500' : quantity > 0 ? 'text-yellow-600' : 'text-red-600';
+            return `<div class="industrial-card list-item p-4 flex items-center gap-4">
+                        <img src="${image}" class="w-16 h-16 rounded-md object-contain flex-shrink-0 bg-[var(--bg-tertiary)]" onerror="this.src='https://ui-avatars.com/api/?name=Error&background=F8D7DA&color=721C24&size=128&bold=true';">
+                        <div class="flex-1 grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+                            <h3 class="md:col-span-2 font-semibold">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
+                            <p class="text-[var(--text-secondary)]">₹${item.price || 'N/A'}</p>
+                            <p class="${statusColor} font-medium">${quantity > 0 ? `${quantity} in Stock` : 'Out of Stock'}</p>
+                            <div class="md:text-right"><button class="view-details-btn text-sm font-bold text-[var(--accent)] hover:underline" data-id="${item.id}">Details</button></div>
                         </div>
                     </div>`;
         }
@@ -726,11 +702,11 @@
             currentLayout = layout;
             localStorage.setItem('layout', layout);
             if (layout === 'grid') {
-                dom.gridViewBtn.classList.add('bg-[--bg-secondary]', 'text-[--accent]');
-                dom.listViewBtn.classList.remove('bg-[--bg-secondary]', 'text-[--accent]');
+                dom.gridViewBtn.classList.add('bg-[var(--bg-secondary)]', 'text-[var(--accent)]');
+                dom.listViewBtn.classList.remove('bg-[var(--bg-secondary)]', 'text-[var(--accent)]');
             } else {
-                dom.listViewBtn.classList.add('bg-[--bg-secondary]', 'text-[--accent]');
-                dom.gridViewBtn.classList.remove('bg-[--bg-secondary]', 'text-[--accent]');
+                dom.listViewBtn.classList.add('bg-[var(--bg-secondary)]', 'text-[var(--accent)]');
+                dom.gridViewBtn.classList.remove('bg-[var(--bg-secondary)]', 'text-[var(--accent)]');
             }
             processAndRenderItems();
         }
@@ -740,31 +716,46 @@
             dom.noResults.classList.add('hidden');
             if (show) {
                 let skeletonHtml = '';
-                for(let i = 0; i < 8; i++) { skeletonHtml += `<div class="industrial-card p-4 space-y-4"><div class="h-48 bg-[--border-color] animate-pulse"></div><div class="space-y-2"><div class="h-6 w-3/4 bg-[--border-color] animate-pulse"></div><div class="h-4 w-1/2 bg-[--border-color] animate-pulse"></div></div></div>`; }
-                dom.skeletonLoader.innerHTML = `<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">${skeletonHtml}</div>`;
+                for(let i = 0; i < 10; i++) { skeletonHtml += `<div class="industrial-card p-4 space-y-4"><div class="h-48 rounded bg-[var(--bg-tertiary)] animate-pulse"></div><div class="space-y-2"><div class="h-6 w-3/4 rounded bg-[var(--bg-tertiary)] animate-pulse"></div><div class="h-4 w-1/2 rounded bg-[var(--bg-tertiary)] animate-pulse"></div></div></div>`; }
+                dom.skeletonLoader.innerHTML = `<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">${skeletonHtml}</div>`;
             }
         }
         function initThemeAndLayout() {
-            if (localStorage.getItem('theme') === 'dark') {
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 dom.html.classList.add('dark');
             } else {
                 dom.html.classList.remove('dark');
             }
-            const savedLayout = localStorage.getItem('layout') || 'grid';
-            switchLayout(savedLayout);
+            switchLayout(localStorage.getItem('layout') || 'grid');
         }
         function toggleTheme() {
             dom.html.classList.toggle('dark');
             localStorage.setItem('theme', dom.html.classList.contains('dark') ? 'dark' : 'light');
-            renderReportCharts(); // Re-render charts with new theme colors
+            if(revenueChart) renderReportCharts();
         }
         function getDriveThumbnail(url) {
             if (!url) return null;
             const match = url.match(/file\/d\/([a-zA-Z0-9_-]+)/);
             return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w512-h512` : url;
         }
-
-        // --- MODALS & FORMS ---
+        function initGalleries() {
+            document.querySelectorAll('.image-gallery').forEach(gallery => {
+                const images = (gallery.dataset.images || '').split(',').map(link => link.trim()).filter(Boolean);
+                if (images.length <= 1) return;
+                let currentIndex = 0;
+                const imgElement = gallery.querySelector('.gallery-image');
+                gallery.querySelectorAll('.gallery-arrow').forEach(arrow => {
+                    arrow.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const direction = parseInt(e.currentTarget.dataset.direction);
+                        currentIndex = (currentIndex + direction + images.length) % images.length;
+                        imgElement.src = getDriveThumbnail(images[currentIndex]);
+                    });
+                });
+            });
+        }
+        
+        // --- Modal & Form ---
         function openAddModal() {
             dom.formTitle.textContent = 'Add New Component';
             dom.editId.value = '';
@@ -785,15 +776,13 @@
             dom.partForm.querySelector('#quantity').value = item.quantity || '0';
             dom.imageLinksInput.value = item.imageLinks || '';
             dom.partForm.querySelector('#note').value = item.note || '';
-
-            updateSpecFields(); 
+            updateSpecFields();
             Object.keys(item).forEach(key => {
                 if (key.startsWith('spec_')) {
                     const input = dom.partForm.querySelector(`[name="${key}"]`);
                     if (input) input.value = item[key];
                 }
             });
-
             dom.formModal.classList.remove('hidden');
             dom.formModal.classList.add('flex');
         }
@@ -814,9 +803,7 @@
                 imageLinks: dom.imageLinksInput.value,
                 note: dom.partForm.querySelector('#note').value,
             };
-            dom.partForm.querySelectorAll('#spec-fields input').forEach(input => {
-                formData[input.name] = input.value;
-            });
+            dom.partForm.querySelectorAll('#spec-fields input').forEach(input => { formData[input.name] = input.value; });
             return formData;
         }
         function updateSpecFields() {
@@ -832,18 +819,12 @@
         function createSpecInput(specName) {
             const id = specName.replace(/_/g, '-');
             const wrapper = document.createElement('div');
-            const label = document.createElement('label');
-            label.htmlFor = id;
-            label.className = 'data-label';
-            label.textContent = specName.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-            const input = document.createElement('input');
-            input.type = 'text'; input.id = id; input.name = specName;
-            input.className = 'mt-1 block w-full industrial-input';
-            wrapper.appendChild(label); wrapper.appendChild(input);
+            const labelText = specName.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+            wrapper.innerHTML = `<label for="${id}">${labelText}</label><input type="text" id="${id}" name="${specName}" class="mt-1 industrial-input">`;
             return wrapper;
         }
 
-        // --- DETAIL PANEL ---
+        // --- Detail Panel ---
         function handleCardClick(e) {
             const viewBtn = e.target.closest('.view-details-btn');
             if (viewBtn) {
@@ -855,72 +836,65 @@
         function openDetailPanel(item) {
             populateDetailPanel(item);
             dom.detailModal.classList.remove('hidden');
-            dom.detailModal.classList.add('flex');
+            requestAnimationFrame(() => {
+                dom.detailModal.classList.remove('opacity-0', 'scale-95');
+            });
         }
         function closeDetailPanel() {
-            dom.detailModal.classList.add('hidden');
-            dom.detailModal.classList.remove('flex');
+            dom.detailModal.classList.add('opacity-0', 'scale-95');
+            setTimeout(() => { dom.detailModal.classList.add('hidden'); }, 300);
         }
         function populateDetailPanel(item) {
             const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
             
-            const teethSpecs = [];
-            const otherSpecs = [];
+            let teethSpecsHtml = '';
+            let otherSpecsHtml = '';
+            const teethKeys = ['spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth'];
+
             Object.keys(item).forEach(key => {
                 if (key.startsWith('spec_') && item[key]) {
                     const label = key.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-                    const specHtml = `<div class="flex justify-between py-2"><dt class="data-label">${label}</dt><dd class="font-semibold text-right">${item[key]}</dd></div>`;
-                    if (key.toLowerCase().includes('teeth')) {
-                        teethSpecs.push(specHtml);
+                    const specRow = `<div class="flex justify-between py-2"><dt class="text-[var(--text-secondary)]">${label}</dt><dd class="font-semibold text-right">${item[key]}</dd></div>`;
+                    if (teethKeys.includes(key)) {
+                        teethSpecsHtml += specRow;
                     } else {
-                        otherSpecs.push(specHtml);
+                        otherSpecsHtml += specRow;
                     }
                 }
             });
-            
-            let specsHtml = [...teethSpecs, ...otherSpecs].join('');
-            if (!specsHtml) specsHtml = '<p class="text-[--text-secondary] text-sm">No specifications provided.</p>';
 
             dom.detailContent.innerHTML = `
-                <!-- Left Column: Images -->
-                <div class="lg:col-span-3 relative flex items-center justify-center border border-[--border-color] bg-[--bg-primary] group" style="min-height: 400px;" data-images="${images.join(',')}" data-current-index="0">
+                <div class="lg:col-span-2 p-6 flex items-center justify-center bg-[var(--bg-primary)] image-gallery" data-images="${images.join(',')}" data-current-index="0">
                     ${images.length > 0 ? `
-                        <img src="${getDriveThumbnail(images[0])}" class="gallery-image w-full h-full max-h-[70vh] object-contain">
-                         ${images.length > 1 ? `
-                            <button class="detail-gallery-arrow absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="-1"><i data-lucide="chevron-left"></i></button>
-                            <button class="detail-gallery-arrow absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="1"><i data-lucide="chevron-right"></i></button>
-                         ` : ''}
-                    ` : `<div class="text-[--text-secondary]">No Images</div>`}
+                        <div class="relative w-full h-full">
+                           <img src="${getDriveThumbnail(images[0])}" class="gallery-image w-full max-h-[75vh] h-full object-contain rounded-lg" onerror="this.src='https://ui-avatars.com/api/?name=No+Image&background=E9ECEF&color=212529&size=512&bold=true';">
+                           ${images.length > 1 ? `<button class="detail-gallery-arrow absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/75 transition-colors" data-direction="-1"><i data-lucide="chevron-left" class="pointer-events-none"></i></button><button class="detail-gallery-arrow absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/75 transition-colors" data-direction="1"><i data-lucide="chevron-right" class="pointer-events-none"></i></button>` : ''}
+                        </div>
+                    ` : `<div class="h-full flex items-center justify-center text-[var(--text-secondary)]">No Images</div>`}
                 </div>
-                <!-- Right Column: Data -->
-                <div class="lg:col-span-2 space-y-6">
+                <div class="lg:col-span-1 p-6 space-y-6 border-l border-[var(--border-color)]">
                     <div>
-                        <h3 class="text-3xl font-extrabold">${[item.model, item.itemName].filter(Boolean).join(' ')}</h3>
-                        <p class="text-lg text-[--text-secondary]">${[item.device, item.size].filter(Boolean).join(' / ')}</p>
+                        <p class="text-sm font-bold text-[var(--accent)] uppercase">${item.itemName || 'Component'}</p>
+                        <h3 class="text-3xl font-black">${[item.model, item.device, item.size].filter(Boolean).join(' ')}</h3>
                     </div>
                     
-                    <div class="p-4 bg-[--bg-primary] border border-[--border-color]">
-                        <h4 class="font-bold mb-2">Stock & Ordering</h4>
+                    <div class="bg-[var(--bg-tertiary)] p-4 rounded-lg border border-[var(--border-color)]">
+                        <h4 class="text-lg font-bold mb-3">Stock & Ordering</h4>
                         <dl class="space-y-2">
-                           <div class="flex justify-between items-baseline"><dt class="data-label">Price</dt><dd class="text-2xl font-bold">₹${item.price || 'N/A'}</dd></div>
-                           <div class="flex justify-between items-baseline"><dt class="data-label">Quantity</dt><dd class="text-2xl font-bold">${item.quantity || '0'}</dd></div>
+                           <div class="flex justify-between items-baseline"><dt class="text-[var(--text-secondary)]">Price</dt><dd class="text-2xl font-bold">₹${item.price || 'N/A'}</dd></div>
+                           <div class="flex justify-between items-baseline"><dt class="text-[var(--text-secondary)]">Quantity</dt><dd class="text-2xl font-bold">${item.quantity || '0'}</dd></div>
                         </dl>
-                        <div class="flex items-center gap-2 mt-4">
-                            <button data-id="${item.id}" class="edit-btn flex-1 btn btn-secondary">Edit</button>
-                            <button data-id="${item.id}" class="delete-btn flex-1 btn btn-danger">Delete</button>
+                        <div class="flex items-center gap-3 mt-4">
+                           <button data-id="${item.id}" class="edit-btn flex-1 btn btn-secondary flex items-center justify-center gap-2"><i data-lucide="edit"></i>Edit</button>
+                           <button data-id="${item.id}" class="delete-btn flex-1 btn btn-danger flex items-center justify-center gap-2"><i data-lucide="trash-2"></i>Delete</button>
                         </div>
                     </div>
-                    
-                    <div>
-                        <h4 class="font-bold mb-2">Specifications</h4>
-                        <dl class="divide-y divide-[--border-color] border-t border-[--border-color]">${specsHtml}</dl>
-                    </div>
-                     <div>
-                        <h4 class="font-bold mb-2">Notes</h4>
-                        <p class="text-sm text-[--text-secondary] p-3 border border-[--border-color] bg-[--bg-primary] min-h-[50px]">${item.note || 'None'}</p>
-                    </div>
-                </div>
-            `;
+
+                    ${teethSpecsHtml ? `<div><h4 class="text-lg font-bold mb-2">Teeth Details</h4><dl class="text-sm divide-y divide-[var(--border-color)] border-y border-[var(--border-color)]">${teethSpecsHtml}</dl></div>` : ''}
+                    ${otherSpecsHtml ? `<div><h4 class="text-lg font-bold mb-2">General Specifications</h4><dl class="text-sm divide-y divide-[var(--border-color)] border-y border-[var(--border-color)]">${otherSpecsHtml}</dl></div>` : ''}
+
+                    ${item.note ? `<div><h4 class="text-lg font-bold mb-2">Notes</h4><p class="text-sm p-3 bg-[var(--bg-tertiary)] rounded border border-[var(--border-color)]">${item.note}</p></div>` : ''}
+                </div>`;
             lucide.createIcons();
         }
         function handleDetailPanelClick(e) {
@@ -929,19 +903,28 @@
             const arrowBtn = e.target.closest('.detail-gallery-arrow');
 
             if (editBtn) {
-                const item = allItems.find(i => i.id === editBtn.dataset.id);
+                const itemId = editBtn.dataset.id;
+                const item = allItems.find(i => i.id === itemId);
                 if (item) { closeDetailPanel(); openEditModal(item); }
             }
             if (deleteBtn) {
                 const itemId = deleteBtn.dataset.id;
                 Swal.fire({
-                    title: 'Do you want to delete this item?', text: "This action cannot be undone.", icon: 'warning',
-                    showCancelButton: true, confirmButtonText: 'Yes, delete it!',
-                }).then((result) => { 
+                    title: 'Delete Component?',
+                    text: "This is the first confirmation.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, proceed',
+                    denyButtonText: `Don't save`,
+                }).then((result) => {
                     if (result.isConfirmed) {
                         Swal.fire({
-                            title: 'Are you absolutely sure?', text: "This is the final confirmation.", icon: 'error',
-                            showCancelButton: true, confirmButtonText: 'Yes, I am sure!',
+                            title: 'Are you absolutely sure?',
+                            text: "This action cannot be undone!",
+                            icon: 'error',
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes, delete it!',
+                            confirmButtonColor: 'var(--danger)'
                         }).then((finalResult) => {
                             if (finalResult.isConfirmed) {
                                 deleteComponent(itemId);
@@ -951,20 +934,18 @@
                 });
             }
             if (arrowBtn) {
-                const gallery = arrowBtn.closest('[data-images]');
-                const images = (gallery.dataset.images || '').split(',');
+                const gallery = arrowBtn.closest('.image-gallery');
+                const images = (gallery.dataset.images || '').split(',').map(link => link.trim()).filter(Boolean);
                 if (images.length <= 1) return;
-                
                 let currentIndex = parseInt(gallery.dataset.currentIndex || '0');
                 const direction = parseInt(arrowBtn.dataset.direction);
                 currentIndex = (currentIndex + direction + images.length) % images.length;
-                
                 gallery.querySelector('.gallery-image').src = getDriveThumbnail(images[currentIndex]);
                 gallery.dataset.currentIndex = currentIndex;
             }
         }
         
-        // --- UTILITIES & HELPERS ---
+        // --- Analytics and Filters ---
         function populateFilters() {
             const devices = [...new Set(allItems.map(item => item.device).filter(Boolean))];
             const sizes = [...new Set(allItems.map(item => item.size).filter(Boolean))];
@@ -973,23 +954,71 @@
             dom.filterSize.innerHTML = '<option value="">All Sizes</option>';
             sizes.forEach(s => dom.filterSize.innerHTML += `<option value="${s}">${s}</option>`);
         }
-        function handlePaginationClick(e) {
-            const button = e.target.closest('button');
-            if (button && !button.disabled) {
-                currentPage = parseInt(button.dataset.page);
-                renderItems();
+        function updateAnalytics(items) {
+            document.getElementById('total-components').textContent = items.length;
+            
+            const totalValue = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0), 0);
+            localStorage.setItem('inventoryTotalValue', totalValue);
+            updateValueVisibility();
+
+            const lowStockCount = items.filter(item => (parseInt(item.quantity) || 0) < 5 && (parseInt(item.quantity) || 0) > 0).length;
+            const lowStockEl = document.getElementById('low-stock');
+            lowStockEl.textContent = lowStockCount;
+            lowStockEl.classList.remove('text-[var(--danger)]', 'text-[var(--success)]');
+            if (lowStockCount === 0) {
+                lowStockEl.classList.add('text-[var(--success)]');
+            } else {
+                lowStockEl.classList.add('text-[var(--danger)]');
             }
+            
+            const outOfStockCount = items.filter(item => (parseInt(item.quantity) || 0) === 0).length;
+            document.getElementById('out-of-stock').textContent = outOfStockCount;
+
+            let mostValuable = { name: '-', value: 0 };
+            if (items.length > 0) {
+                items.forEach(item => {
+                    const itemValue = (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0);
+                    if (itemValue > mostValuable.value) {
+                        mostValuable = { name: [item.model, item.itemName].filter(Boolean).join(' '), value: itemValue };
+                    }
+                });
+            }
+            document.getElementById('most-valuable').textContent = mostValuable.name;
+        }
+        function toggleValueVisibility() {
+            isValueVisible = !isValueVisible;
+            updateValueVisibility();
+        }
+        function updateValueVisibility() {
+            const totalValue = parseFloat(localStorage.getItem('inventoryTotalValue') || '0');
+            if (isValueVisible) {
+                dom.totalValue.textContent = `₹${totalValue.toLocaleString('en-IN')}`;
+                dom.valueToggleBtn.innerHTML = `<i data-lucide="eye" class="w-5 h-5"></i>`;
+            } else {
+                dom.totalValue.textContent = `₹ ••••••••`;
+                dom.valueToggleBtn.innerHTML = `<i data-lucide="eye-off" class="w-5 h-5"></i>`;
+            }
+            lucide.createIcons();
         }
         function renderPaginationControls() {
             const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
             dom.paginationControls.innerHTML = '';
             if (totalPages <= 1) return;
-
             let html = `<button data-page="${currentPage - 1}" class="btn btn-secondary" ${currentPage === 1 ? 'disabled' : ''}>&larr; Prev</button>`;
-            html += `<span class="font-bold text-[--text-secondary]">Page ${currentPage} of ${totalPages}</span>`;
+            html += `<span class="font-semibold text-[var(--text-secondary)]">Page ${currentPage} of ${totalPages}</span>`;
             html += `<button data-page="${currentPage + 1}" class="btn btn-secondary" ${currentPage === totalPages ? 'disabled' : ''}>Next &rarr;</button>`;
             dom.paginationControls.innerHTML = html;
         }
+        function handlePaginationClick(e) {
+            const button = e.target.closest('button');
+            if (button && !button.disabled) {
+                currentPage = parseInt(button.dataset.page);
+                renderItems();
+                window.scrollTo(0, 0);
+            }
+        }
+        
+        // --- View Switching ---
         function switchView(view) {
             document.querySelectorAll('.sidebar-nav-link').forEach(l => l.classList.remove('active'));
             if (view === 'dashboard') {
@@ -997,67 +1026,21 @@
                 dom.dashboardView.classList.remove('hidden');
                 dom.reportsView.classList.add('hidden');
                 dom.layoutSwitcher.classList.remove('hidden');
+                dom.pageTitle.textContent = "Dashboard";
             } else if (view === 'reports') {
                 dom.navReports.classList.add('active');
                 dom.dashboardView.classList.add('hidden');
                 dom.reportsView.classList.remove('hidden');
                 dom.layoutSwitcher.classList.add('hidden');
+                dom.pageTitle.textContent = "Reports";
             }
         }
         
-        // --- ANALYTICS & CHARTS ---
-        function updateAnalytics(items) {
-            const totalValue = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0), 0);
-            const lowStockCount = items.filter(item => (parseInt(item.quantity) || 0) < 5).length;
-            const deviceCounts = items.reduce((acc, item) => {
-                if (item.device) { acc[item.device] = (acc[item.device] || 0) + 1; }
-                return acc;
-            }, {});
-            const commonDevice = Object.keys(deviceCounts).reduce((a, b) => deviceCounts[a] > deviceCounts[b] ? a : b, '-');
-            const totalValueFormatted = `₹${totalValue.toLocaleString('en-IN')}`;
-            const lowStockColor = lowStockCount === 0 ? 'text-[--success-color]' : 'text-[--danger-color]';
-
-            // Suggested new analytics
-            const uniqueItemTypes = new Set(items.map(item => item.itemName)).size;
-            const averagePrice = items.length > 0 ? (items.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0) / items.length) : 0;
-
-
-            const analyticsData = [
-                { label: 'Total Components', value: items.length, icon: 'cpu' },
-                { 
-                    label: 'Total Inventory Value', 
-                    value: `<span id="total-value" data-is-hidden="false">${totalValueFormatted}</span>`, 
-                    icon: 'banknote',
-                    extra: `<button id="inventory-value-toggle" class="ml-2 text-[--text-secondary] hover:text-[--text-primary]"><i data-lucide="eye"></i></button>`
-                },
-                { label: 'Items Low on Stock', value: `<span class="${lowStockColor}">${lowStockCount}</span>`, icon: 'alert-triangle' },
-                { label: 'Most Common Device', value: commonDevice, icon: 'truck' },
-                // { label: 'Unique Item Types', value: uniqueItemTypes, icon: 'tags' },
-                // { label: 'Avg. Component Price', value: `₹${averagePrice.toFixed(2)}`, icon: 'scale' },
-            ];
-
-            dom.analyticsWidgets.innerHTML = analyticsData.map(d => `
-                <div class="industrial-card p-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="p-3 bg-[--bg-primary] border border-[--border-color]">
-                                <i data-lucide="${d.icon}" class="w-6 h-6 text-[--text-secondary]"></i>
-                            </div>
-                            <div>
-                                <p class="data-label">${d.label}</p>
-                                <p class="text-2xl font-extrabold">${d.value}</p>
-                            </div>
-                        </div>
-                        ${d.extra || ''}
-                    </div>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
+        // --- Charting ---
         function renderReportCharts() {
             const isDark = dom.html.classList.contains('dark');
-            const textColor = isDark ? 'rgba(248, 249, 250, 0.8)' : 'rgba(33, 37, 41, 0.8)';
-            const gridColor = isDark ? 'rgba(73, 80, 87, 0.5)' : 'rgba(222, 226, 230, 0.5)';
+            const textColor = isDark ? '#888888' : '#6C757D';
+            const gridColor = isDark ? '#3A3A3A' : '#DEE2E6';
 
             const monthlyRevenue = allSales.reduce((acc, sale) => {
                 const month = new Date(sale.date).toLocaleString('default', { month: 'short', year: 'numeric' });
@@ -1090,13 +1073,7 @@
                 type: 'bar',
                 data: {
                     labels: Object.keys(monthlyRevenue),
-                    datasets: [{
-                        label: 'Monthly Revenue',
-                        data: Object.values(monthlyRevenue),
-                        backgroundColor: 'rgba(255, 193, 7, 0.5)',
-                        borderColor: 'rgb(255, 193, 7)',
-                        borderWidth: 1
-                    }]
+                    datasets: [{ label: 'Monthly Revenue', data: Object.values(monthlyRevenue), backgroundColor: 'rgba(255, 193, 7, 0.5)', borderColor: 'rgb(255, 193, 7)', borderWidth: 1 }]
                 },
                 options: chartOptions
             });
@@ -1106,16 +1083,12 @@
                 type: 'doughnut',
                 data: {
                     labels: sortedBestSellers.map(item => item[0]),
-                    datasets: [{
-                        label: 'Quantity Sold',
-                        data: sortedBestSellers.map(item => item[1]),
-                        backgroundColor: ['#FFC107', '#FFCA2C', '#FFD54F', '#FFE082', '#FFECB3'],
-                    }]
+                    datasets: [{ label: 'Quantity Sold', data: sortedBestSellers.map(item => item[1]), backgroundColor: ['#FFC107', '#FFCA28', '#FFD54F', '#FFE082', '#FFECB3'], borderColor: isDark ? '#1E1E1E' : '#FFFFFF' }]
                 },
                 options: { plugins: { legend: { position: 'right', labels: { color: textColor } } } }
             });
         }
-
+        
         lucide.createIcons();
     });
     </script>
