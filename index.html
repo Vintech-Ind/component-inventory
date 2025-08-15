@@ -147,7 +147,6 @@
         .btn-danger { background-color: transparent; color: var(--danger); border: 1px solid var(--danger); }
         .btn-danger:hover { background-color: var(--danger); color: white; }
 
-        /* MODIFICATION: Unified filter control styling */
         .filter-control-group {
             background-color: var(--bg-tertiary);
             border: 1px solid var(--border-color);
@@ -306,9 +305,10 @@
                      <div id="layout-switcher" class="flex items-center gap-1 bg-[var(--bg-tertiary)] p-1 rounded-lg border border-[var(--border-color)]">
                          <button id="grid-view-btn" aria-label="Switch to grid view" class="p-2 rounded-md"><i data-lucide="layout-grid"></i></button>
                          <button id="list-view-btn" aria-label="Switch to list view" class="p-2 rounded-md"><i data-lucide="list"></i></button>
-                         <button id="table-view-btn" aria-label="Switch to table view" class="p-2 rounded-md hidden"><i data-lucide="table-2"></i></button>
-                         <button id="kanban-view-btn" aria-label="Switch to kanban view" class="p-2 rounded-md hidden"><i data-lucide="trello"></i></button>
+                         <button id="table-view-btn" aria-label="Switch to table view" class="p-2 rounded-md"><i data-lucide="table-2"></i></button>
+                         <button id="kanban-view-btn" aria-label="Switch to kanban view" class="p-2 rounded-md"><i data-lucide="trello"></i></button>
                      </div>
+                     <button id="compare-btn" class="btn btn-secondary hidden">Compare (0)</button>
                      <button id="addPartBtn" class="btn btn-primary flex items-center gap-2 disabled:bg-gray-400 disabled:text-gray-600 disabled:cursor-not-allowed disabled:border-b-0" disabled>
                          <i data-lucide="plus" class="w-5 h-5"></i><span class="hidden sm:inline">Add Component</span>
                      </button>
@@ -341,16 +341,10 @@
                             </div>
                         </div>
                     </div>
-                    <!-- ================================================================================ -->
-                    <!-- == MODIFICATION START: Redesigned Filter Bar ================================= -->
-                    <!-- ================================================================================ -->
                     <div class="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-4 mb-8">
-                        <!-- 1. Layout: Flexbox with justify-between separates filters from sorting. -->
                         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-                            <!-- 2. Filters Group: Filters are grouped together on the left. -->
                             <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <div class="lg:col-span-1">
-                                    <!-- 3. Unified Style: Each control uses the .filter-control-group for a consistent look. -->
                                     <div class="filter-control-group flex items-center gap-2">
                                         <i data-lucide="search" class="w-5 h-5 text-[var(--text-secondary)] flex-shrink-0"></i>
                                         <input type="text" id="search" placeholder="Search components..." class="filter-control-input">
@@ -369,7 +363,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- 4. Sort Control: Sorting is now isolated on the right for clarity. -->
                             <div class="flex-shrink-0">
                                 <div class="filter-control-group">
                                     <label for="sort-by">Sort By</label>
@@ -378,9 +371,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- ================================================================================ -->
-                    <!-- == MODIFICATION END: Redesigned Filter Bar =================================== -->
-                    <!-- ================================================================================ -->
                 
                     <div id="skeleton-loader" class="hidden"></div>
                     <div id="searchResults" class="hidden"></div>
@@ -434,6 +424,13 @@
             </div>
         </div>
     </div>
+
+    <div id="comparison-modal" role="dialog" aria-modal="true" aria-labelledby="comparison-title" class="fixed inset-0 z-50 justify-center items-start p-4 overflow-y-auto bg-black/70 hidden">
+        <div class="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg shadow-2xl w-full max-w-7xl my-8 flex flex-col">
+            <div class="flex justify-between items-center p-6 border-b border-[var(--border-color)]"><h2 id="comparison-title" class="text-2xl font-black">Compare Components</h2><button type="button" id="closeComparisonModalBtn" aria-label="Close comparison" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
+            <div id="comparison-content" class="p-6 overflow-x-auto"></div>
+        </div>
+    </div>
     
     <script src="https://apis.google.com/js/api.js"></script>
     <script>
@@ -457,12 +454,11 @@
         let tokenClient;
         let currentLayout = 'grid';
         let currentPage = 1;
-        // MODIFICATION: Changed items per page to 12
         const ITEMS_PER_PAGE = 12;
         let revenueChart, bestsellersChart;
         let isValueVisible = false;
-        // MODIFICATION: Added timer for search debounce
         let searchDebounceTimer;
+        let comparisonList = new Set();
 
         const dom = {
             html: document.documentElement,
@@ -494,6 +490,8 @@
             sidebar: document.querySelector('.sidebar'),
             gridViewBtn: document.getElementById('grid-view-btn'),
             listViewBtn: document.getElementById('list-view-btn'),
+            tableViewBtn: document.getElementById('table-view-btn'),
+            kanbanViewBtn: document.getElementById('kanban-view-btn'),
             themeToggle: document.getElementById('theme-toggle'),
             detailModal: document.getElementById('detail-modal'),
             detailBackdrop: document.getElementById('detail-backdrop'),
@@ -512,6 +510,10 @@
             valueToggleBtn: document.getElementById('value-toggle-btn'),
             totalValue: document.getElementById('total-value'),
             mobileBackdrop: document.getElementById('mobile-backdrop'),
+            compareBtn: document.getElementById('compare-btn'),
+            comparisonModal: document.getElementById('comparison-modal'),
+            closeComparisonModalBtn: document.getElementById('closeComparisonModalBtn'),
+            comparisonContent: document.getElementById('comparison-content'),
         };
 
         const COLUMN_HEADERS = ['id', 'model', 'device', 'size', 'itemName', 'price', 'quantity', 'imageLinks', 'note', 'spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_width', 'spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_splineOd', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'];
@@ -641,7 +643,6 @@
         async function handleFormSubmit(e) {
             e.preventDefault();
             
-            // MODIFICATION: Check for duplicates before saving
             if (isDuplicate()) {
                 Swal.fire({
                     title: 'Duplicate Component',
@@ -749,7 +750,7 @@
             if (!gapiInited || !gapi.client || (typeof gapi.client.getToken !== 'function')) return;
             dom.searchResults.innerHTML = '';
             dom.noResults.classList.toggle('hidden', filteredItems.length > 0 || !gapi.client.getToken());
-            dom.searchResults.classList.toggle('hidden', filteredItems.length === 0);
+            dom.searchResults.classList.toggle('hidden', filteredItems.length === 0 && currentLayout !== 'kanban');
             
             const paginatedItems = filteredItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
             
@@ -758,15 +759,27 @@
             }
 
             const fragment = document.createDocumentFragment();
-            if (currentLayout === 'grid') {
-                dom.searchResults.className = 'grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5';
-                paginatedItems.forEach(item => fragment.appendChild(createGridCard(item)));
-            } else {
-                dom.searchResults.className = 'space-y-3';
-                paginatedItems.forEach(item => fragment.appendChild(createListCard(item)));
+            switch(currentLayout) {
+                case 'grid':
+                    dom.searchResults.className = 'grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5';
+                    paginatedItems.forEach(item => fragment.appendChild(createGridCard(item)));
+                    break;
+                case 'list':
+                    dom.searchResults.className = 'space-y-3';
+                    paginatedItems.forEach(item => fragment.appendChild(createListCard(item)));
+                    break;
+                case 'table':
+                    dom.searchResults.className = 'w-full overflow-x-auto';
+                    fragment.appendChild(createTableView(paginatedItems));
+                    break;
+                case 'kanban':
+                    dom.searchResults.className = 'grid lg:grid-cols-3 gap-6 items-start';
+                    fragment.appendChild(createKanbanView(filteredItems));
+                    break;
             }
+            
             dom.searchResults.appendChild(fragment);
-
+            updatePaginationVisibility();
             lucide.createIcons();
             initGalleries();
             renderPaginationControls();
@@ -774,26 +787,25 @@
 
         function createGridCard(item) {
             const card = document.createElement('div');
-            // MODIFICATION: Added flex classes for equal height cards
             card.className = 'industrial-card overflow-hidden flex flex-col group';
             const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
             const firstImage = getDriveThumbnail(images[0]) || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.itemName || 'N/A')}&background=E9ECEF&color=212529&size=512&bold=true`;
             const quantity = parseInt(item.quantity) || 0;
-            // MODIFICATION: Logic for dynamic stock badge colors
             const statusColor = quantity === 0 ? 'bg-[var(--danger)]' : quantity < 5 ? 'bg-[var(--warning)]' : 'bg-green-500';
             const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
+            const isChecked = comparisonList.has(item.id);
+
             card.innerHTML = `
                 <div class="relative image-gallery bg-[var(--bg-tertiary)]" data-images="${images.join(',')}">
                     <img loading="lazy" src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-52 object-contain" onerror="this.src='https://ui-avatars.com/api/?name=Error&background=F8D7DA&color=721C24&size=512&bold=true';">
                     ${images.length > 1 ? `<button aria-label="Previous image" class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="-1"><i data-lucide="chevron-left"></i></button><button aria-label="Next image" class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
                     <div class="absolute top-2 left-2 flex items-center gap-2 text-xs font-bold px-2 py-1 rounded text-white ${statusColor}">${statusText}</div>
+                    <input type="checkbox" data-id="${item.id}" class="compare-checkbox absolute top-2 right-2 h-5 w-5" ${isChecked ? 'checked' : ''}>
                 </div>
                 <div class="p-4 flex-grow flex flex-col">
-                    <!-- MODIFICATION: Improved title typography (capitalize) -->
                     <h3 class="font-bold leading-tight capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3>
                     <p class="text-sm text-[var(--text-secondary)] mt-1">Price: <span class="font-semibold text-[var(--text-primary)]">₹${item.price || 'N/A'}</span></p>
                     <div class="mt-auto pt-4 text-right">
-                        <!-- MODIFICATION: Strengthened CTA link styling -->
                         <button class="view-details-btn text-sm font-bold text-[var(--accent)] hover:underline" data-id="${item.id}">View Details &rarr;</button>
                     </div>
                 </div>`;
@@ -806,7 +818,10 @@
             const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.itemName || 'N/A')}&background=E9ECEF&color=212529&size=128&bold=true`;
             const quantity = parseInt(item.quantity) || 0;
             const statusColor = quantity === 0 ? 'text-[var(--danger)]' : quantity < 5 ? 'text-[var(--warning)]' : 'text-green-500';
+            const isChecked = comparisonList.has(item.id);
+
             card.innerHTML = `
+                <input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5 flex-shrink-0" ${isChecked ? 'checked' : ''}>
                 <img loading="lazy" src="${image}" class="w-16 h-16 rounded-md object-contain flex-shrink-0 bg-[var(--bg-tertiary)]" onerror="this.src='https://ui-avatars.com/api/?name=Error&background=F8D7DA&color=721C24&size=128&bold=true';">
                 <div class="flex-1 grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
                     <h3 class="md:col-span-2 font-semibold capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3>
@@ -817,16 +832,90 @@
             return card;
         }
 
+        function createTableView(items) {
+            const table = document.createElement('table');
+            table.className = 'w-full text-left border-collapse industrial-card';
+            let head = `<thead><tr class="border-b border-[var(--border-color)]">
+                <th class="p-4"></th>
+                <th class="p-4 font-semibold">Component</th>
+                <th class="p-4 font-semibold">Price</th>
+                <th class="p-4 font-semibold">Quantity</th>
+                <th class="p-4 font-semibold">Actions</th>
+            </tr></thead>`;
+            
+            let body = '<tbody>';
+            items.forEach(item => {
+                const quantity = parseInt(item.quantity) || 0;
+                const statusColor = quantity === 0 ? 'text-[var(--danger)]' : quantity < 5 ? 'text-[var(--warning)]' : 'text-green-500';
+                const isChecked = comparisonList.has(item.id);
+                body += `<tr class="border-b border-[var(--border-color)] last:border-b-0 hover:bg-[var(--bg-tertiary)]">
+                    <td class="p-4"><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5" ${isChecked ? 'checked' : ''}></td>
+                    <td class="p-4 capitalize font-medium">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</td>
+                    <td class="p-4 text-[var(--text-secondary)]">₹${item.price || 'N/A'}</td>
+                    <td class="p-4 font-medium ${statusColor}">${quantity}</td>
+                    <td class="p-4"><button class="view-details-btn text-sm font-bold text-[var(--accent)] hover:underline" data-id="${item.id}">Details</button></td>
+                </tr>`;
+            });
+            body += '</tbody>';
+            table.innerHTML = head + body;
+            return table;
+        }
+
+        function createKanbanView(items) {
+            const container = document.createElement('div');
+            const columns = {
+                inStock: { title: 'In Stock', items: [], color: 'bg-green-500' },
+                lowStock: { title: 'Low Stock', items: [], color: 'bg-[var(--warning)]' },
+                outOfStock: { title: 'Out of Stock', items: [], color: 'bg-[var(--danger)]' },
+            };
+
+            items.forEach(item => {
+                const quantity = parseInt(item.quantity) || 0;
+                if (quantity === 0) columns.outOfStock.items.push(item);
+                else if (quantity < 5) columns.lowStock.items.push(item);
+                else columns.inStock.items.push(item);
+            });
+
+            for (const key in columns) {
+                const col = columns[key];
+                const colDiv = document.createElement('div');
+                colDiv.className = 'flex flex-col gap-4';
+                let cardsHtml = col.items.map(item => {
+                    const isChecked = comparisonList.has(item.id);
+                    return `<div class="industrial-card p-4">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-bold capitalize pr-2">${[item.model, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h4>
+                            <input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5 flex-shrink-0" ${isChecked ? 'checked' : ''}>
+                        </div>
+                        <p class="text-sm text-[var(--text-secondary)]">${item.device || ''} ${item.size || ''}</p>
+                        <div class="mt-4 pt-4 border-t border-[var(--border-color)] flex justify-between items-center">
+                            <span class="font-semibold">Qty: ${item.quantity}</span>
+                            <button class="view-details-btn text-sm font-bold text-[var(--accent)] hover:underline" data-id="${item.id}">Details</button>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                colDiv.innerHTML = `
+                    <div class="flex items-center gap-3 pb-2 border-b-4" style="border-color: var(--${key === 'inStock' ? 'success' : key === 'lowStock' ? 'warning' : 'danger'});">
+                        <h3 class="text-lg font-black">${col.title}</h3>
+                        <span class="font-bold text-sm bg-[var(--bg-tertiary)] px-2.5 py-0.5 rounded-full">${col.items.length}</span>
+                    </div>
+                    <div class="flex flex-col gap-4">${cardsHtml || '<p class="text-sm text-center text-[var(--text-secondary)] p-4">No items in this category.</p>'}</div>
+                `;
+                container.appendChild(colDiv);
+            }
+            return container;
+        }
+
         function switchLayout(layout) {
             currentLayout = layout;
             localStorage.setItem('layout', layout);
-            if (layout === 'grid') {
-                dom.gridViewBtn.classList.add('bg-[var(--bg-secondary)]', 'text-[var(--accent)]');
-                dom.listViewBtn.classList.remove('bg-[var(--bg-secondary)]', 'text-[var(--accent)]');
-            } else {
-                dom.listViewBtn.classList.add('bg-[var(--bg-secondary)]', 'text-[var(--accent)]');
-                dom.gridViewBtn.classList.remove('bg-[var(--bg-secondary)]', 'text-[var(--accent)]');
-            }
+            
+            ['gridViewBtn', 'listViewBtn', 'tableViewBtn', 'kanbanViewBtn'].forEach(btnId => {
+                dom[btnId].classList.remove('bg-[var(--bg-secondary)]', 'text-[var(--accent)]');
+            });
+            dom[layout + 'ViewBtn'].classList.add('bg-[var(--bg-secondary)]', 'text-[var(--accent)]');
+            
             processAndRenderItems();
         }
 
@@ -1029,7 +1118,6 @@
         // ================================================================================
         // 5. ANALYTICS & HELPERS
         // ================================================================================
-        // MODIFICATION: Function to check for duplicate items
         function isDuplicate() {
             const form = dom.partForm;
             const model = form.querySelector('#model').value.trim().toLowerCase();
@@ -1039,7 +1127,6 @@
             const editId = form.querySelector('#edit-id').value;
 
             return allItems.some(item => {
-                // If we are editing, don't compare the item to itself
                 if (item.id === editId) return false;
 
                 return (item.model || '').trim().toLowerCase() === model &&
@@ -1090,6 +1177,10 @@
                 dom.valueToggleBtn.innerHTML = `<i data-lucide="eye-off" class="w-5 h-5"></i>`;
             }
             lucide.createIcons();
+        }
+        
+        function updatePaginationVisibility() {
+            dom.paginationControls.style.display = currentLayout === 'kanban' ? 'none' : 'flex';
         }
 
         function renderPaginationControls() {
@@ -1203,7 +1294,59 @@
         }
         
         // ================================================================================
-        // 7. EVENT LISTENERS & INITIALIZATION
+        // 7. COMPARISON LOGIC
+        // ================================================================================
+        function updateCompareButton() {
+            const count = comparisonList.size;
+            if (count >= 2) {
+                dom.compareBtn.classList.remove('hidden');
+                dom.compareBtn.textContent = `Compare (${count})`;
+            } else {
+                dom.compareBtn.classList.add('hidden');
+            }
+        }
+
+        function openComparisonModal() {
+            const itemsToCompare = allItems.filter(item => comparisonList.has(item.id));
+            if (itemsToCompare.length < 2) return;
+
+            const allKeys = new Set(['itemName', 'model', 'device', 'size', 'price', 'quantity']);
+            itemsToCompare.forEach(item => {
+                Object.keys(item).forEach(key => {
+                    if (key.startsWith('spec_') && item[key]) {
+                        allKeys.add(key);
+                    }
+                });
+            });
+
+            let tableHTML = '<table class="w-full text-left border-collapse"><thead><tr><th class="p-3 font-semibold border-b-2 border-[var(--border-color)]">Feature</th>';
+            itemsToCompare.forEach(item => {
+                tableHTML += `<th class="p-3 font-semibold border-b-2 border-[var(--border-color)] capitalize">${[item.model, item.itemName].filter(Boolean).join(' ').toLowerCase()}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+
+            allKeys.forEach(key => {
+                const label = key.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                tableHTML += `<tr class="border-b border-[var(--border-color)] last:border-0"><td class="p-3 font-medium text-[var(--text-secondary)]">${label}</td>`;
+                itemsToCompare.forEach(item => {
+                    tableHTML += `<td class="p-3">${item[key] || 'N/A'}</td>`;
+                });
+                tableHTML += '</tr>';
+            });
+
+            tableHTML += '</tbody></table>';
+            dom.comparisonContent.innerHTML = tableHTML;
+            dom.comparisonModal.classList.remove('hidden');
+            dom.comparisonModal.classList.add('flex');
+        }
+
+        function closeComparisonModal() {
+            dom.comparisonModal.classList.add('hidden');
+            dom.comparisonModal.classList.remove('flex');
+        }
+
+        // ================================================================================
+        // 8. EVENT LISTENERS & INITIALIZATION
         // ================================================================================
         function handlePaginationClick(e) {
             const button = e.target.closest('button');
@@ -1220,6 +1363,18 @@
                 const itemId = viewBtn.dataset.id;
                 const item = allItems.find(i => i.id === itemId);
                 if (item) openDetailPanel(item);
+                return;
+            }
+
+            const checkbox = e.target.closest('.compare-checkbox');
+            if (checkbox) {
+                const itemId = checkbox.dataset.id;
+                if (checkbox.checked) {
+                    comparisonList.add(itemId);
+                } else {
+                    comparisonList.delete(itemId);
+                }
+                updateCompareButton();
             }
         }
 
@@ -1273,7 +1428,6 @@
 
         dom.partForm.addEventListener('submit', handleFormSubmit);
         
-        // MODIFICATION: Debounced search input
         dom.search.addEventListener('input', () => {
             clearTimeout(searchDebounceTimer);
             searchDebounceTimer = setTimeout(() => {
@@ -1295,6 +1449,8 @@
         dom.itemNameSelect.addEventListener('change', updateSpecFields);
         dom.gridViewBtn.addEventListener('click', () => switchLayout('grid'));
         dom.listViewBtn.addEventListener('click', () => switchLayout('list'));
+        dom.tableViewBtn.addEventListener('click', () => switchLayout('table'));
+        dom.kanbanViewBtn.addEventListener('click', () => switchLayout('kanban'));
         dom.themeToggle.addEventListener('click', toggleTheme);
         dom.detailCloseBtn.addEventListener('click', closeDetailPanel);
         dom.detailBackdrop.addEventListener('click', closeDetailPanel);
@@ -1312,6 +1468,8 @@
             });
         });
         dom.valueToggleBtn.addEventListener('click', toggleValueVisibility);
+        dom.compareBtn.addEventListener('click', openComparisonModal);
+        dom.closeComparisonModalBtn.addEventListener('click', closeComparisonModal);
     });
     </script>
 </body>
