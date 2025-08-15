@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Industries | Component Database</title>
+    <title>Vinayaka Industries | Component Database</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -103,7 +103,6 @@
             color: var(--accent-text);
             font-weight: 700;
         }
-        /* UPGRADED: Clearer hover state for inactive nav links */
         .sidebar-nav-link:not(.active):hover { background-color: var(--bg-tertiary); }
 
         .industrial-card {
@@ -148,7 +147,6 @@
         .btn-danger { background-color: transparent; color: var(--danger); border: 1px solid var(--danger); }
         .btn-danger:hover { background-color: var(--danger); color: white; }
 
-        /* UPGRADED: Unified Filter Bar Inputs */
         .filter-control-group {
             background-color: var(--bg-tertiary);
             border: 1px solid var(--border-color);
@@ -177,7 +175,7 @@
         }
         .filter-control-input::placeholder { color: var(--text-secondary); }
 
-        .industrial-input { /* Kept for form modal */
+        .industrial-input {
             background-color: transparent;
             border: none;
             border-bottom: 2px solid var(--border-color);
@@ -262,7 +260,6 @@
             </nav>
 
             <div class="p-4 border-t border-[var(--border-color)] flex-shrink-0">
-                <!-- UPGRADED: Auth UI now correctly shows one state at a time -->
                 <div id="user-profile-area">
                     <div id="auth-signed-out-view" class="p-2 rounded-lg cursor-pointer group hover:bg-[var(--bg-tertiary)] transition-colors">
                         <div class="flex items-center gap-3">
@@ -308,7 +305,6 @@
                      <div id="layout-switcher" class="flex items-center gap-1 bg-[var(--bg-tertiary)] p-1 rounded-lg border border-[var(--border-color)]">
                          <button id="grid-view-btn" aria-label="Switch to grid view" class="p-2 rounded-md"><i data-lucide="layout-grid"></i></button>
                          <button id="list-view-btn" aria-label="Switch to list view" class="p-2 rounded-md"><i data-lucide="list"></i></button>
-                         <!-- ADDED: New Layout Buttons (placeholders) -->
                          <button id="table-view-btn" aria-label="Switch to table view" class="p-2 rounded-md hidden"><i data-lucide="table-2"></i></button>
                          <button id="kanban-view-btn" aria-label="Switch to kanban view" class="p-2 rounded-md hidden"><i data-lucide="trello"></i></button>
                      </div>
@@ -442,7 +438,7 @@
         let tokenClient;
         let currentLayout = 'grid';
         let currentPage = 1;
-        const ITEMS_PER_PAGE = 10;
+        const ITEMS_PER_PAGE = 12; // UPGRADED
         let revenueChart, bestsellersChart;
         let isValueVisible = false;
         let searchDebounceTimer;
@@ -623,6 +619,16 @@
 
         async function handleFormSubmit(e) {
             e.preventDefault();
+            
+            if (isDuplicate()) {
+                Swal.fire({
+                    title: 'Duplicate Component',
+                    text: 'An item with the same model, device, size, and name already exists. Please modify the details.',
+                    icon: 'warning'
+                });
+                return;
+            }
+
             const submitButton = e.currentTarget.querySelector('button[type="submit"]');
             const originalButtonText = submitButton.innerHTML;
             submitButton.innerHTML = `<svg class="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...`;
@@ -804,7 +810,7 @@
             dom.noResults.classList.add('hidden');
             if (show) {
                 let skeletonHtml = '';
-                for(let i = 0; i < 10; i++) { skeletonHtml += `<div class="industrial-card p-4 space-y-4"><div class="h-48 rounded bg-[var(--bg-tertiary)]"></div><div class="space-y-2"><div class="h-6 w-3/4 rounded bg-[var(--bg-tertiary)]"></div><div class="h-4 w-1/2 rounded bg-[var(--bg-tertiary)]"></div></div></div>`; }
+                for(let i = 0; i < 12; i++) { skeletonHtml += `<div class="industrial-card p-4 space-y-4"><div class="h-48 rounded bg-[var(--bg-tertiary)]"></div><div class="space-y-2"><div class="h-6 w-3/4 rounded bg-[var(--bg-tertiary)]"></div><div class="h-4 w-1/2 rounded bg-[var(--bg-tertiary)]"></div></div></div>`; }
                 dom.skeletonLoader.innerHTML = `<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 skeleton-breathe">${skeletonHtml}</div>`;
             }
         }
@@ -997,6 +1003,25 @@
         // ================================================================================
         // 5. ANALYTICS & HELPERS
         // ================================================================================
+        function isDuplicate() {
+            const form = dom.partForm;
+            const model = form.querySelector('#model').value.trim().toLowerCase();
+            const device = form.querySelector('#device').value.trim().toLowerCase();
+            const size = form.querySelector('#size').value.trim().toLowerCase();
+            const itemName = form.querySelector('#item-name-main').value.trim().toLowerCase();
+            const editId = form.querySelector('#edit-id').value;
+
+            return allItems.some(item => {
+                // If we are editing, don't compare the item to itself
+                if (item.id === editId) return false;
+
+                return (item.model || '').trim().toLowerCase() === model &&
+                       (item.device || '').trim().toLowerCase() === device &&
+                       (item.size || '').trim().toLowerCase() === size &&
+                       (item.itemName || '').trim().toLowerCase() === itemName;
+            });
+        }
+
         function populateFilters() {
             const devices = [...new Set(allItems.map(item => item.device).filter(Boolean))];
             const sizes = [...new Set(allItems.map(item => item.size).filter(Boolean))];
