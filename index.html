@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Industries | Component Database</title>
+    <title>Vinayaka Industries | Component Database</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,7 +33,7 @@
             --accent: #FFC107;
             --accent-text: #212529;
             --danger: #DC3545;
-            --warning: #FD7E14; /* ADDED */
+            --warning: #FD7E14;
             --success: #198754;
             --shadow-color: rgba(0, 0, 0, 0.05);
         }
@@ -48,7 +48,7 @@
             --accent: #FFC107;
             --accent-text: #212529;
             --danger: #EF5350;
-            --warning: #FFA726; /* ADDED */
+            --warning: #FFA726;
             --success: #4CAF50;
             --shadow-color: rgba(0, 0, 0, 0.2);
         }
@@ -147,6 +147,7 @@
         .btn-danger { background-color: transparent; color: var(--danger); border: 1px solid var(--danger); }
         .btn-danger:hover { background-color: var(--danger); color: white; }
 
+        /* MODIFICATION: Unified filter control styling */
         .filter-control-group {
             background-color: var(--bg-tertiary);
             border: 1px solid var(--border-color);
@@ -318,12 +319,6 @@
                 <div id="dashboard-view">
                     <div class="mb-8">
                         <h2 class="text-2xl font-black mb-4">Analytics Overview</h2>
-                        <!-- ================================================================================ -->
-                        <!-- == MODIFICATION START: Enhanced Analytics Grid ================================= -->
-                        <!-- ================================================================================ -->
-                        <!-- 1. Grid Layout: Changed xl:grid-cols-4 to lg:grid-cols-4 for better responsiveness, preventing orphaned elements. -->
-                        <!-- 2. Card Alignment & Spacing: Added flex classes to all cards for consistent vertical alignment. -->
-                        <!-- 3. Font Sizes: Ensured all large numbers use responsive text classes (e.g., text-3xl sm:text-4xl xl:text-5xl). -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                             <div class="industrial-card p-6 flex flex-col justify-between">
                                 <p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Total Components</p>
@@ -345,15 +340,17 @@
                                 <p id="out-of-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2 text-[var(--danger)]">0</p>
                             </div>
                         </div>
-                        <!-- ================================================================================ -->
-                        <!-- == MODIFICATION END: Enhanced Analytics Grid =================================== -->
-                        <!-- ================================================================================ -->
                     </div>
-
+                    <!-- ================================================================================ -->
+                    <!-- == MODIFICATION START: Redesigned Filter Bar ================================= -->
+                    <!-- ================================================================================ -->
                     <div class="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-4 mb-8">
+                        <!-- 1. Layout: Flexbox with justify-between separates filters from sorting. -->
                         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                            <!-- 2. Filters Group: Filters are grouped together on the left. -->
                             <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <div class="lg:col-span-1">
+                                    <!-- 3. Unified Style: Each control uses the .filter-control-group for a consistent look. -->
                                     <div class="filter-control-group flex items-center gap-2">
                                         <i data-lucide="search" class="w-5 h-5 text-[var(--text-secondary)] flex-shrink-0"></i>
                                         <input type="text" id="search" placeholder="Search components..." class="filter-control-input">
@@ -372,6 +369,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- 4. Sort Control: Sorting is now isolated on the right for clarity. -->
                             <div class="flex-shrink-0">
                                 <div class="filter-control-group">
                                     <label for="sort-by">Sort By</label>
@@ -380,6 +378,9 @@
                             </div>
                         </div>
                     </div>
+                    <!-- ================================================================================ -->
+                    <!-- == MODIFICATION END: Redesigned Filter Bar =================================== -->
+                    <!-- ================================================================================ -->
                 
                     <div id="skeleton-loader" class="hidden"></div>
                     <div id="searchResults" class="hidden"></div>
@@ -456,9 +457,11 @@
         let tokenClient;
         let currentLayout = 'grid';
         let currentPage = 1;
-        const ITEMS_PER_PAGE = 12; // UPGRADED
+        // MODIFICATION: Changed items per page to 12
+        const ITEMS_PER_PAGE = 12;
         let revenueChart, bestsellersChart;
         let isValueVisible = false;
+        // MODIFICATION: Added timer for search debounce
         let searchDebounceTimer;
 
         const dom = {
@@ -638,6 +641,7 @@
         async function handleFormSubmit(e) {
             e.preventDefault();
             
+            // MODIFICATION: Check for duplicates before saving
             if (isDuplicate()) {
                 Swal.fire({
                     title: 'Duplicate Component',
@@ -770,10 +774,12 @@
 
         function createGridCard(item) {
             const card = document.createElement('div');
+            // MODIFICATION: Added flex classes for equal height cards
             card.className = 'industrial-card overflow-hidden flex flex-col group';
             const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
             const firstImage = getDriveThumbnail(images[0]) || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.itemName || 'N/A')}&background=E9ECEF&color=212529&size=512&bold=true`;
             const quantity = parseInt(item.quantity) || 0;
+            // MODIFICATION: Logic for dynamic stock badge colors
             const statusColor = quantity === 0 ? 'bg-[var(--danger)]' : quantity < 5 ? 'bg-[var(--warning)]' : 'bg-green-500';
             const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
             card.innerHTML = `
@@ -783,9 +789,11 @@
                     <div class="absolute top-2 left-2 flex items-center gap-2 text-xs font-bold px-2 py-1 rounded text-white ${statusColor}">${statusText}</div>
                 </div>
                 <div class="p-4 flex-grow flex flex-col">
+                    <!-- MODIFICATION: Improved title typography (capitalize) -->
                     <h3 class="font-bold leading-tight capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3>
                     <p class="text-sm text-[var(--text-secondary)] mt-1">Price: <span class="font-semibold text-[var(--text-primary)]">₹${item.price || 'N/A'}</span></p>
                     <div class="mt-auto pt-4 text-right">
+                        <!-- MODIFICATION: Strengthened CTA link styling -->
                         <button class="view-details-btn text-sm font-bold text-[var(--accent)] hover:underline" data-id="${item.id}">View Details &rarr;</button>
                     </div>
                 </div>`;
@@ -1021,6 +1029,7 @@
         // ================================================================================
         // 5. ANALYTICS & HELPERS
         // ================================================================================
+        // MODIFICATION: Function to check for duplicate items
         function isDuplicate() {
             const form = dom.partForm;
             const model = form.querySelector('#model').value.trim().toLowerCase();
@@ -1264,6 +1273,7 @@
 
         dom.partForm.addEventListener('submit', handleFormSubmit);
         
+        // MODIFICATION: Debounced search input
         dom.search.addEventListener('input', () => {
             clearTimeout(searchDebounceTimer);
             searchDebounceTimer = setTimeout(() => {
@@ -1306,4 +1316,3 @@
     </script>
 </body>
 </html>
-
