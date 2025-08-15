@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Industries | Component Database</title>
+    <title>Vinayaka Industries | Component Database</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,6 +34,7 @@
             --accent: #FFC107;
             --accent-text: #212529;
             --danger: #DC3545;
+            --warning: #FD7E14; /* NEW: Warning color for low stock */
             --success: #198754;
             --shadow-color: rgba(0, 0, 0, 0.05);
         }
@@ -49,6 +50,7 @@
             --accent: #FFC107;
             --accent-text: #212529;
             --danger: #EF5350;
+            --warning: #FFA726; /* NEW: Warning color for low stock */
             --success: #4CAF50;
             --shadow-color: rgba(0, 0, 0, 0.2);
         }
@@ -61,15 +63,11 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
         
-        /* ================================================================================
-        2. TYPOGRAPHY & READABILITY
-        ================================================================================ */
         h1, h2, h3, h4, h5, h6 { font-weight: 800; }
         body, p, span, div { line-height: 1.6; }
-        label { font-weight: 500; color: var(--text-secondary); }
-
+        
         /* ================================================================================
-        3. LAYOUT & SPACING: Grid, Borders, and Shadows
+        3. LAYOUT & SPACING
         ================================================================================ */
         .main-content {
             padding-left: var(--sidebar-width);
@@ -123,7 +121,7 @@
         }
         
         /* ================================================================================
-        4. INTERACTIVE ELEMENTS & MICRO-INTERACTIONS
+        4. INTERACTIVE ELEMENTS & FORMS
         ================================================================================ */
         .btn {
             padding: 0.65rem 1.25rem;
@@ -151,7 +149,36 @@
         .btn-danger { background-color: transparent; color: var(--danger); border: 1px solid var(--danger); }
         .btn-danger:hover { background-color: var(--danger); color: white; }
 
-        .industrial-input {
+        /* UPGRADED: Unified Filter Bar Inputs */
+        .filter-control-group {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .filter-control-group:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-text);
+        }
+        .filter-control-group label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .filter-control-input {
+            background-color: transparent;
+            border: none;
+            outline: none;
+            width: 100%;
+            padding: 0.1rem 0;
+            color: var(--text-primary);
+        }
+        .filter-control-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .industrial-input { /* Kept for form modal */
             background-color: transparent;
             border: none;
             border-bottom: 2px solid var(--border-color);
@@ -167,7 +194,6 @@
             --tw-ring-color: transparent;
         }
         
-        /* Blurred value for privacy */
         .blurred-value {
             filter: blur(8px);
             user-select: none;
@@ -175,14 +201,12 @@
             transition: filter 0.2s ease;
         }
         
-        /* SweetAlert Customization */
         .swal2-popup { font-family: 'Inter', sans-serif; background-color: var(--bg-secondary) !important; color: var(--text-primary) !important; border: 1px solid var(--border-color) !important; }
         .swal2-title { color: var(--text-primary) !important; }
         .swal2-confirm { background-color: var(--accent) !important; color: var(--accent-text) !important; }
         .swal2-deny { background-color: var(--danger) !important; }
         .swal2-cancel { background-color: var(--bg-tertiary) !important; }
 
-        /* NEW: Breathing animation for skeleton loader */
         @keyframes breathing {
             0%, 100% { opacity: 0.7; }
             50% { opacity: 1; }
@@ -193,8 +217,6 @@
         .skeleton-breathe > div > div:nth-child(2) { animation-delay: 0.1s; }
         .skeleton-breathe > div > div:nth-child(3) { animation-delay: 0.2s; }
 
-
-        /* MOBILE RESPONSIVENESS */
         @media (max-width: 1024px) {
             .main-content { padding-left: 0; }
             .sidebar { transform: translateX(-100%); box-shadow: 5px 0 15px rgba(0,0,0,0.2); z-index: 50; }
@@ -223,10 +245,8 @@
     </div>
 
     <div id="app-wrapper" class="relative min-h-screen hidden">
-        <!-- Mobile Backdrop -->
         <div id="mobile-backdrop" class="mobile-backdrop hidden lg:hidden"></div>
 
-        <!-- Sidebar -->
         <aside class="sidebar fixed top-0 left-0 w-[var(--sidebar-width)] flex flex-col">
             <div class="flex items-center gap-4 p-5 h-[var(--header-height)] border-b border-[var(--border-color)] flex-shrink-0">
                 <div class="bg-[var(--text-primary)] p-2.5 rounded-lg"><i data-lucide="gem" class="w-6 h-6 text-[var(--bg-primary)]"></i></div>
@@ -269,13 +289,13 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content flex-1 flex flex-col min-h-screen">
             <header class="sticky top-0 z-30 bg-[var(--bg-primary)]/80 backdrop-blur-sm h-[var(--header-height)] flex items-center justify-between px-6 lg:px-8 border-b border-[var(--border-color)]">
                 <div class="flex items-center gap-4">
                      <button id="menuBtn" aria-label="Open sidebar menu" class="lg:hidden p-2 text-[var(--text-secondary)] -ml-2"><i data-lucide="menu" class="w-6 h-6"></i></button>
                      <h2 class="text-2xl font-black" id="page-title">Dashboard</h2>
                 </div>
+                <!-- UPGRADED: Header actions are now in a single group for better alignment -->
                 <div class="flex items-center gap-4">
                      <div id="layout-switcher" class="flex items-center gap-1 bg-[var(--bg-tertiary)] p-1 rounded-lg border border-[var(--border-color)]">
                          <button id="grid-view-btn" aria-label="Switch to grid view" class="p-2 rounded-md"><i data-lucide="layout-grid"></i></button>
@@ -288,42 +308,52 @@
             </header>
 
             <div id="app" class="flex-1 w-full p-6 lg:p-8">
-                <!-- Dashboard View -->
                 <div id="dashboard-view">
                     <div class="mb-8">
                         <h2 class="text-2xl font-black mb-4">Analytics Overview</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-                            <div class="industrial-card p-6"><p class="text-sm font-medium text-[var(--text-secondary)]">Total Components</p><p id="total-components" class="text-5xl font-black mt-2">0</p></div>
-                            <div class="industrial-card p-6">
+                        <!-- UPGRADED: Analytics cards are now fully responsive -->
+                        <div class="flex flex-wrap gap-6">
+                            <div class="industrial-card p-6 flex-1 min-w-[250px]"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Total Components</p><p id="total-components" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p></div>
+                            <div class="industrial-card p-6 flex-1 min-w-[250px]">
                                 <div class="flex justify-between items-start">
-                                    <p class="text-sm font-medium text-[var(--text-secondary)]">Inventory Value</p>
+                                    <p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Inventory Value</p>
                                     <button id="value-toggle-btn" aria-label="Toggle inventory value visibility" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"><i data-lucide="eye-off" class="w-5 h-5"></i></button>
                                 </div>
-                                <p id="total-value" class="text-5xl font-black mt-2">₹0</p>
+                                <p id="total-value" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">₹0</p>
                             </div>
-                            <div class="industrial-card p-6"><p class="text-sm font-medium text-[var(--text-secondary)]">Low Stock Items</p><p id="low-stock" class="text-5xl font-black mt-2">0</p></div>
-                            <div class="industrial-card p-6"><p class="text-sm font-medium text-[var(--text-secondary)]">Out of Stock</p><p id="out-of-stock" class="text-5xl font-black mt-2 text-[var(--danger)]">0</p></div>
+                            <div class="industrial-card p-6 flex-1 min-w-[250px]"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Low Stock Items</p><p id="low-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p></div>
+                            <div class="industrial-card p-6 flex-1 min-w-[250px]"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Out of Stock</p><p id="out-of-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2 text-[var(--danger)]">0</p></div>
                         </div>
                     </div>
 
-                    <!-- Filters and Search -->
+                    <!-- UPGRADED: Unified and responsive filter bar -->
                     <div class="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-4 mb-8">
-                        <div class="grid grid-cols-1 md:grid-cols-5 gap-x-6 gap-y-4">
-                            <div class="md:col-span-2 relative">
-                                <i data-lucide="search" class="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-secondary)]"></i>
-                                <input type="text" id="search" placeholder="Search by model, name, device..." class="pl-8 industrial-input">
+                        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                            <div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div class="sm:col-span-3 lg:col-span-1">
+                                    <div class="filter-control-group flex items-center gap-2">
+                                        <i data-lucide="search" class="w-5 h-5 text-[var(--text-secondary)] flex-shrink-0"></i>
+                                        <input type="text" id="search" placeholder="Search..." class="filter-control-input">
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="filter-control-group">
+                                        <label for="filter-device">Device</label>
+                                        <select id="filter-device" class="filter-control-input"><option value="">All Devices</option></select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="filter-control-group">
+                                        <label for="filter-size">Size</label>
+                                        <select id="filter-size" class="filter-control-input"><option value="">All Sizes</option></select>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <label for="filter-device" class="text-xs">Device</label>
-                                <select id="filter-device" class="industrial-input"><option value="">All Devices</option></select>
-                            </div>
-                            <div>
-                                <label for="filter-size" class="text-xs">Size</label>
-                                <select id="filter-size" class="industrial-input"><option value="">All Sizes</option></select>
-                            </div>
-                            <div>
-                                <label for="sort-by" class="text-xs">Sort By</label>
-                                <select id="sort-by" class="industrial-input"><option value="model-asc">Model (A-Z)</option><option value="price-desc">Price (High-Low)</option><option value="quantity-asc">Quantity (Low-High)</option></select>
+                            <div class="flex-shrink-0">
+                                <div class="filter-control-group">
+                                    <label for="sort-by">Sort By</label>
+                                    <select id="sort-by" class="filter-control-input"><option value="model-asc">Model (A-Z)</option><option value="price-desc">Price (High-Low)</option><option value="quantity-asc">Quantity (Low-High)</option></select>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -335,7 +365,6 @@
                     <div id="pagination-controls" class="flex justify-center items-center gap-4 mt-8"></div>
                 </div>
 
-                <!-- Reports View -->
                 <div id="reports-view" class="hidden space-y-8">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <div class="industrial-card p-6"><h3 class="font-semibold mb-4">Monthly Revenue</h3><canvas id="revenue-chart"></canvas></div>
@@ -346,7 +375,6 @@
         </main>
     </div>
 
-    <!-- Add/Edit Modal -->
     <div id="formModal" role="dialog" aria-modal="true" aria-labelledby="form-title" class="fixed inset-0 z-50 justify-center items-start p-4 overflow-y-auto bg-black/70 hidden">
         <div class="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg shadow-2xl w-full max-w-4xl my-8 flex flex-col">
             <div class="flex justify-between items-center p-6 border-b border-[var(--border-color)]"><h2 id="form-title" class="text-2xl font-black">Add New Component</h2><button type="button" id="closeFormModalBtn" aria-label="Close form" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
@@ -370,7 +398,6 @@
         </div>
     </div>
 
-    <!-- Detail Modal -->
     <div id="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title" class="detail-modal fixed inset-0 z-50 justify-center items-center p-4 hidden opacity-0 scale-95">
         <div class="fixed inset-0 bg-black/70" id="detail-backdrop"></div>
         <div class="relative bg-[var(--bg-secondary)] w-full max-w-6xl max-h-[90vh] rounded-lg border border-[var(--border-color)] flex flex-col">
@@ -390,7 +417,7 @@
         // ================================================================================
         // 1. CONFIGURATION & STATE MANAGEMENT
         // ================================================================================
-        const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw'; // IMPORTANT: Restrict this key in Google Cloud Console!
+        const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
         const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com';
         const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
         const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile";
@@ -409,6 +436,7 @@
         const ITEMS_PER_PAGE = 10;
         let revenueChart, bestsellersChart;
         let isValueVisible = false;
+        let searchDebounceTimer;
 
         const dom = {
             html: document.documentElement,
@@ -524,15 +552,14 @@
                 dom.userProfile.classList.remove('flex');
                 allItems = [];
                 allSales = [];
-                localStorage.removeItem('inventoryData'); // Clear cache on sign out
+                localStorage.removeItem('inventoryData');
                 processAndRenderItems();
             }
         }
         
         async function loadAllData() {
-            // PERFORMANCE: First, try to load from cache
             const cachedData = JSON.parse(localStorage.getItem('inventoryData'));
-            if (cachedData && (Date.now() - cachedData.timestamp < 3600000)) { // 1 hour cache
+            if (cachedData && (Date.now() - cachedData.timestamp < 3600000)) {
                 allItems = cachedData.items;
                 allSales = cachedData.sales;
                 populateFilters();
@@ -542,7 +569,6 @@
                 showSkeletonLoader(true);
             }
 
-            // Always fetch fresh data from API
             try {
                 const responses = await Promise.all([
                     gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: INVENTORY_RANGE }),
@@ -551,7 +577,7 @@
                 
                 const inventoryValues = responses[0].result.values;
                 const freshItems = (inventoryValues && inventoryValues.length > 1) ? inventoryValues.slice(1).map((row, index) => {
-                    const item = inventoryValues[0].reduce((obj, header, i) => ({...obj, [header]: row[i]}), {});
+                    const item = (inventoryValues[0] || []).reduce((obj, header, i) => ({...obj, [header]: row[i]}), {});
                     item.rowIndex = index + 2;
                     return item;
                 }).filter(item => item.id && item.id.trim() !== '') : [];
@@ -564,7 +590,6 @@
                     date: row[3]
                 })) : [];
 
-                // Update state and cache
                 allItems = freshItems;
                 allSales = freshSales;
                 localStorage.setItem('inventoryData', JSON.stringify({
@@ -574,7 +599,7 @@
                 }));
 
             } catch (err) {
-                Swal.fire({ title: 'Data Loading Error', text: `Could not load data. Check Sheet ID and permissions. Error: ${err.result.error.message}`, icon: 'error' });
+                Swal.fire({ title: 'Data Loading Error', text: `Could not load data. Check Sheet ID and permissions. Error: ${err.result?.error?.message || 'Unknown error'}`, icon: 'error' });
                 updateAuthStatus(false);
             } finally {
                 showSkeletonLoader(false);
@@ -588,7 +613,7 @@
             e.preventDefault();
             const submitButton = e.currentTarget.querySelector('button[type="submit"]');
             const originalButtonText = submitButton.innerHTML;
-            submitButton.innerHTML = `<svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">...</svg> Saving...`;
+            submitButton.innerHTML = `<svg class="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...`;
             submitButton.disabled = true;
 
             const editId = dom.editId.value;
@@ -610,10 +635,10 @@
                 await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SPREADSHEET_ID, range: INVENTORY_RANGE, valueInputOption: 'USER_ENTERED', resource: { values: [newRow] } });
                 Swal.fire({ title: 'Success!', text: 'Component added successfully.', icon: 'success', timer: 2000, showConfirmButton: false });
                 closeFormModal();
-                localStorage.removeItem('inventoryData'); // Invalidate cache
+                localStorage.removeItem('inventoryData');
                 loadAllData();
             } catch (err) {
-                Swal.fire({ title: 'Save Error', text: `Could not save the component. Error: ${err.result.error.message}`, icon: 'error' });
+                Swal.fire({ title: 'Save Error', text: `Could not save the component. Error: ${err.result?.error?.message || 'Unknown error'}`, icon: 'error' });
             }
         }
 
@@ -630,10 +655,10 @@
                 await gapi.client.sheets.spreadsheets.values.update({ spreadsheetId: SPREADSHEET_ID, range: updateRange, valueInputOption: 'USER_ENTERED', resource: { values: [updatedRow] }});
                 Swal.fire({ title: 'Success!', text: 'Component updated successfully.', icon: 'success', timer: 2000, showConfirmButton: false });
                 closeFormModal();
-                localStorage.removeItem('inventoryData'); // Invalidate cache
+                localStorage.removeItem('inventoryData');
                 loadAllData();
             } catch (err) {
-                Swal.fire('Update Error', `Could not update the component. Error: ${err.result.error.message}`, 'error');
+                Swal.fire('Update Error', `Could not update the component. Error: ${err.result?.error?.message || 'Unknown error'}`, 'error');
             }
         }
 
@@ -646,10 +671,10 @@
                 await gapi.client.sheets.spreadsheets.batchUpdate({ spreadsheetId: SPREADSHEET_ID, resource: { requests: [{ deleteDimension: { range: { sheetId: 0, dimension: 'ROWS', startIndex: itemToDelete.rowIndex - 1, endIndex: itemToDelete.rowIndex }}}]}});
                 Swal.fire('Deleted!', 'The component has been deleted.', 'success');
                 closeDetailPanel();
-                localStorage.removeItem('inventoryData'); // Invalidate cache
+                localStorage.removeItem('inventoryData');
                 loadAllData();
             } catch (err) {
-                 Swal.fire('Delete Error', `Could not delete the component. Error: ${err.result.error.message}`, 'error');
+                 Swal.fire('Delete Error', `Could not delete the component. Error: ${err.result?.error?.message || 'Unknown error'}`, 'error');
             }
         }
 
@@ -713,7 +738,7 @@
             const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
             const firstImage = getDriveThumbnail(images[0]) || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.itemName || 'N/A')}&background=E9ECEF&color=212529&size=512&bold=true`;
             const quantity = parseInt(item.quantity, 10);
-            const statusColor = quantity > 10 ? 'bg-green-500' : quantity > 0 ? 'bg-yellow-500' : 'bg-red-500';
+            const statusColor = quantity === 0 ? 'bg-[var(--danger)]' : quantity < 5 ? 'bg-[var(--warning)]' : 'bg-green-500';
             const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
             card.innerHTML = `
                 <div class="relative image-gallery bg-[var(--bg-tertiary)]" data-images="${images.join(',')}">
@@ -736,7 +761,7 @@
             card.className = 'industrial-card list-item p-4 flex items-center gap-4';
             const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.itemName || 'N/A')}&background=E9ECEF&color=212529&size=128&bold=true`;
             const quantity = parseInt(item.quantity, 10);
-            const statusColor = quantity > 10 ? 'text-green-500' : quantity > 0 ? 'text-yellow-600' : 'text-red-600';
+            const statusColor = quantity === 0 ? 'text-[var(--danger)]' : quantity < 5 ? 'text-[var(--warning)]' : 'text-green-500';
             card.innerHTML = `
                 <img loading="lazy" src="${image}" class="w-16 h-16 rounded-md object-contain flex-shrink-0 bg-[var(--bg-tertiary)]" onerror="this.src='https://ui-avatars.com/api/?name=Error&background=F8D7DA&color=721C24&size=128&bold=true';">
                 <div class="flex-1 grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
@@ -779,7 +804,7 @@
                 dom.html.classList.remove('dark');
             }
             switchLayout(localStorage.getItem('layout') || 'grid');
-            updateValueVisibility(); // Set initial visibility state
+            updateValueVisibility();
         }
 
         function toggleTheme() {
@@ -979,8 +1004,8 @@
             const lowStockCount = items.filter(item => (parseInt(item.quantity) || 0) < 5 && (parseInt(item.quantity) || 0) > 0).length;
             const lowStockEl = document.getElementById('low-stock');
             lowStockEl.textContent = lowStockCount;
-            lowStockEl.classList.toggle('text-[var(--danger)]', lowStockCount > 0);
-            lowStockEl.classList.toggle('text-[var(--success)]', lowStockCount === 0);
+            // UPGRADED: Use warning color for low stock
+            lowStockEl.style.color = lowStockCount > 0 ? 'var(--warning)' : 'var(--success)';
             
             const outOfStockCount = items.filter(item => (parseInt(item.quantity) || 0) === 0).length;
             document.getElementById('out-of-stock').textContent = outOfStockCount;
@@ -1036,7 +1061,6 @@
             dom.mobileBackdrop.classList.toggle('hidden', !isOpen);
         }
 
-        // ACCESSIBILITY: Trap focus inside a modal
         function trapFocus(element) {
             const focusableEls = element.querySelectorAll('a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])');
             const firstFocusableEl = focusableEls[0];
@@ -1045,19 +1069,19 @@
 
             element.addEventListener('keydown', function(e) {
                 if (e.key !== 'Tab' && e.keyCode !== KEYCODE_TAB) return;
-                if (e.shiftKey) { // shift + tab
+                if (e.shiftKey) {
                     if (document.activeElement === firstFocusableEl) {
                         lastFocusableEl.focus();
                         e.preventDefault();
                     }
-                } else { // tab
+                } else {
                     if (document.activeElement === lastFocusableEl) {
                         firstFocusableEl.focus();
                         e.preventDefault();
                     }
                 }
             });
-            firstFocusableEl.focus();
+            if(firstFocusableEl) firstFocusableEl.focus();
         }
 
         // ================================================================================
@@ -1185,10 +1209,20 @@
         document.body.appendChild(gisScript);
 
         dom.partForm.addEventListener('submit', handleFormSubmit);
-        [dom.search, dom.filterDevice, dom.filterSize, dom.sortBy].forEach(el => el.addEventListener('input', () => {
+        
+        dom.search.addEventListener('input', () => {
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                currentPage = 1;
+                processAndRenderItems();
+            }, 300); // 300ms debounce
+        });
+
+        [dom.filterDevice, dom.filterSize, dom.sortBy].forEach(el => el.addEventListener('change', () => {
             currentPage = 1;
             processAndRenderItems();
         }));
+
         dom.addPartBtn.addEventListener('click', openAddModal);
         dom.closeFormModalBtn.addEventListener('click', closeFormModal);
         dom.cancelBtn.addEventListener('click', closeFormModal);
