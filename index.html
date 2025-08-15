@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>  | Component Database</title>
+    <title>Vinayaka Industries | Component Database</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,14 +16,13 @@
 
     <style>
         /* ================================================================================
-        1. WORLD-CLASS AESTHETIC & BRANDING: Brutalist Industrial Theme
+        1. WORLD-CLASS AESTHETIC & BRANDING
         ================================================================================ */
         :root {
             --sidebar-width: 260px;
             --header-height: 72px;
         }
         
-        /* Light Theme Color Palette */
         html:not(.dark) {
             --bg-primary: #F8F9FA;
             --bg-secondary: #FFFFFF;
@@ -34,12 +33,11 @@
             --accent: #FFC107;
             --accent-text: #212529;
             --danger: #DC3545;
-            --warning: #FD7E14; /* NEW: Warning color for low stock */
+            --warning: #FD7E14; /* ADDED */
             --success: #198754;
             --shadow-color: rgba(0, 0, 0, 0.05);
         }
 
-        /* Dark Theme Color Palette */
         html.dark {
             --bg-primary: #121212;
             --bg-secondary: #1E1E1E;
@@ -50,7 +48,7 @@
             --accent: #FFC107;
             --accent-text: #212529;
             --danger: #EF5350;
-            --warning: #FFA726; /* NEW: Warning color for low stock */
+            --warning: #FFA726; /* ADDED */
             --success: #4CAF50;
             --shadow-color: rgba(0, 0, 0, 0.2);
         }
@@ -67,7 +65,7 @@
         body, p, span, div { line-height: 1.6; }
         
         /* ================================================================================
-        3. LAYOUT & SPACING
+        2. LAYOUT & SPACING
         ================================================================================ */
         .main-content {
             padding-left: var(--sidebar-width);
@@ -105,6 +103,7 @@
             color: var(--accent-text);
             font-weight: 700;
         }
+        /* UPGRADED: Clearer hover state for inactive nav links */
         .sidebar-nav-link:not(.active):hover { background-color: var(--bg-tertiary); }
 
         .industrial-card {
@@ -121,7 +120,7 @@
         }
         
         /* ================================================================================
-        4. INTERACTIVE ELEMENTS & FORMS
+        3. INTERACTIVE ELEMENTS & FORMS
         ================================================================================ */
         .btn {
             padding: 0.65rem 1.25rem;
@@ -159,12 +158,13 @@
         }
         .filter-control-group:focus-within {
             border-color: var(--accent);
-            box-shadow: 0 0 0 2px var(--accent-text);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
         }
         .filter-control-group label {
             font-size: 0.7rem;
             font-weight: 600;
             color: var(--text-secondary);
+            display: block;
         }
         .filter-control-input {
             background-color: transparent;
@@ -173,10 +173,9 @@
             width: 100%;
             padding: 0.1rem 0;
             color: var(--text-primary);
+            font-weight: 500;
         }
-        .filter-control-input::placeholder {
-            color: var(--text-secondary);
-        }
+        .filter-control-input::placeholder { color: var(--text-secondary); }
 
         .industrial-input { /* Kept for form modal */
             background-color: transparent;
@@ -263,19 +262,29 @@
             </nav>
 
             <div class="p-4 border-t border-[var(--border-color)] flex-shrink-0">
-                <div id="user-profile-area" class="p-2 rounded-lg cursor-pointer group hover:bg-[var(--bg-tertiary)] transition-colors">
-                    <div id="auth-required-profile" class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center border border-dashed border-[var(--border-color)]"><i data-lucide="user-x" class="text-[var(--text-secondary)]"></i></div>
-                        <div>
-                            <p class="font-semibold text-[var(--text-secondary)]">Not Signed In</p>
-                            <p class="text-xs text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-colors">Click to sign in</p>
+                <!-- UPGRADED: Auth UI now correctly shows one state at a time -->
+                <div id="user-profile-area">
+                    <div id="auth-signed-out-view" class="p-2 rounded-lg cursor-pointer group hover:bg-[var(--bg-tertiary)] transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center border border-dashed border-[var(--border-color)]"><i data-lucide="user-x" class="text-[var(--text-secondary)]"></i></div>
+                            <div>
+                                <p class="font-semibold text-[var(--text-secondary)]">Not Signed In</p>
+                                <p class="text-xs text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-colors">Click to sign in</p>
+                            </div>
                         </div>
                     </div>
-                    <div id="user-profile" class="hidden items-center gap-3">
-                        <img id="user-dp" class="w-11 h-11 rounded-full" src="" alt="User profile picture">
-                        <div>
-                            <p id="user-name" class="font-semibold"></p>
-                            <p id="user-role" class="text-xs text-green-500 font-medium">Online</p>
+                    <div id="auth-signed-in-view" class="hidden">
+                        <div class="flex items-center justify-between p-2">
+                            <div class="flex items-center gap-3">
+                                <img id="user-dp" class="w-11 h-11 rounded-full" src="" alt="User profile picture">
+                                <div>
+                                    <p id="user-name" class="font-semibold"></p>
+                                    <p class="text-xs text-green-500 font-medium">Online</p>
+                                </div>
+                            </div>
+                            <button id="sign-out-btn" aria-label="Sign out" class="p-2 rounded-full hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] transition-colors">
+                                <i data-lucide="log-out" class="w-5 h-5"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -295,8 +304,7 @@
                      <button id="menuBtn" aria-label="Open sidebar menu" class="lg:hidden p-2 text-[var(--text-secondary)] -ml-2"><i data-lucide="menu" class="w-6 h-6"></i></button>
                      <h2 class="text-2xl font-black" id="page-title">Dashboard</h2>
                 </div>
-                <!-- UPGRADED: Header actions are now in a single group for better alignment -->
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 sm:gap-4">
                      <div id="layout-switcher" class="flex items-center gap-1 bg-[var(--bg-tertiary)] p-1 rounded-lg border border-[var(--border-color)]">
                          <button id="grid-view-btn" aria-label="Switch to grid view" class="p-2 rounded-md"><i data-lucide="layout-grid"></i></button>
                          <button id="list-view-btn" aria-label="Switch to list view" class="p-2 rounded-md"><i data-lucide="list"></i></button>
@@ -311,29 +319,27 @@
                 <div id="dashboard-view">
                     <div class="mb-8">
                         <h2 class="text-2xl font-black mb-4">Analytics Overview</h2>
-                        <!-- UPGRADED: Analytics cards are now fully responsive -->
-                        <div class="flex flex-wrap gap-6">
-                            <div class="industrial-card p-6 flex-1 min-w-[250px]"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Total Components</p><p id="total-components" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p></div>
-                            <div class="industrial-card p-6 flex-1 min-w-[250px]">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+                            <div class="industrial-card p-6"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Total Components</p><p id="total-components" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p></div>
+                            <div class="industrial-card p-6">
                                 <div class="flex justify-between items-start">
                                     <p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Inventory Value</p>
                                     <button id="value-toggle-btn" aria-label="Toggle inventory value visibility" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"><i data-lucide="eye-off" class="w-5 h-5"></i></button>
                                 </div>
                                 <p id="total-value" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">₹0</p>
                             </div>
-                            <div class="industrial-card p-6 flex-1 min-w-[250px]"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Low Stock Items</p><p id="low-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p></div>
-                            <div class="industrial-card p-6 flex-1 min-w-[250px]"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Out of Stock</p><p id="out-of-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2 text-[var(--danger)]">0</p></div>
+                            <div class="industrial-card p-6"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Low Stock Items</p><p id="low-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p></div>
+                            <div class="industrial-card p-6"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Out of Stock</p><p id="out-of-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2 text-[var(--danger)]">0</p></div>
                         </div>
                     </div>
 
-                    <!-- UPGRADED: Unified and responsive filter bar -->
                     <div class="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-4 mb-8">
                         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-                            <div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                <div class="sm:col-span-3 lg:col-span-1">
+                            <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div class="lg:col-span-1">
                                     <div class="filter-control-group flex items-center gap-2">
                                         <i data-lucide="search" class="w-5 h-5 text-[var(--text-secondary)] flex-shrink-0"></i>
-                                        <input type="text" id="search" placeholder="Search..." class="filter-control-input">
+                                        <input type="text" id="search" placeholder="Search components..." class="filter-control-input">
                                     </div>
                                 </div>
                                 <div>
@@ -394,7 +400,7 @@
                 </div>
                 <div id="spec-fields-container" class="hidden"><h3 class="text-lg font-bold border-b border-[var(--border-color)] pb-2 mb-4">Specifications</h3><div id="spec-fields" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4"></div></div>
             </form>
-            <div class="p-6 border-t border-[var(--border-color)] bg-[var(--bg-primary)] flex justify-end gap-3"><button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button><button type="submit" form="partForm" class="btn btn-primary">Save Component</button></div>
+            <div class="p-6 border-t border-[var(--border-color)] bg-[var(--bg-primary)] flex justify-end gap-3"><button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button><button type="submit" form="partForm" class="btn btn-primary flex items-center justify-center">Save Component</button></div>
         </div>
     </div>
 
@@ -446,7 +452,9 @@
             searchResults: document.getElementById('searchResults'),
             noResults: document.getElementById('no-results'),
             userProfileArea: document.getElementById('user-profile-area'),
-            userProfile: document.getElementById('user-profile'),
+            authSignedInView: document.getElementById('auth-signed-in-view'),
+            authSignedOutView: document.getElementById('auth-signed-out-view'),
+            signOutBtn: document.getElementById('sign-out-btn'),
             userDp: document.getElementById('user-dp'),
             userName: document.getElementById('user-name'),
             signInButtonMain: document.getElementById('signin-button-main'),
@@ -502,8 +510,9 @@
         }
         function maybeEnableButtons() {
             if (gapiInited && gisInited) {
-                dom.userProfileArea.onclick = handleAuthClick;
+                dom.authSignedOutView.onclick = handleAuthClick;
                 dom.signInButtonMain.onclick = handleAuthClick;
+                dom.signOutBtn.onclick = handleAuthClick;
                 lucide.createIcons();
             }
         }
@@ -532,8 +541,8 @@
                 dom.loginView.classList.add('hidden');
                 dom.appWrapper.classList.remove('hidden');
                 dom.addPartBtn.disabled = false;
-                dom.userProfile.classList.remove('hidden');
-                dom.userProfile.classList.add('flex');
+                dom.authSignedInView.classList.remove('hidden');
+                dom.authSignedOutView.classList.add('hidden');
                 
                 try {
                     const userInfo = await gapi.client.oauth2.userinfo.get();
@@ -548,8 +557,8 @@
                 dom.loginView.classList.remove('hidden');
                 dom.appWrapper.classList.add('hidden');
                 dom.addPartBtn.disabled = true;
-                dom.userProfile.classList.add('hidden');
-                dom.userProfile.classList.remove('flex');
+                dom.authSignedInView.classList.add('hidden');
+                dom.authSignedOutView.classList.remove('hidden');
                 allItems = [];
                 allSales = [];
                 localStorage.removeItem('inventoryData');
@@ -719,7 +728,7 @@
 
             const fragment = document.createDocumentFragment();
             if (currentLayout === 'grid') {
-                dom.searchResults.className = 'grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5';
+                dom.searchResults.className = 'grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5';
                 paginatedItems.forEach(item => fragment.appendChild(createGridCard(item)));
             } else {
                 dom.searchResults.className = 'space-y-3';
@@ -737,7 +746,7 @@
             card.className = 'industrial-card overflow-hidden flex flex-col group';
             const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
             const firstImage = getDriveThumbnail(images[0]) || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.itemName || 'N/A')}&background=E9ECEF&color=212529&size=512&bold=true`;
-            const quantity = parseInt(item.quantity, 10);
+            const quantity = parseInt(item.quantity) || 0;
             const statusColor = quantity === 0 ? 'bg-[var(--danger)]' : quantity < 5 ? 'bg-[var(--warning)]' : 'bg-green-500';
             const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
             card.innerHTML = `
@@ -747,7 +756,7 @@
                     <div class="absolute top-2 left-2 flex items-center gap-2 text-xs font-bold px-2 py-1 rounded text-white ${statusColor}">${statusText}</div>
                 </div>
                 <div class="p-4 flex-grow flex flex-col">
-                    <h3 class="font-bold leading-tight">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
+                    <h3 class="font-bold leading-tight capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3>
                     <p class="text-sm text-[var(--text-secondary)] mt-1">Price: <span class="font-semibold text-[var(--text-primary)]">₹${item.price || 'N/A'}</span></p>
                     <div class="mt-auto pt-4 text-right">
                         <button class="view-details-btn text-sm font-bold text-[var(--accent)] hover:underline" data-id="${item.id}">View Details &rarr;</button>
@@ -760,12 +769,12 @@
             const card = document.createElement('div');
             card.className = 'industrial-card list-item p-4 flex items-center gap-4';
             const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.itemName || 'N/A')}&background=E9ECEF&color=212529&size=128&bold=true`;
-            const quantity = parseInt(item.quantity, 10);
+            const quantity = parseInt(item.quantity) || 0;
             const statusColor = quantity === 0 ? 'text-[var(--danger)]' : quantity < 5 ? 'text-[var(--warning)]' : 'text-green-500';
             card.innerHTML = `
                 <img loading="lazy" src="${image}" class="w-16 h-16 rounded-md object-contain flex-shrink-0 bg-[var(--bg-tertiary)]" onerror="this.src='https://ui-avatars.com/api/?name=Error&background=F8D7DA&color=721C24&size=128&bold=true';">
                 <div class="flex-1 grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
-                    <h3 class="md:col-span-2 font-semibold">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ')}</h3>
+                    <h3 class="md:col-span-2 font-semibold capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3>
                     <p class="text-[var(--text-secondary)]">₹${item.price || 'N/A'}</p>
                     <p class="${statusColor} font-medium">${quantity > 0 ? `${quantity} in Stock` : 'Out of Stock'}</p>
                     <div class="md:text-right"><button class="view-details-btn text-sm font-bold text-[var(--accent)] hover:underline" data-id="${item.id}">Details</button></div>
@@ -959,7 +968,7 @@
                 <div class="lg:col-span-1 p-6 space-y-6 border-l border-[var(--border-color)]">
                     <div>
                         <p class="text-sm font-bold text-[var(--accent)] uppercase">${item.itemName || 'Component'}</p>
-                        <h3 class="text-3xl font-black">${[item.model, item.device, item.size].filter(Boolean).join(' ')}</h3>
+                        <h3 class="text-3xl font-black capitalize">${[item.model, item.device, item.size].filter(Boolean).join(' ').toLowerCase()}</h3>
                     </div>
                     
                     <div class="bg-[var(--bg-tertiary)] p-4 rounded-lg border border-[var(--border-color)]">
@@ -1004,7 +1013,6 @@
             const lowStockCount = items.filter(item => (parseInt(item.quantity) || 0) < 5 && (parseInt(item.quantity) || 0) > 0).length;
             const lowStockEl = document.getElementById('low-stock');
             lowStockEl.textContent = lowStockCount;
-            // UPGRADED: Use warning color for low stock
             lowStockEl.style.color = lowStockCount > 0 ? 'var(--warning)' : 'var(--success)';
             
             const outOfStockCount = items.filter(item => (parseInt(item.quantity) || 0) === 0).length;
@@ -1215,7 +1223,7 @@
             searchDebounceTimer = setTimeout(() => {
                 currentPage = 1;
                 processAndRenderItems();
-            }, 300); // 300ms debounce
+            }, 300);
         });
 
         [dom.filterDevice, dom.filterSize, dom.sortBy].forEach(el => el.addEventListener('change', () => {
