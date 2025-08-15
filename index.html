@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vinayaka Industries | Component Database</title>
+    <title>Vinayaka  | Component Database</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,6 +12,8 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+    <script src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 
     <style>
         /* --- BRUTALIST INDUSTRIAL THEME --- */
@@ -347,22 +349,48 @@
     </div>
     
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
         const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
         const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com';
-        const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4", "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
+        const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4", "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest", "https://www.googleapis.com/discovery/v1/apis/oauth2/v2/rest"];
         const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/drive.readonly";
         const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ'; 
         const IMAGE_FOLDER_ID = '1o3i8aVtpFb2EZd4-014OrxPB1H6ncGu0';
         const INVENTORY_RANGE = 'Sheet1!A:AC';
         const SALES_RANGE = 'SalesLog!A:D';
 
-        let allItems = [];
-        let allSales = [];
-        let filteredItems = [];
         let gapiInited = false;
         let gisInited = false;
         let tokenClient;
+
+        function gapiLoaded() {
+            gapi.load('client', initializeGapiClient);
+        }
+
+        function gisLoaded() {
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: handleAuthResponse,
+            });
+            gisInited = true;
+            maybeEnableButtons();
+        }
+
+        function initializeGapiClient() {
+            gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS })
+                .then(() => {
+                    gapiInited = true;
+                    maybeEnableButtons();
+                })
+                .catch(err => {
+                    console.error("Error initializing GAPI client", err);
+                });
+        }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        let allItems = [];
+        let allSales = [];
+        let filteredItems = [];
         let currentLayout = 'grid';
         let currentPage = 1;
         const ITEMS_PER_PAGE = 10;
@@ -425,37 +453,6 @@
         // --- Initial Setup ---
         initLayout();
         
-        // This function is called when the GAPI script is loaded
-        function gapiLoaded() {
-            gapi.load('client', initializeGapiClient);
-        }
-
-        // This function is called when the GIS script is loaded
-        function gisLoaded() {
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CLIENT_ID,
-                scope: SCOPES,
-                callback: handleAuthResponse,
-            });
-            gisInited = true;
-            maybeEnableButtons();
-        }
-
-        // Make functions available globally for script onload callbacks
-        window.gapiLoaded = gapiLoaded;
-        window.gisLoaded = gisLoaded;
-
-        function initializeGapiClient() {
-            gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS })
-                .then(() => {
-                    gapiInited = true;
-                    maybeEnableButtons();
-                })
-                .catch(err => {
-                    console.error("Error initializing GAPI client", err);
-                });
-        }
-
         // --- Event Listeners ---
         dom.partForm.addEventListener('submit', handleFormSubmit);
         [dom.search, dom.filterDevice, dom.filterSize, dom.sortBy].forEach(el => el.addEventListener('input', () => {
@@ -485,14 +482,14 @@
 
 
         // --- Core Functions ---
-        function maybeEnableButtons() {
+        window.maybeEnableButtons = function() {
             if (gapiInited && gisInited) {
                 dom.userProfileArea.onclick = handleAuthClick;
                 dom.signInButtonMain.onclick = handleAuthClick;
                 lucide.createIcons();
             }
         }
-        function handleAuthResponse(resp) {
+        window.handleAuthResponse = function(resp) {
             if (resp.error !== undefined) {
                 Swal.fire({ title: 'Authentication Error', text: 'Could not sign in. Please try again.', icon: 'error' });
                 updateAuthStatus(false); return;
@@ -861,10 +858,10 @@
             dom.partForm.querySelector('#model').value = item.model || '';
             dom.partForm.querySelector('#device').value = item.device || '';
             dom.partForm.querySelector('#size').value = item.size || '';
-            dom.itemNameSelect.value = item.itemName || '';
+            dom.partForm.querySelector('#item-name-main').value = item.itemName || '';
             dom.partForm.querySelector('#price').value = item.price || '';
             dom.partForm.querySelector('#quantity').value = item.quantity || '0';
-            dom.imageLinksInput.value = item.imageLinks || '';
+            dom.partForm.querySelector('#image-links-input').value = item.imageLinks || '';
             dom.partForm.querySelector('#note').value = item.note || '';
 
             updateSpecFields(); // This will show the spec container if needed
