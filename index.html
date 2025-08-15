@@ -318,8 +318,17 @@
                 <div id="dashboard-view">
                     <div class="mb-8">
                         <h2 class="text-2xl font-black mb-4">Analytics Overview</h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-                            <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Total Components</p><p id="total-components" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p></div>
+                        <!-- ================================================================================ -->
+                        <!-- == MODIFICATION START: Enhanced Analytics Grid ================================= -->
+                        <!-- ================================================================================ -->
+                        <!-- 1. Grid Layout: Changed xl:grid-cols-4 to lg:grid-cols-4 for better responsiveness, preventing orphaned elements. -->
+                        <!-- 2. Card Alignment & Spacing: Added flex classes to all cards for consistent vertical alignment. -->
+                        <!-- 3. Font Sizes: Ensured all large numbers use responsive text classes (e.g., text-3xl sm:text-4xl xl:text-5xl). -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="industrial-card p-6 flex flex-col justify-between">
+                                <p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Total Components</p>
+                                <p id="total-components" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p>
+                            </div>
                             <div class="industrial-card p-6 flex flex-col justify-between">
                                 <div class="flex justify-between items-start">
                                     <p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Inventory Value</p>
@@ -327,9 +336,18 @@
                                 </div>
                                 <p id="total-value" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">₹0</p>
                             </div>
-                            <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Low Stock Items</p><p id="low-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p></div>
-                            <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Out of Stock</p><p id="out-of-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2 text-[var(--danger)]">0</p></div>
+                            <div class="industrial-card p-6 flex flex-col justify-between">
+                                <p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Low Stock Items</p>
+                                <p id="low-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p>
+                            </div>
+                            <div class="industrial-card p-6 flex flex-col justify-between">
+                                <p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Out of Stock</p>
+                                <p id="out-of-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2 text-[var(--danger)]">0</p>
+                            </div>
                         </div>
+                        <!-- ================================================================================ -->
+                        <!-- == MODIFICATION END: Enhanced Analytics Grid =================================== -->
+                        <!-- ================================================================================ -->
                     </div>
 
                     <div class="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-4 mb-8">
@@ -1288,3 +1306,4 @@
     </script>
 </body>
 </html>
+
