@@ -308,6 +308,9 @@
                      <div id="layout-switcher" class="flex items-center gap-1 bg-[var(--bg-tertiary)] p-1 rounded-lg border border-[var(--border-color)]">
                          <button id="grid-view-btn" aria-label="Switch to grid view" class="p-2 rounded-md"><i data-lucide="layout-grid"></i></button>
                          <button id="list-view-btn" aria-label="Switch to list view" class="p-2 rounded-md"><i data-lucide="list"></i></button>
+                         <!-- ADDED: New Layout Buttons (placeholders) -->
+                         <button id="table-view-btn" aria-label="Switch to table view" class="p-2 rounded-md hidden"><i data-lucide="table-2"></i></button>
+                         <button id="kanban-view-btn" aria-label="Switch to kanban view" class="p-2 rounded-md hidden"><i data-lucide="trello"></i></button>
                      </div>
                      <button id="addPartBtn" class="btn btn-primary flex items-center gap-2 disabled:bg-gray-400 disabled:text-gray-600 disabled:cursor-not-allowed disabled:border-b-0" disabled>
                          <i data-lucide="plus" class="w-5 h-5"></i><span class="hidden sm:inline">Add Component</span>
@@ -320,16 +323,16 @@
                     <div class="mb-8">
                         <h2 class="text-2xl font-black mb-4">Analytics Overview</h2>
                         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-                            <div class="industrial-card p-6"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Total Components</p><p id="total-components" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p></div>
-                            <div class="industrial-card p-6">
+                            <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Total Components</p><p id="total-components" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p></div>
+                            <div class="industrial-card p-6 flex flex-col justify-between">
                                 <div class="flex justify-between items-start">
                                     <p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Inventory Value</p>
                                     <button id="value-toggle-btn" aria-label="Toggle inventory value visibility" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"><i data-lucide="eye-off" class="w-5 h-5"></i></button>
                                 </div>
                                 <p id="total-value" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">₹0</p>
                             </div>
-                            <div class="industrial-card p-6"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Low Stock Items</p><p id="low-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p></div>
-                            <div class="industrial-card p-6"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Out of Stock</p><p id="out-of-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2 text-[var(--danger)]">0</p></div>
+                            <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Low Stock Items</p><p id="low-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p></div>
+                            <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Out of Stock</p><p id="out-of-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2 text-[var(--danger)]">0</p></div>
                         </div>
                     </div>
 
