@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vinayaka  | Component Database</title>
-    
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Vinayaka Industries | Component Database</title>
+
+    <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
-    <script src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 
     <style>
         /* --- BRUTALIST INDUSTRIAL THEME --- */
@@ -42,7 +41,7 @@
         }
         .main-content {
             transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            padding-left: calc(var(--sidebar-width) + 1rem); /* +1rem for margin */
+            padding-left: calc(var(--sidebar-width) + 1rem);
         }
         h1, h2, h3 { font-weight: 800; color: var(--text-primary); }
         h4, h5, h6 { font-weight: 700; color: var(--text-primary); }
@@ -57,27 +56,22 @@
         .sidebar-nav-link {
             color: var(--text-secondary);
             font-weight: 500;
-            transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
+            transition: background-color 0.1s, color 0.1s;
         }
-        .sidebar-nav-link:hover {
-            background-color: var(--bg-tertiary);
-            color: var(--text-primary);
-        }
+        .sidebar-nav-link:hover { background-color: var(--bg-tertiary); color: var(--text-primary); }
         .sidebar-nav-link.active {
             background-color: var(--accent-primary);
             color: var(--text-primary);
             font-weight: 600;
         }
-        .sidebar-nav-link.active:hover {
-            background-color: var(--accent-primary-darker);
-        }
+        .sidebar-nav-link.active:hover { background-color: var(--accent-primary-darker); }
 
         /* --- Cards --- */
         .brutalist-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border-primary);
             border-radius: 4px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
         }
         .brutalist-card:hover {
             transform: translateY(-4px);
@@ -94,7 +88,7 @@
             font-weight: 600;
             padding: 0.6rem 1.25rem;
             border-radius: 4px;
-            transition: transform 0.1s ease-out, border-bottom-width 0.1s ease-out, background-color 0.1s ease-out;
+            transition: transform 0.1s, border-bottom-width 0.1s, background-color 0.1s;
             cursor: pointer;
         }
         .btn-primary {
@@ -103,37 +97,13 @@
             border: 1px solid var(--accent-primary-darker);
             border-bottom: 3px solid var(--accent-primary-darker);
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            border-bottom-width: 5px;
-            background-color: #ffca2c; /* Slightly brighter on hover */
-        }
-        .btn-primary:active {
-            transform: translateY(0);
-            border-bottom-width: 3px;
-        }
-        .btn-primary:disabled {
-            background-color: #E9ECEF;
-            color: #ADB5BD;
-            border-color: #DEE2E6;
-            border-bottom-color: #DEE2E6;
-            cursor: not-allowed;
-        }
-        .btn-secondary {
-            background-color: var(--bg-secondary);
-            color: var(--text-secondary);
-            border: 1px solid var(--border-primary);
-        }
-        .btn-secondary:hover {
-            border-color: var(--text-primary);
-            color: var(--text-primary);
-        }
-        .btn-icon {
-            padding: 0.5rem;
-        }
-        .btn-icon:hover {
-            background-color: var(--bg-tertiary);
-        }
+        .btn-primary:hover { transform: translateY(-2px); border-bottom-width: 5px; background-color: #ffca2c; }
+        .btn-primary:active { transform: translateY(0); border-bottom-width: 3px; }
+        .btn-primary:disabled { background-color: #E9ECEF; color: #ADB5BD; border-color: #DEE2E6; border-bottom-color: #DEE2E6; cursor: not-allowed; }
+        .btn-secondary { background-color: var(--bg-secondary); color: var(--text-secondary); border: 1px solid var(--border-primary); }
+        .btn-secondary:hover { border-color: var(--text-primary); color: var(--text-primary); }
+        .btn-icon { padding: 0.5rem; }
+        .btn-icon:hover { background-color: var(--bg-tertiary); }
 
         /* --- Forms & Inputs --- */
         .brutalist-input, .brutalist-select {
@@ -144,23 +114,13 @@
             padding: 8px 0;
             width: 100%;
             font-weight: 500;
-            transition: border-color 0.2s ease;
+            transition: border-color 0.2s;
         }
-        .brutalist-input:focus, .brutalist-select:focus {
-            outline: none;
-            border-bottom-color: var(--accent-primary);
-        }
-        label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
+        .brutalist-input:focus, .brutalist-select:focus { outline: none; border-bottom-color: var(--accent-primary); }
+        label { font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); }
 
         /* --- Modals --- */
-        .modal-backdrop {
-            background-color: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
-        }
+        .modal-backdrop { background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
         .swal2-popup { font-family: var(--font-body); background-color: var(--bg-secondary) !important; color: var(--text-primary) !important; }
         .swal2-title { color: var(--text-primary) !important; font-weight: 700; }
         .swal2-confirm { background-color: var(--accent-primary) !important; color: var(--text-primary) !important; font-weight: 600; }
@@ -176,6 +136,7 @@
 </head>
 <body class="antialiased">
 
+    <!-- Login View -->
     <div id="login-view" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-8 bg-gray-100">
         <div class="text-center">
             <div class="inline-block bg-zinc-800 p-4 rounded-lg shadow-sm mb-6">
@@ -197,7 +158,6 @@
                 <div class="bg-zinc-800 p-2.5 rounded-md"><i data-lucide="gem" class="w-6 h-6 text-amber-400"></i></div>
                 <h1 class="text-xl font-bold">Vinayaka DB</h1>
             </div>
-            
             <nav class="flex-1 px-3 py-4 space-y-1">
                 <a href="#" id="nav-dashboard" class="sidebar-nav-link active flex items-center gap-3 px-3 py-2.5 rounded-md">
                     <i data-lucide="layout-grid" class="w-5 h-5"></i><span>Dashboard</span>
@@ -213,7 +173,7 @@
             <div class="p-3 border-t border-t-[var(--border-primary)]">
                 <div id="user-profile-area" class="p-2 rounded-lg cursor-pointer group hover:bg-gray-100 transition-colors">
                     <div id="user-profile" class="hidden items-center gap-3">
-                        <img id="user-dp" class="w-10 h-10 rounded-full" src="" alt="User">
+                        <img id="user-dp" class="w-10 h-10 rounded-full" src="" alt="User"/>
                         <div>
                             <p id="user-name" class="font-semibold text-sm"></p>
                             <p class="text-xs text-green-600 font-medium">Online</p>
@@ -268,7 +228,7 @@
                                 <p class="text-sm font-medium text-[var(--text-secondary)]">Most Profitable Item</p>
                                 <p id="most-profitable" class="text-2xl xl:text-3xl font-extrabold mt-2 truncate">-</p>
                             </div>
-                             <div class="brutalist-card p-5"><p class="text-sm font-medium text-[var(--text-secondary)]">Dust Collectors</p><p id="dust-collectors" class="text-4xl font-extrabold mt-2">0</p></div>
+                            <div class="brutalist-card p-5"><p class="text-sm font-medium text-[var(--text-secondary)]">Dust Collectors</p><p id="dust-collectors" class="text-4xl font-extrabold mt-2">0</p></div>
                         </div>
                     </div>
 
@@ -277,18 +237,28 @@
                         <div class="grid grid-cols-1 md:grid-cols-5 gap-x-6 gap-y-4">
                             <div class="md:col-span-2 relative">
                                 <i data-lucide="search" class="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-secondary)]"></i>
-                                <input type="text" id="search" placeholder="Search by model, name, device..." class="w-full pl-8 brutalist-input">
+                                <input type="text" id="search" placeholder="Search by model, name, device..." class="w-full pl-8 brutalist-input"/>
                             </div>
                             <div><select id="filter-device" class="brutalist-select"><option value="">All Devices</option></select></div>
                             <div><select id="filter-size" class="brutalist-select"><option value="">All Sizes</option></select></div>
-                            <div><select id="sort-by" class="brutalist-select"><option value="model-asc">Sort by Model (A-Z)</option><option value="price-desc">Sort by Price (High-Low)</option><option value="quantity-asc">Sort by Quantity (Low-High)</option></select></div>
+                            <div>
+                                <select id="sort-by" class="brutalist-select">
+                                    <option value="model-asc">Sort by Model (A–Z)</option>
+                                    <option value="price-desc">Sort by Price (High–Low)</option>
+                                    <option value="quantity-asc">Sort by Quantity (Low–High)</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                
+
                     <div id="skeleton-loader" class="hidden"></div>
                     <div id="searchResults" class="hidden"></div>
-                    <div id="no-results" class="hidden text-center py-16 brutalist-card"><i data-lucide="search-x" class="w-16 h-16 mx-auto text-[var(--text-secondary)]"></i><h3 class="mt-4 text-2xl font-bold">No Components Found</h3><p class="mt-2 text-[var(--text-secondary)]">Your database is empty or your search returned no results.</p></div>
-                
+                    <div id="no-results" class="hidden text-center py-16 brutalist-card">
+                        <i data-lucide="search-x" class="w-16 h-16 mx-auto text-[var(--text-secondary)]"></i>
+                        <h3 class="mt-4 text-2xl font-bold">No Components Found</h3>
+                        <p class="mt-2 text-[var(--text-secondary)]">Your database is empty or your search returned no results.</p>
+                    </div>
+
                     <!-- Pagination -->
                     <div id="pagination-controls" class="flex justify-center items-center gap-4 mt-8"></div>
                 </div>
@@ -314,24 +284,57 @@
     <!-- Add/Edit Modal -->
     <div id="formModal" class="modal-backdrop hidden fixed inset-0 z-50 justify-center items-center p-4">
         <div class="brutalist-card w-full max-w-4xl m-4 max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center p-5 border-b border-[var(--border-primary)]"><h2 id="form-title" class="text-2xl font-bold">Add New Component</h2><button type="button" id="closeFormModalBtn" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
+            <div class="flex justify-between items-center p-5 border-b border-[var(--border-primary)]">
+                <h2 id="form-title" class="text-2xl font-bold">Add New Component</h2>
+                <button type="button" id="closeFormModalBtn" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
             <form id="partForm" class="p-6 space-y-6 overflow-y-auto">
-                <input type="hidden" id="edit-id">
+                <input type="hidden" id="edit-id"/>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div><label for="model">Model*</label><input type="text" id="model" required class="brutalist-input"></div>
-                    <div><label for="device">Device</label><select id="device" class="brutalist-select"><option value="">(None)</option><option value="SWING DEVICE">Swing Device</option><option value="TRAVEL DEVICE">Travel Device</option></select></div>
-                    <div><label for="size">Size</label><select id="size" class="brutalist-select"><option value="">(None)</option><option value="SMALL">Small</option><option value="MIDDLE">Middle</option><option value="BIG">Big</option></select></div>
-                    <div><label for="item-name-main">Item Name*</label><select id="item-name-main" required class="brutalist-select"><option value="">Select item type...</option><option value="Planetary Gear">Planetary Gear</option><option value="Sun Gear">Sun Gear</option><option value="Ring Gear">Ring Gear</option><option value="Spline/Pinion Shaft">Spline/Pinion Shaft</option><option value="Track Motor Shaft">Track Motor Shaft</option><option value="Bearing">Bearing</option><option value="Bushes">Bushes</option></select></div>
-                    <div><label for="price">Price</label><input type="number" id="price" placeholder="e.g., 4500" class="brutalist-input"></div>
-                    <div><label for="quantity">Quantity*</label><input type="number" id="quantity" required value="1" min="0" class="brutalist-input"></div>
+                    <div><label for="model">Model*</label><input type="text" id="model" required class="brutalist-input"/></div>
+                    <div><label for="device">Device</label>
+                        <select id="device" class="brutalist-select">
+                            <option value="">(None)</option>
+                            <option value="SWING DEVICE">Swing Device</option>
+                            <option value="TRAVEL DEVICE">Travel Device</option>
+                        </select>
+                    </div>
+                    <div><label for="size">Size</label>
+                        <select id="size" class="brutalist-select">
+                            <option value="">(None)</option>
+                            <option value="SMALL">Small</option>
+                            <option value="MIDDLE">Middle</option>
+                            <option value="BIG">Big</option>
+                        </select>
+                    </div>
+                    <div><label for="item-name-main">Item Name*</label>
+                        <select id="item-name-main" required class="brutalist-select">
+                            <option value="">Select item type...</option>
+                            <option value="Planetary Gear">Planetary Gear</option>
+                            <option value="Sun Gear">Sun Gear</option>
+                            <option value="Ring Gear">Ring Gear</option>
+                            <option value="Spline/Pinion Shaft">Spline/Pinion Shaft</option>
+                            <option value="Track Motor Shaft">Track Motor Shaft</option>
+                            <option value="Bearing">Bearing</option>
+                            <option value="Bushes">Bushes</option>
+                        </select>
+                    </div>
+                    <div><label for="price">Price</label><input type="number" id="price" placeholder="e.g., 4500" class="brutalist-input"/></div>
+                    <div><label for="quantity">Quantity*</label><input type="number" id="quantity" required value="1" min="0" class="brutalist-input"/></div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div><label for="image-links-input">Image Links</label><textarea id="image-links-input" name="image-link" placeholder="Paste one or more comma-separated Google Drive links here..." class="brutalist-input" rows="3"></textarea></div>
                     <div><label for="note">Note</label><textarea id="note" rows="3" class="brutalist-input"></textarea></div>
                 </div>
-                <div id="spec-fields-container" class="hidden"><h3 class="text-lg font-semibold border-b border-[var(--border-primary)] pb-2 mb-4">Specifications</h3><div id="spec-fields" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4"></div></div>
+                <div id="spec-fields-container" class="hidden">
+                    <h3 class="text-lg font-semibold border-b border-[var(--border-primary)] pb-2 mb-4">Specifications</h3>
+                    <div id="spec-fields" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4"></div>
+                </div>
             </form>
-            <div class="mt-auto p-4 border-t border-[var(--border-primary)] bg-gray-50 flex justify-end gap-3"><button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button><button type="submit" form="partForm" class="btn btn-primary">Save Component</button></div>
+            <div class="mt-auto p-4 border-t border-[var(--border-primary)] bg-gray-50 flex justify-end gap-3">
+                <button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button>
+                <button type="submit" form="partForm" class="btn btn-primary">Save Component</button>
+            </div>
         </div>
     </div>
 
@@ -343,59 +346,40 @@
                 <h2 class="text-xl font-bold">Component Datasheet</h2>
                 <button id="detail-close-btn" class="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full hover:bg-gray-100"><i data-lucide="x"></i></button>
             </div>
-            <div id="detail-content" class="p-6 overflow-y-auto">
-                </div>
+            <div id="detail-content" class="p-6 overflow-y-auto"></div>
         </div>
     </div>
-    
+
     <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // ====== CONFIG ======
         const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
         const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com';
-        const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4", "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest", "https://www.googleapis.com/discovery/v1/apis/oauth2/v2/rest"];
+        const DISCOVERY_DOCS = [
+            "https://sheets.googleapis.com/$discovery/rest?version=v4",
+            "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest",
+            "https://www.googleapis.com/discovery/v1/apis/oauth2/v2/rest" // <-- Needed for userinfo
+        ];
         const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/drive.readonly";
-        const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ'; 
+
+        const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ';
         const IMAGE_FOLDER_ID = '1o3i8aVtpFb2EZd4-014OrxPB1H6ncGu0';
         const INVENTORY_RANGE = 'Sheet1!A:AC';
         const SALES_RANGE = 'SalesLog!A:D';
 
-        let gapiInited = false;
-        let gisInited = false;
-        let tokenClient;
-
-        function gapiLoaded() {
-            gapi.load('client', initializeGapiClient);
-        }
-
-        function gisLoaded() {
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CLIENT_ID,
-                scope: SCOPES,
-                callback: handleAuthResponse,
-            });
-            gisInited = true;
-            maybeEnableButtons();
-        }
-
-        function initializeGapiClient() {
-            gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS })
-                .then(() => {
-                    gapiInited = true;
-                    maybeEnableButtons();
-                })
-                .catch(err => {
-                    console.error("Error initializing GAPI client", err);
-                });
-        }
-
-    document.addEventListener('DOMContentLoaded', () => {
+        // ====== STATE ======
         let allItems = [];
         let allSales = [];
         let filteredItems = [];
+        let gapiInited = false;
+        let gisInited = false;
+        let tokenClient;
         let currentLayout = 'grid';
         let currentPage = 1;
         const ITEMS_PER_PAGE = 10;
         let revenueChart, bestsellersChart;
 
+        // ====== DOM ======
         const dom = {
             html: document.documentElement,
             appWrapper: document.getElementById('app-wrapper'),
@@ -447,18 +431,55 @@
             refreshBtn: document.getElementById('refresh-btn'),
         };
 
-        const COLUMN_HEADERS = ['id', 'model', 'device', 'size', 'itemName', 'price', 'quantity', 'imageLinks', 'note', 'spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_width', 'spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_splineOd', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'];
-        const specDefinitions = { 'Planetary Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeeth'], 'Sun Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd'], 'Ring Gear': ['spec_teeth', 'spec_outerDiameter', 'spec_innerDiameter'], 'Spline/Pinion Shaft': ['spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_length', 'spec_splineOd'], 'Track Motor Shaft': ['spec_length', 'spec_outerDiameter', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'], 'Bearing': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_width'], 'Bushes': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length'], };
-        
+        const COLUMN_HEADERS = ['id','model','device','size','itemName','price','quantity','imageLinks','note','spec_innerDiameter','spec_outerDiameter','spec_length','spec_width','spec_teeth','spec_numberOfTeeth','spec_numberOfTeethInOd','spec_numberOfTeethInId','spec_stepOd','spec_bigTeethOd','spec_bigTeeth','spec_bigTeethLength','spec_smallTeethOd','spec_smallTeeth','spec_smallTeethLength','spec_splineOd','spec_teethOd','spec_outsideTeeth','spec_insideTeeth','spec_insideOd'];
+
+        const specDefinitions = {
+            'Planetary Gear': ['spec_innerDiameter','spec_outerDiameter','spec_length','spec_numberOfTeeth'],
+            'Sun Gear': ['spec_innerDiameter','spec_outerDiameter','spec_length','spec_numberOfTeethInOd','spec_numberOfTeethInId','spec_stepOd'],
+            'Ring Gear': ['spec_teeth','spec_outerDiameter','spec_innerDiameter'],
+            'Spline/Pinion Shaft': ['spec_bigTeethOd','spec_bigTeeth','spec_bigTeethLength','spec_smallTeethOd','spec_smallTeeth','spec_smallTeethLength','spec_length','spec_splineOd'],
+            'Track Motor Shaft': ['spec_length','spec_outerDiameter','spec_teethOd','spec_outsideTeeth','spec_insideTeeth','spec_insideOd'],
+            'Bearing': ['spec_innerDiameter','spec_outerDiameter','spec_width'],
+            'Bushes': ['spec_innerDiameter','spec_outerDiameter','spec_length'],
+        };
+
         // --- Initial Setup ---
         initLayout();
-        
+
+        // Make auth click available immediately (so the button responds even if libs still loading)
+        dom.userProfileArea.addEventListener('click', handleAuthClick);
+        dom.signInButtonMain.addEventListener('click', handleAuthClick);
+
+        // These functions are called by the external Google scripts (see tags at bottom)
+        function gapiLoaded() {
+            gapi.load('client', initializeGapiClient);
+        }
+        function gisLoaded() {
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: handleAuthResponse,
+            });
+            gisInited = true;
+        }
+        // Expose for onload attributes
+        window.gapiLoaded = gapiLoaded;
+        window.gisLoaded = gisLoaded;
+
+        async function initializeGapiClient() {
+            try {
+                await gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS });
+                gapiInited = true;
+            } catch (err) {
+                console.error("Error initializing GAPI client", err);
+            }
+        }
+
         // --- Event Listeners ---
         dom.partForm.addEventListener('submit', handleFormSubmit);
-        [dom.search, dom.filterDevice, dom.filterSize, dom.sortBy].forEach(el => el.addEventListener('input', () => {
-            currentPage = 1;
-            processAndRenderItems();
-        }));
+        [dom.search, dom.filterDevice, dom.filterSize, dom.sortBy].forEach(el =>
+            el.addEventListener('input', () => { currentPage = 1; processAndRenderItems(); })
+        );
         dom.addPartBtn.addEventListener('click', openAddModal);
         dom.closeFormModalBtn.addEventListener('click', closeFormModal);
         dom.cancelBtn.addEventListener('click', closeFormModal);
@@ -480,56 +501,63 @@
         dom.toggleValueVisibility.addEventListener('click', toggleValueVisibility);
         dom.refreshBtn.addEventListener('click', loadAllData);
 
-
-        // --- Core Functions ---
-        window.maybeEnableButtons = function() {
-            if (gapiInited && gisInited) {
-                dom.userProfileArea.onclick = handleAuthClick;
-                dom.signInButtonMain.onclick = handleAuthClick;
-                lucide.createIcons();
-            }
-        }
-        window.handleAuthResponse = function(resp) {
+        // --- Auth Flow ---
+        function handleAuthResponse(resp) {
             if (resp.error !== undefined) {
                 Swal.fire({ title: 'Authentication Error', text: 'Could not sign in. Please try again.', icon: 'error' });
-                updateAuthStatus(false); return;
+                updateAuthStatus(false);
+                return;
             }
-            gapi.client.setToken(resp);
+            // Set token explicitly with access_token
+            gapi.client.setToken({ access_token: resp.access_token });
             updateAuthStatus(true);
         }
+
         function handleAuthClick() {
             if (!gapiInited || !gisInited) {
-                Swal.fire('Loading...', 'Authentication libraries are still loading. Please try again in a moment.', 'info');
+                Swal.fire('Loading...', 'Google libraries are still loading. Try again in a moment.', 'info');
                 return;
             }
             if (gapi.client.getToken() === null) {
                 tokenClient?.requestAccessToken({ prompt: 'consent' });
             } else {
-                Swal.fire({ title: 'Sign Out', text: 'Are you sure you want to sign out?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, sign out'})
-                .then((result) => { if (result.isConfirmed) { gapi.client.setToken(null); updateAuthStatus(false); } });
+                Swal.fire({
+                    title: 'Sign Out',
+                    text: 'Are you sure you want to sign out?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, sign out'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        gapi.client.setToken(null);
+                        updateAuthStatus(false);
+                    }
+                });
             }
         }
+
         async function updateAuthStatus(isSignedIn) {
             if (isSignedIn) {
-                dom.loginView.classList.add('hidden');
-                dom.appWrapper.classList.remove('hidden');
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('app-wrapper').classList.remove('hidden');
                 dom.addPartBtn.disabled = false;
                 dom.userProfile.classList.remove('hidden');
                 dom.userProfile.classList.add('flex');
-                
+
                 showSkeletonLoader(true);
                 try {
+                    // Fetch profile (requires oauth2 discovery doc + userinfo.profile scope)
                     const userInfo = await gapi.client.oauth2.userinfo.get();
-                    dom.userName.textContent = userInfo.result.name;
-                    dom.userDp.src = userInfo.result.picture;
+                    dom.userName.textContent = userInfo.result.name || 'User';
+                    dom.userDp.src = userInfo.result.picture || `https://placehold.co/44x44/212529/F8F9FA?text=U`;
                 } catch (e) {
                     dom.userName.textContent = "User";
                     dom.userDp.src = `https://placehold.co/44x44/212529/F8F9FA?text=U`;
                 }
                 loadAllData();
             } else {
-                dom.loginView.classList.remove('hidden');
-                dom.appWrapper.classList.add('hidden');
+                document.getElementById('login-view').classList.remove('hidden');
+                document.getElementById('app-wrapper').classList.add('hidden');
                 dom.addPartBtn.disabled = true;
                 dom.userProfile.classList.add('hidden');
                 dom.userProfile.classList.remove('flex');
@@ -538,31 +566,37 @@
                 updateAnalytics([], []);
             }
         }
+
+        // --- Data Load ---
         async function loadAllData() {
             showSkeletonLoader(true);
             try {
-                const responses = await Promise.all([
+                const [invRes, salesRes] = await Promise.all([
                     gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: INVENTORY_RANGE }),
                     gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: SALES_RANGE })
                 ]);
-                
-                const inventoryValues = responses[0].result.values;
-                allItems = (inventoryValues && inventoryValues.length > 1) ? inventoryValues.slice(1).map((row, index) => {
-                    const item = inventoryValues[0].reduce((obj, header, i) => ({...obj, [header]: row[i]}), {});
-                    item.rowIndex = index + 2;
-                    return item;
-                }).filter(item => item.id && item.id.trim() !== '') : [];
 
-                const salesValues = responses[1].result.values;
-                allSales = (salesValues && salesValues.length > 1) ? salesValues.slice(1).map(row => ({
-                    itemId: row[0],
-                    quantitySold: parseInt(row[1], 10),
-                    salePrice: parseFloat(row[2]),
-                    date: row[3]
-                })) : [];
+                const inventoryValues = invRes.result.values;
+                allItems = (inventoryValues && inventoryValues.length > 1)
+                    ? inventoryValues.slice(1).map((row, index) => {
+                        const item = inventoryValues[0].reduce((obj, header, i) => ({ ...obj, [header]: row[i] }), {});
+                        item.rowIndex = index + 2;
+                        return item;
+                    }).filter(item => item.id && item.id.trim() !== '')
+                    : [];
 
+                const salesValues = salesRes.result.values;
+                allSales = (salesValues && salesValues.length > 1)
+                    ? salesValues.slice(1).map(row => ({
+                        itemId: row[0],
+                        quantitySold: parseInt(row[1], 10),
+                        salePrice: parseFloat(row[2]),
+                        date: row[3]
+                    }))
+                    : [];
             } catch (err) {
-                Swal.fire({ title: 'Data Loading Error', text: `Could not load data. Check Sheet ID and permissions. Error: ${err.result.error.message}`, icon: 'error' });
+                const msg = (err && err.result && err.result.error && err.result.error.message) ? err.result.error.message : 'Unknown error';
+                Swal.fire({ title: 'Data Loading Error', text: `Could not load data. Check Sheet ID and permissions. Error: ${msg}`, icon: 'error' });
                 updateAuthStatus(false);
             } finally {
                 showSkeletonLoader(false);
@@ -571,36 +605,39 @@
                 renderReportCharts();
             }
         }
+
+        // --- CRUD ---
         async function handleFormSubmit(e) {
             e.preventDefault();
             const editId = dom.editId.value;
-            if (editId) {
-                await updateComponent(editId);
-            } else {
-                await addComponent();
-            }
+            if (editId) { await updateComponent(editId); } else { await addComponent(); }
         }
+
         async function addComponent() {
             const newItem = collectFormData();
-            newItem.id = Date.now();
+            newItem.id = Date.now().toString();
             const newRow = COLUMN_HEADERS.map(header => newItem[header] || "");
             try {
-                await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SPREADSHEET_ID, range: INVENTORY_RANGE, valueInputOption: 'USER_ENTERED', resource: { values: [newRow] } });
+                await gapi.client.sheets.spreadsheets.values.append({
+                    spreadsheetId: SPREADSHEET_ID,
+                    range: INVENTORY_RANGE,
+                    valueInputOption: 'USER_ENTERED',
+                    resource: { values: [newRow] }
+                });
                 Swal.fire({ title: 'Success!', text: 'Component added successfully.', icon: 'success' });
                 closeFormModal();
                 loadAllData();
             } catch (err) {
-                Swal.fire({ title: 'Save Error', text: `Could not save the component. Error: ${err.result.error.message}`, icon: 'error' });
+                const msg = err?.result?.error?.message || 'Unknown error';
+                Swal.fire({ title: 'Save Error', text: `Could not save the component. Error: ${msg}`, icon: 'error' });
             }
         }
+
         async function updateComponent(id) {
             const itemToUpdate = allItems.find(item => item.id === id);
-            if (!itemToUpdate) {
-                Swal.fire('Error', 'Could not find the component to update.', 'error');
-                return;
-            }
+            if (!itemToUpdate) { Swal.fire('Error', 'Could not find the component to update.', 'error'); return; }
             const updatedItem = collectFormData();
-            updatedItem.id = id; // Preserve original ID
+            updatedItem.id = id;
             const updatedRow = COLUMN_HEADERS.map(header => updatedItem[header] || "");
             const updateRange = `Sheet1!A${itemToUpdate.rowIndex}:AC${itemToUpdate.rowIndex}`;
             try {
@@ -614,15 +651,14 @@
                 closeFormModal();
                 loadAllData();
             } catch (err) {
-                Swal.fire('Update Error', `Could not update the component. Error: ${err.result.error.message}`, 'error');
+                const msg = err?.result?.error?.message || 'Unknown error';
+                Swal.fire('Update Error', `Could not update the component. Error: ${msg}`, 'error');
             }
         }
+
         async function deleteComponent(id) {
             const itemToDelete = allItems.find(item => item.id === id);
-            if (!itemToDelete) {
-                Swal.fire('Error', 'Could not find the component to delete.', 'error');
-                return;
-            }
+            if (!itemToDelete) { Swal.fire('Error', 'Could not find the component to delete.', 'error'); return; }
             try {
                 await gapi.client.sheets.spreadsheets.batchUpdate({
                     spreadsheetId: SPREADSHEET_ID,
@@ -630,7 +666,7 @@
                         requests: [{
                             deleteDimension: {
                                 range: {
-                                    sheetId: 0, // Assumes the first sheet
+                                    sheetId: 0, // NOTE: assumes first sheet is Sheet1
                                     dimension: 'ROWS',
                                     startIndex: itemToDelete.rowIndex - 1,
                                     endIndex: itemToDelete.rowIndex
@@ -643,9 +679,12 @@
                 closeDetailPanel();
                 loadAllData();
             } catch (err) {
-                 Swal.fire('Delete Error', `Could not delete the component. Error: ${err.result.error.message}`, 'error');
+                const msg = err?.result?.error?.message || 'Unknown error';
+                Swal.fire('Delete Error', `Could not delete the component. Error: ${msg}`, 'error');
             }
         }
+
+        // --- Listing / Filters / Pagination ---
         function processAndRenderItems() {
             if (!gapiInited) return;
             const searchTerm = dom.search.value.toLowerCase();
@@ -660,7 +699,6 @@
                 return searchMatch && deviceMatch && sizeMatch;
             });
 
-            // Sorting
             switch (sortBy) {
                 case 'price-desc':
                     filteredItems.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0));
@@ -673,10 +711,11 @@
                     filteredItems.sort((a, b) => (a.model || '').localeCompare(b.model || ''));
                     break;
             }
-            
-            updateAnalytics(allItems, allSales); // Analytics should be based on all items, not filtered
+
+            updateAnalytics(allItems, allSales);
             renderItems();
         }
+
         function renderItems() {
             if (!gapiInited || !gapi.client || (typeof gapi.client.getToken !== 'function')) {
                 dom.searchResults.innerHTML = '';
@@ -687,14 +726,9 @@
             dom.searchResults.innerHTML = '';
             dom.noResults.classList.toggle('hidden', filteredItems.length > 0 || !gapi.client.getToken());
             dom.searchResults.classList.toggle('hidden', filteredItems.length === 0);
-            
+
             const paginatedItems = filteredItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
-            
-            if (paginatedItems.length === 0 && currentPage > 1) { // If on a page that no longer exists
-                currentPage = 1;
-                renderItems();
-                return;
-            }
+            if (paginatedItems.length === 0 && currentPage > 1) { currentPage = 1; renderItems(); return; }
 
             if (currentLayout === 'grid') {
                 dom.searchResults.className = 'grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5';
@@ -714,7 +748,6 @@
             renderPaginationControls();
         }
 
-        // --- UI & Layout ---
         function createGridCard(item) {
             const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
             const firstImage = getDriveThumbnail(images[0]) || `https://placehold.co/600x400/E9ECEF/6C757D?text=${encodeURIComponent(item.itemName || 'No Image')}`;
@@ -735,6 +768,7 @@
                         </div>
                     </div>`;
         }
+
         function createListCard(item) {
             const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://placehold.co/100x100/E9ECEF/6C757D?text=Img`;
             const quantity = parseInt(item.quantity, 10);
@@ -749,6 +783,7 @@
                         </div>
                     </div>`;
         }
+
         function createCompactCard(item) {
             const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://placehold.co/100x100/E9ECEF/6C757D?text=Img`;
             return `<div class="brutalist-card text-center p-2 group">
@@ -757,6 +792,7 @@
                         <button class="view-details-btn absolute inset-0" data-id="${item.id}"></button>
                     </div>`;
         }
+
         function renderKanbanView() {
             const statuses = {
                 'In Stock': items => parseInt(items.quantity) > 10,
@@ -781,6 +817,7 @@
             html += '</div>';
             dom.searchResults.innerHTML = html;
         }
+
         function renderTableView() {
             let html = `<div class="overflow-x-auto brutalist-card"><table class="w-full text-sm text-left">
                             <thead class="bg-gray-50 border-b border-gray-200">
@@ -807,40 +844,49 @@
             html += `</tbody></table></div>`;
             dom.searchResults.innerHTML = html;
         }
+
         function switchLayout(layout) {
             currentLayout = layout;
             localStorage.setItem('layout', layout);
-            
-            ['grid', 'list', 'kanban', 'table', 'compact'].forEach(l => {
+            ['grid','list','kanban','table','compact'].forEach(l => {
                 const btn = dom[`${l}ViewBtn`];
-                if (l === layout) {
-                    btn.classList.add('bg-white', 'text-black', 'shadow-sm');
-                } else {
-                    btn.classList.remove('bg-white', 'text-black', 'shadow-sm');
-                }
+                if (!btn) return;
+                if (l === layout) { btn.classList.add('bg-white','text-black','shadow-sm'); }
+                else { btn.classList.remove('bg-white','text-black','shadow-sm'); }
             });
             processAndRenderItems();
         }
+
         function showSkeletonLoader(show) {
             dom.skeletonLoader.classList.toggle('hidden', !show);
             dom.searchResults.classList.add('hidden');
             dom.noResults.classList.add('hidden');
             if (show) {
                 let skeletonHtml = '';
-                for(let i = 0; i < 10; i++) { skeletonHtml += `<div class="brutalist-card p-4 space-y-4"><div class="h-40 rounded bg-gray-200 animate-pulse"></div><div class="space-y-2"><div class="h-6 w-3/4 rounded bg-gray-200 animate-pulse"></div><div class="h-4 w-1/2 rounded bg-gray-200 animate-pulse"></div></div></div>`; }
+                for (let i = 0; i < 10; i++) {
+                    skeletonHtml += `<div class="brutalist-card p-4 space-y-4">
+                                        <div class="h-40 rounded bg-gray-200 animate-pulse"></div>
+                                        <div class="space-y-2">
+                                            <div class="h-6 w-3/4 rounded bg-gray-200 animate-pulse"></div>
+                                            <div class="h-4 w-1/2 rounded bg-gray-200 animate-pulse"></div>
+                                        </div>
+                                     </div>`;
+                }
                 dom.skeletonLoader.innerHTML = `<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">${skeletonHtml}</div>`;
             }
         }
+
         function initLayout() {
             const savedLayout = localStorage.getItem('layout') || 'grid';
             switchLayout(savedLayout);
         }
+
         function getDriveThumbnail(url) {
             if (!url) return null;
             const match = url.match(/file\/d\/([a-zA-Z0-9_-]+)/);
             return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w512-h512` : url;
         }
-        
+
         // --- Modal & Form ---
         function openAddModal() {
             dom.formTitle.textContent = 'Add New Component';
@@ -851,21 +897,20 @@
             dom.formModal.classList.remove('hidden');
             dom.formModal.classList.add('flex');
         }
+
         function openEditModal(item) {
             dom.formTitle.textContent = 'Edit Component';
             dom.editId.value = item.id;
-            // Populate form
             dom.partForm.querySelector('#model').value = item.model || '';
             dom.partForm.querySelector('#device').value = item.device || '';
             dom.partForm.querySelector('#size').value = item.size || '';
-            dom.partForm.querySelector('#item-name-main').value = item.itemName || '';
+            dom.itemNameSelect.value = item.itemName || '';
             dom.partForm.querySelector('#price').value = item.price || '';
             dom.partForm.querySelector('#quantity').value = item.quantity || '0';
-            dom.partForm.querySelector('#image-links-input').value = item.imageLinks || '';
+            dom.imageLinksInput.value = item.imageLinks || '';
             dom.partForm.querySelector('#note').value = item.note || '';
 
-            updateSpecFields(); // This will show the spec container if needed
-            // Populate spec fields
+            updateSpecFields();
             Object.keys(item).forEach(key => {
                 if (key.startsWith('spec_')) {
                     const input = dom.partForm.querySelector(`[name="${key}"]`);
@@ -876,12 +921,14 @@
             dom.formModal.classList.remove('hidden');
             dom.formModal.classList.add('flex');
         }
-        function closeFormModal() { 
+
+        function closeFormModal() {
             dom.formModal.classList.add('hidden'); dom.formModal.classList.remove('flex');
             dom.partForm.reset();
             dom.specFieldsContainer.classList.add('hidden');
             dom.specFields.innerHTML = '';
         }
+
         function collectFormData() {
             const formData = {
                 model: dom.partForm.querySelector('#model').value,
@@ -898,16 +945,20 @@
             });
             return formData;
         }
+
         function updateSpecFields() {
             const selectedType = dom.itemNameSelect.value;
             dom.specFields.innerHTML = '';
             if (selectedType && specDefinitions[selectedType]) {
                 dom.specFieldsContainer.classList.remove('hidden');
-                specDefinitions[selectedType].forEach(specName => { dom.specFields.appendChild(createSpecInput(specName)); });
+                specDefinitions[selectedType].forEach(specName => {
+                    dom.specFields.appendChild(createSpecInput(specName));
+                });
             } else {
                 dom.specFieldsContainer.classList.add('hidden');
             }
         }
+
         function createSpecInput(specName) {
             const id = specName.replace(/_/g, '-');
             const wrapper = document.createElement('div');
@@ -915,8 +966,7 @@
             label.htmlFor = id;
             label.textContent = specName.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
             const input = document.createElement('input');
-            input.type = 'text'; input.id = id; input.name = specName;
-            input.className = 'brutalist-input';
+            input.type = 'text'; input.id = id; input.name = specName; input.className = 'brutalist-input';
             wrapper.appendChild(label); wrapper.appendChild(input);
             return wrapper;
         }
@@ -930,18 +980,13 @@
                 if (item) openDetailPanel(item);
             }
         }
-        function openDetailPanel(item) {
-            populateDetailPanel(item);
-            dom.detailModal.classList.remove('hidden');
-            dom.detailModal.classList.add('flex');
-        }
-        function closeDetailPanel() {
-            dom.detailModal.classList.add('hidden');
-            dom.detailModal.classList.remove('flex');
-        }
+
+        function openDetailPanel(item) { populateDetailPanel(item); dom.detailModal.classList.remove('hidden'); dom.detailModal.classList.add('flex'); }
+        function closeDetailPanel() { dom.detailModal.classList.add('hidden'); dom.detailModal.classList.remove('flex'); }
+
         function populateDetailPanel(item) {
             const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
-            
+
             const specKeys = Object.keys(item)
                 .filter(key => key.startsWith('spec_') && item[key])
                 .sort((a, b) => {
@@ -982,7 +1027,7 @@
                             <h3 class="text-3xl font-extrabold mt-1">${item.itemName || 'Unnamed Item'}</h3>
                             <p class="text-lg text-gray-500 font-semibold">${item.model || 'No Model'}</p>
                         </div>
-                        
+
                         <div class="bg-[var(--bg-tertiary)] p-4 rounded-md border border-[var(--border-primary)]">
                             <h4 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3">Stock & Actions</h4>
                             <div class="flex items-center justify-between gap-4">
@@ -1010,6 +1055,7 @@
             `;
             lucide.createIcons();
         }
+
         function handleDetailPanelClick(e) {
             const editBtn = e.target.closest('.edit-btn');
             const deleteBtn = e.target.closest('.delete-btn');
@@ -1020,11 +1066,9 @@
                 const imgEl = gallery.querySelector('img');
                 const images = (gallery.dataset.images || '').split(',');
                 if (images.length <= 1) return;
-                
                 let currentIndex = parseInt(gallery.dataset.currentIndex || '0');
                 const direction = parseInt(arrowBtn.dataset.direction);
                 currentIndex = (currentIndex + direction + images.length) % images.length;
-                
                 imgEl.src = getDriveThumbnail(images[currentIndex]);
                 gallery.dataset.currentIndex = currentIndex;
             }
@@ -1032,11 +1076,9 @@
             if (editBtn) {
                 const itemId = editBtn.dataset.id;
                 const item = allItems.find(i => i.id === itemId);
-                if (item) {
-                    closeDetailPanel();
-                    openEditModal(item);
-                }
+                if (item) { closeDetailPanel(); openEditModal(item); }
             }
+
             if (deleteBtn) {
                 const itemId = deleteBtn.dataset.id;
                 Swal.fire({
@@ -1057,30 +1099,28 @@
                             confirmButtonColor: '#d33',
                             cancelButtonText: 'No, take me back'
                         }).then((finalResult) => {
-                            if (finalResult.isConfirmed) {
-                                deleteComponent(itemId);
-                            }
+                            if (finalResult.isConfirmed) { deleteComponent(itemId); }
                         });
                     }
                 });
             }
         }
-        
-        // --- Analytics and Filters ---
+
+        // --- Analytics & Filters ---
         function populateFilters() {
             const devices = [...new Set(allItems.map(item => item.device).filter(Boolean))];
             const sizes = [...new Set(allItems.map(item => item.size).filter(Boolean))];
-            
+
             dom.filterDevice.innerHTML = '<option value="">All Devices</option>';
             devices.forEach(d => dom.filterDevice.innerHTML += `<option value="${d}">${d}</option>`);
-            
+
             dom.filterSize.innerHTML = '<option value="">All Sizes</option>';
             sizes.forEach(s => dom.filterSize.innerHTML += `<option value="${s}">${s}</option>`);
         }
 
         function updateAnalytics(items, sales) {
             document.getElementById('total-components').textContent = items.length;
-            
+
             const totalValue = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0), 0);
             document.getElementById('total-value').textContent = `₹${totalValue.toLocaleString('en-IN')}`;
 
@@ -1096,12 +1136,10 @@
             }
 
             const deviceCounts = items.reduce((acc, item) => {
-                if (item.device) {
-                    acc[item.device] = (acc[item.device] || 0) + 1;
-                }
+                if (item.device) acc[item.device] = (acc[item.device] || 0) + 1;
                 return acc;
             }, {});
-            const commonDevice = Object.keys(deviceCounts).reduce((a, b) => deviceCounts[a] > deviceCounts[b] ? a : b, '-');
+            const commonDevice = Object.keys(deviceCounts).reduce((a, b) => deviceCounts[a] > deviceCounts[b] ? a : b, '-') || '-';
             document.getElementById('common-device').textContent = commonDevice;
 
             // Most Profitable Item
@@ -1117,7 +1155,7 @@
             const mostProfitable = Object.entries(revenueByItem).sort((a, b) => b[1] - a[1])[0];
             document.getElementById('most-profitable').textContent = mostProfitable ? `${mostProfitable[0]} (₹${mostProfitable[1].toLocaleString('en-IN')})` : '-';
 
-            // Dust Collectors (Items with no sales)
+            // Dust Collectors (no sales)
             const soldItemIds = new Set(sales.map(s => s.itemId));
             const dustCollectorsCount = items.filter(item => !soldItemIds.has(item.id)).length;
             document.getElementById('dust-collectors').textContent = dustCollectorsCount;
@@ -1141,7 +1179,7 @@
                 renderItems();
             }
         }
-        
+
         function toggleValueVisibility() {
             const valueEl = document.getElementById('total-value');
             const iconEl = dom.toggleValueVisibility.querySelector('i');
@@ -1157,9 +1195,7 @@
         // --- View Switching ---
         function switchView(view) {
             document.querySelectorAll('.sidebar-nav-link').forEach(l => l.classList.remove('active'));
-            ['dashboard', 'reports', 'library'].forEach(v => {
-                dom[`${v}View`].classList.add('hidden');
-            });
+            ['dashboard','reports','library'].forEach(v => { dom[`${v}View`].classList.add('hidden'); });
 
             if (view === 'dashboard') {
                 dom.navDashboard.classList.add('active');
@@ -1215,8 +1251,8 @@
                 console.error("Error loading library images:", err);
             }
         }
-        
-        // --- Charting ---
+
+        // --- Charts ---
         function renderReportCharts() {
             const monthlyRevenue = allSales.reduce((acc, sale) => {
                 const month = new Date(sale.date).toLocaleString('default', { month: 'short', year: 'numeric' });
@@ -1233,7 +1269,6 @@
                 }
                 return acc;
             }, {});
-            
             const sortedBestSellers = Object.entries(bestSellers).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
             const chartOptions = {
@@ -1274,9 +1309,13 @@
                 options: { plugins: { legend: { position: 'right', labels: { color: 'var(--text-secondary)' } } } }
             });
         }
-        
+
         lucide.createIcons();
     });
     </script>
+
+    <!-- Required Google scripts: keep these AFTER the inline script so onload handlers exist -->
+    <script src="https://apis.google.com/js/api.js" async defer onload="gapiLoaded()"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer onload="gisLoaded()"></script>
 </body>
 </html>
