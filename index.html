@@ -87,11 +87,32 @@
             transition: padding-left 0.3s ease;
         }
 
+        /* FUTURISTIC SIDEBAR DESIGN */
         .sidebar {
             background-color: var(--bg-secondary);
             border-right: 1px solid var(--border-color);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             height: 100vh;
+        }
+        .sidebar-nav-link {
+            position: relative;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .sidebar-nav-link:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%) scaleY(0);
+            width: 4px;
+            height: 60%;
+            background-color: var(--accent);
+            border-radius: 0 4px 4px 0;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sidebar-nav-link:hover:before,
+        .sidebar-nav-link.active:before {
+            transform: translateY(-50%) scaleY(1);
         }
         .sidebar-nav-link.active {
             background-color: var(--accent);
@@ -99,6 +120,7 @@
             font-weight: 700;
         }
         .sidebar-nav-link:not(.active):hover { background-color: var(--bg-tertiary); }
+
 
         .industrial-card {
             background-color: var(--bg-secondary);
@@ -161,6 +183,14 @@
             box-shadow: none;
             --tw-ring-color: transparent;
         }
+
+        /* Blurred value for privacy */
+        .blurred-value {
+            filter: blur(8px);
+            user-select: none;
+            cursor: pointer;
+            transition: filter 0.2s ease;
+        }
         
         /* SweetAlert Customization */
         .swal2-popup { font-family: 'Inter', sans-serif; background-color: var(--bg-secondary) !important; color: var(--text-primary) !important; border: 1px solid var(--border-color) !important; }
@@ -169,10 +199,18 @@
         .swal2-deny { background-color: var(--danger) !important; }
         .swal2-cancel { background-color: var(--bg-tertiary) !important; }
 
+        /* MOBILE RESPONSIVENESS */
         @media (max-width: 1024px) {
             .main-content { padding-left: 0; }
             .sidebar { transform: translateX(-100%); box-shadow: 5px 0 15px rgba(0,0,0,0.2); z-index: 50; }
             .sidebar.open { transform: translateX(0); }
+            .mobile-backdrop {
+                position: fixed;
+                inset: 0;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 49;
+                transition: opacity 0.3s ease;
+            }
         }
     </style>
 </head>
@@ -190,23 +228,26 @@
     </div>
 
     <div id="app-wrapper" class="relative min-h-screen hidden">
+        <!-- Mobile Backdrop -->
+        <div id="mobile-backdrop" class="mobile-backdrop hidden lg:hidden"></div>
+
         <!-- Sidebar -->
         <aside class="sidebar fixed top-0 left-0 w-[var(--sidebar-width)] flex flex-col">
-            <div class="flex items-center gap-4 p-5 h-[var(--header-height)] border-b border-[var(--border-color)]">
+            <div class="flex items-center gap-4 p-5 h-[var(--header-height)] border-b border-[var(--border-color)] flex-shrink-0">
                 <div class="bg-[var(--text-primary)] p-2.5 rounded-lg"><i data-lucide="gem" class="w-6 h-6 text-[var(--bg-primary)]"></i></div>
                 <h1 class="text-xl font-black">Vinayaka Industries</h1>
             </div>
             
             <nav class="flex-1 px-4 py-6 space-y-2">
-                <a href="#" id="nav-dashboard" class="sidebar-nav-link active flex items-center gap-3 px-3 py-2.5 rounded-lg">
+                <a href="#" id="nav-dashboard" class="sidebar-nav-link active flex items-center gap-4 px-4 py-3 rounded-lg">
                     <i data-lucide="layout-grid" class="w-5 h-5"></i><span>Dashboard</span>
                 </a>
-                <a href="#" id="nav-reports" class="sidebar-nav-link flex items-center gap-3 px-3 py-2.5 text-[var(--text-secondary)] rounded-lg font-medium transition-colors">
+                <a href="#" id="nav-reports" class="sidebar-nav-link flex items-center gap-4 px-4 py-3 text-[var(--text-secondary)] rounded-lg font-medium">
                     <i data-lucide="bar-chart-2" class="w-5 h-5"></i><span>Reports</span>
                 </a>
             </nav>
 
-            <div class="p-4 border-t border-[var(--border-color)]">
+            <div class="p-4 border-t border-[var(--border-color)] flex-shrink-0">
                 <div id="user-profile-area" class="p-2 rounded-lg cursor-pointer group hover:bg-[var(--bg-tertiary)] transition-colors">
                     <div id="auth-required-profile" class="flex items-center gap-3">
                         <div class="w-11 h-11 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center border border-dashed border-[var(--border-color)]"><i data-lucide="user-x" class="text-[var(--text-secondary)]"></i></div>
@@ -256,18 +297,18 @@
                 <div id="dashboard-view">
                     <div class="mb-8">
                         <h2 class="text-2xl font-black mb-4">Analytics Overview</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-6">
-                            <div class="industrial-card p-6 2xl:col-span-1"><p class="text-sm font-medium text-[var(--text-secondary)]">Total Components</p><p id="total-components" class="text-5xl font-black mt-2">0</p></div>
-                            <div class="industrial-card p-6 2xl:col-span-2">
+                        <div class="flex flex-wrap gap-6">
+                            <div class="industrial-card p-6 flex-grow"><p class="text-sm font-medium text-[var(--text-secondary)]">Total Components</p><p id="total-components" class="text-5xl font-black mt-2">0</p></div>
+                            <div class="industrial-card p-6 flex-grow min-w-[300px]">
                                 <div class="flex justify-between items-start">
                                     <p class="text-sm font-medium text-[var(--text-secondary)]">Inventory Value</p>
-                                    <button id="value-toggle-btn" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"><i data-lucide="eye" class="w-5 h-5"></i></button>
+                                    <button id="value-toggle-btn" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"><i data-lucide="eye-off" class="w-5 h-5"></i></button>
                                 </div>
                                 <p id="total-value" class="text-5xl font-black mt-2">₹0</p>
                             </div>
-                            <div class="industrial-card p-6 2xl:col-span-1"><p class="text-sm font-medium text-[var(--text-secondary)]">Low Stock Items</p><p id="low-stock" class="text-5xl font-black mt-2">0</p></div>
-                            <div class="industrial-card p-6 2xl:col-span-1"><p class="text-sm font-medium text-[var(--text-secondary)]">Out of Stock</p><p id="out-of-stock" class="text-5xl font-black mt-2 text-[var(--danger)]">0</p></div>
-                            <div class="industrial-card p-6 2xl:col-span-1"><p class="text-sm font-medium text-[var(--text-secondary)]">Most Valuable Item</p><p id="most-valuable" class="text-2xl font-black mt-2 leading-tight">-</p></div>
+                            <div class="industrial-card p-6 flex-grow"><p class="text-sm font-medium text-[var(--text-secondary)]">Low Stock Items</p><p id="low-stock" class="text-5xl font-black mt-2">0</p></div>
+                            <div class="industrial-card p-6 flex-grow"><p class="text-sm font-medium text-[var(--text-secondary)]">Out of Stock</p><p id="out-of-stock" class="text-5xl font-black mt-2 text-[var(--danger)]">0</p></div>
+                            <div class="industrial-card p-6 flex-grow"><p class="text-sm font-medium text-[var(--text-secondary)]">Most Valuable Item</p><p id="most-valuable" class="text-2xl font-black mt-2 leading-tight">-</p></div>
                         </div>
                     </div>
 
@@ -372,7 +413,7 @@
         let currentPage = 1;
         const ITEMS_PER_PAGE = 10;
         let revenueChart, bestsellersChart;
-        let isValueVisible = true;
+        let isValueVisible = false; // Default to hidden
 
         // --- DOM Element Cache ---
         const dom = {
@@ -420,6 +461,7 @@
             pageTitle: document.getElementById('page-title'),
             valueToggleBtn: document.getElementById('value-toggle-btn'),
             totalValue: document.getElementById('total-value'),
+            mobileBackdrop: document.getElementById('mobile-backdrop'),
         };
 
         const COLUMN_HEADERS = ['id', 'model', 'device', 'size', 'itemName', 'price', 'quantity', 'imageLinks', 'note', 'spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_width', 'spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_splineOd', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'];
@@ -444,7 +486,8 @@
         dom.addPartBtn.addEventListener('click', openAddModal);
         dom.closeFormModalBtn.addEventListener('click', closeFormModal);
         dom.cancelBtn.addEventListener('click', closeFormModal);
-        dom.menuBtn.addEventListener('click', () => dom.sidebar.classList.toggle('open'));
+        dom.menuBtn.addEventListener('click', toggleMobileSidebar);
+        dom.mobileBackdrop.addEventListener('click', toggleMobileSidebar);
         dom.itemNameSelect.addEventListener('change', updateSpecFields);
         dom.gridViewBtn.addEventListener('click', () => switchLayout('grid'));
         dom.listViewBtn.addEventListener('click', () => switchLayout('list'));
@@ -454,8 +497,16 @@
         dom.searchResults.addEventListener('click', handleCardClick);
         dom.detailContent.addEventListener('click', handleDetailPanelClick);
         dom.paginationControls.addEventListener('click', handlePaginationClick);
-        dom.navDashboard.addEventListener('click', (e) => { e.preventDefault(); switchView('dashboard'); });
-        dom.navReports.addEventListener('click', (e) => { e.preventDefault(); switchView('reports'); });
+        [dom.navDashboard, dom.navReports].forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const view = e.currentTarget.id === 'nav-dashboard' ? 'dashboard' : 'reports';
+                switchView(view);
+                if (window.innerWidth < 1024) {
+                    toggleMobileSidebar();
+                }
+            });
+        });
         dom.valueToggleBtn.addEventListener('click', toggleValueVisibility);
 
         // --- Core Functions ---
@@ -991,11 +1042,12 @@
         }
         function updateValueVisibility() {
             const totalValue = parseFloat(localStorage.getItem('inventoryTotalValue') || '0');
+            dom.totalValue.textContent = `₹${totalValue.toLocaleString('en-IN')}`;
             if (isValueVisible) {
-                dom.totalValue.textContent = `₹${totalValue.toLocaleString('en-IN')}`;
+                dom.totalValue.classList.remove('blurred-value');
                 dom.valueToggleBtn.innerHTML = `<i data-lucide="eye" class="w-5 h-5"></i>`;
             } else {
-                dom.totalValue.textContent = `₹ ••••••••`;
+                dom.totalValue.classList.add('blurred-value');
                 dom.valueToggleBtn.innerHTML = `<i data-lucide="eye-off" class="w-5 h-5"></i>`;
             }
             lucide.createIcons();
@@ -1036,6 +1088,12 @@
             }
         }
         
+        // --- Mobile Sidebar ---
+        function toggleMobileSidebar() {
+            const isOpen = dom.sidebar.classList.toggle('open');
+            dom.mobileBackdrop.classList.toggle('hidden', !isOpen);
+        }
+
         // --- Charting ---
         function renderReportCharts() {
             const isDark = dom.html.classList.contains('dark');
