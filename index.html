@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- The 'dark' class is now controlled by JS based on user preference -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,14 +26,14 @@
            ========================================================================== */
         :root {
             /* ┌────────────────────────────────────────────────────────────────────┐
-            │ A. CORE LAYOUT & SIZING                                            │
-            └────────────────────────────────────────────────────────────────────┘ */
+             │ A. CORE LAYOUT & SIZING                                            │
+             └────────────────────────────────────────────────────────────────────┘ */
             --sidebar-width: 260px;
             --header-height: 72px;
 
             /* ┌────────────────────────────────────────────────────────────────────┐
-            │ B. TYPOGRAPHY                                                      │
-            └────────────────────────────────────────────────────────────────────┘ */
+             │ B. TYPOGRAPHY                                                      │
+             └────────────────────────────────────────────────────────────────────┘ */
             --font-family-base: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             --font-weight-normal: 400;
             --font-weight-medium: 500;
@@ -43,8 +42,8 @@
             --font-weight-black: 800;
 
             /* ┌────────────────────────────────────────────────────────────────────┐
-            │ C. SPACING SCALE (8px Grid)                                        │
-            └────────────────────────────────────────────────────────────────────┘ */
+             │ C. SPACING SCALE (8px Grid)                                        │
+             └────────────────────────────────────────────────────────────────────┘ */
             --space-1: 0.25rem;  /* 4px  */
             --space-2: 0.5rem;   /* 8px  */
             --space-3: 0.75rem;  /* 12px */
@@ -54,24 +53,24 @@
             --space-8: 2rem;     /* 32px */
 
             /* ┌────────────────────────────────────────────────────────────────────┐
-            │ D. BORDERS & RADII                                                 │
-            └────────────────────────────────────────────────────────────────────┘ */
+             │ D. BORDERS & RADII                                                 │
+             └────────────────────────────────────────────────────────────────────┘ */
             --border-width: 1px;
             --radius-sm: 0.25rem;
             --radius-md: 0.5rem;
             --radius-lg: 0.75rem;
 
             /* ┌────────────────────────────────────────────────────────────────────┐
-            │ E. TRANSITIONS & ANIMATIONS                                        │
-            └────────────────────────────────────────────────────────────────────┘ */
+             │ E. TRANSITIONS & ANIMATIONS                                        │
+             └────────────────────────────────────────────────────────────────────┘ */
             --transition-speed-fast: 150ms;
             --transition-speed-normal: 300ms;
             --transition-curve-bounce: cubic-bezier(0.4, 0, 0.2, 1);
             --transition-curve-smooth: ease-in-out;
 
             /* ┌────────────────────────────────────────────────────────────────────┐
-            │ F. LIGHT THEME PALETTE                                             │
-            └────────────────────────────────────────────────────────────────────┘ */
+             │ F. LIGHT THEME PALETTE                                             │
+             └────────────────────────────────────────────────────────────────────┘ */
             --color-bg-primary: #F8F9FA;
             --color-bg-secondary: #FFFFFF;
             --color-bg-tertiary: #E9ECEF;
@@ -105,8 +104,8 @@
 
         html.dark {
             /* ┌────────────────────────────────────────────────────────────────────┐
-            │ G. DARK THEME OVERRIDES                                            │
-            └────────────────────────────────────────────────────────────────────┘ */
+             │ G. DARK THEME OVERRIDES                                            │
+             └────────────────────────────────────────────────────────────────────┘ */
             --color-bg-primary: #121212;
             --color-bg-secondary: #1E1E1E;
             --color-bg-tertiary: #2C2C2C;
@@ -598,8 +597,7 @@
                 <button id="detail-close-btn" aria-label="Close details panel" class="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] rounded-full hover:bg-[var(--color-bg-tertiary)]"><i data-lucide="x"></i></button>
             </div>
             <div id="detail-content" class="grid lg:grid-cols-3 gap-0 overflow-y-auto">
-                <!-- Content will be injected here by JS -->
-            </div>
+                </div>
         </div>
     </div>
 
@@ -616,11 +614,11 @@
         // ================================================================================
         // 1. CONFIGURATION & STATE MANAGEMENT
         // ================================================================================
-        const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw'; // Replace with your API key
-        const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com'; // Replace with your Client ID
+        const API_KEY = 'YOUR_API_KEY'; // Replace with your API key
+        const CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com'; // Replace with your Client ID
         const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
         const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile";
-        const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ'; // Replace with your Spreadsheet ID
+        const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID'; // Replace with your Spreadsheet ID
         const INVENTORY_RANGE = 'Sheet1!A:ZZ'; // Use a wide range to ensure all columns are read
         const SALES_RANGE = 'SalesLog!A:D';
 
@@ -630,7 +628,7 @@
         let gapiInited = false;
         let gisInited = false;
         let tokenClient;
-        let sheetHeaders = []; // <-- FIX: To store actual headers from the sheet
+        let sheetHeaders = []; // To store actual headers from the sheet
         let currentLayout = 'grid';
         let currentPage = 1;
         const ITEMS_PER_PAGE = 12;
@@ -788,14 +786,14 @@
                 ]);
                 
                 const inventoryValues = responses[0].result.values;
-                // --- FIX: Check for empty sheet and capture headers ---
+                // --- Check for empty sheet and capture headers ---
                 if (!inventoryValues || inventoryValues.length === 0) {
                     Swal.fire('Sheet Error', 'The inventory sheet is empty or could not be read.', 'error');
                     showSkeletonLoader(false);
                     dom.noResults.classList.remove('hidden');
                     return;
                 }
-                sheetHeaders = inventoryValues[0]; // <-- The critical fix: store the actual headers
+                sheetHeaders = inventoryValues[0]; // The actual headers from the sheet
                 
                 const freshItems = inventoryValues.slice(1).map((row, index) => {
                     const item = sheetHeaders.reduce((obj, header, i) => {
@@ -819,7 +817,7 @@
                 localStorage.setItem('inventoryData', JSON.stringify({
                     items: allItems,
                     sales: allSales,
-                    headers: sheetHeaders, // <-- Store headers in cache
+                    headers: sheetHeaders, // Store headers in cache
                     timestamp: Date.now()
                 }));
 
@@ -865,7 +863,7 @@
         async function addComponent() {
             const newItem = collectFormData();
             newItem.id = Date.now();
-            // --- FIX: Use dynamic headers to build the row array ---
+            // Use dynamic headers to build the row array
             const newRow = sheetHeaders.map(header => newItem[header] || "");
             try {
                 await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SPREADSHEET_ID, range: 'Sheet1!A1', valueInputOption: 'USER_ENTERED', resource: { values: [newRow] } });
@@ -885,11 +883,13 @@
             }
             const updatedItem = collectFormData();
             updatedItem.id = id;
-            // --- FIX: Use dynamic headers to build the row array ---
+            // Use dynamic headers to build the row array
             const updatedRow = sheetHeaders.map(header => updatedItem[header] || "");
-            // --- FIX: Dynamically calculate the update range ---
+
+            // ✅ FIX: Dynamically calculate the update range
             const endColumn = columnToLetter(sheetHeaders.length);
             const updateRange = `Sheet1!A${itemToUpdate.rowIndex}:${endColumn}${itemToUpdate.rowIndex}`;
+            
             try {
                 await gapi.client.sheets.spreadsheets.values.update({ spreadsheetId: SPREADSHEET_ID, range: updateRange, valueInputOption: 'USER_ENTERED', resource: { values: [updatedRow] }});
                 Swal.fire({ title: 'Success!', text: 'Component updated successfully.', icon: 'success', timer: 2000, showConfirmButton: false });
@@ -1319,7 +1319,7 @@
         // 5. ANALYTICS & HELPERS
         // ================================================================================
         
-        // --- FIX: Helper function to convert column number to Letter (e.g., 1 -> A, 27 -> AA) ---
+        // ✅ FIX: Helper function to convert column number to Letter (e.g., 1 -> A, 27 -> AA)
         function columnToLetter(column) {
             let temp, letter = '';
             while (column > 0) {
