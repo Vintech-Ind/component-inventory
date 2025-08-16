@@ -4,240 +4,418 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vinayaka  | Component Database</title>
+    <title>Vinayaka | Component Database</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* ================================================================================
-        1. WORLD-CLASS AESTHETIC & BRANDING
-        ================================================================================ */
+        /* ==========================================================================
+           VINAYAKA INDUSTRIES :: COMPONENT DATABASE STYLESHEET
+           Author: 10+ Yr Sr. Web Developer
+           Methodology: A token-based design system for maximum scalability,
+                        inspired by enterprise-grade application architecture.
+           ========================================================================== */
+
+        /* ==========================================================================
+           1. SETTINGS :: Design Tokens & Global Variables
+           ========================================================================== */
         :root {
+            /* ┌────────────────────────────────────────────────────────────────────┐
+            │ A. CORE LAYOUT & SIZING                                            │
+            └────────────────────────────────────────────────────────────────────┘ */
             --sidebar-width: 260px;
             --header-height: 72px;
-        }
-        
-        html:not(.dark) {
-            --bg-primary: #F8F9FA;
-            --bg-secondary: #FFFFFF;
-            --bg-tertiary: #E9ECEF;
-            --text-primary: #212529;
-            --text-secondary: #6C757D;
-            --border-color: #DEE2E6;
-            --accent: #FFC107;
-            --accent-text: #212529;
-            --danger: #DC3545;
-            --warning: #FD7E14;
-            --success: #198754;
-            --shadow-color: rgba(0, 0, 0, 0.05);
+
+            /* ┌────────────────────────────────────────────────────────────────────┐
+            │ B. TYPOGRAPHY                                                      │
+            └────────────────────────────────────────────────────────────────────┘ */
+            --font-family-base: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            --font-weight-black: 800;
+
+            /* ┌────────────────────────────────────────────────────────────────────┐
+            │ C. SPACING SCALE (8px Grid)                                        │
+            └────────────────────────────────────────────────────────────────────┘ */
+            --space-1: 0.25rem;  /* 4px  */
+            --space-2: 0.5rem;   /* 8px  */
+            --space-3: 0.75rem;  /* 12px */
+            --space-4: 1rem;     /* 16px */
+            --space-5: 1.25rem;  /* 20px */
+            --space-6: 1.5rem;   /* 24px */
+            --space-8: 2rem;     /* 32px */
+
+            /* ┌────────────────────────────────────────────────────────────────────┐
+            │ D. BORDERS & RADII                                                 │
+            └────────────────────────────────────────────────────────────────────┘ */
+            --border-width: 1px;
+            --radius-sm: 0.25rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+
+            /* ┌────────────────────────────────────────────────────────────────────┐
+            │ E. TRANSITIONS & ANIMATIONS                                        │
+            └────────────────────────────────────────────────────────────────────┘ */
+            --transition-speed-fast: 150ms;
+            --transition-speed-normal: 300ms;
+            --transition-curve-bounce: cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-curve-smooth: ease-in-out;
+
+            /* ┌────────────────────────────────────────────────────────────────────┐
+            │ F. LIGHT THEME PALETTE                                             │
+            └────────────────────────────────────────────────────────────────────┘ */
+            --color-bg-primary: #F8F9FA;
+            --color-bg-secondary: #FFFFFF;
+            --color-bg-tertiary: #E9ECEF;
+
+            --color-text-primary: #212529;
+            --color-text-secondary: #6C757D;
+            --color-text-on-accent: #212529;
+            --color-text-on-danger: #FFFFFF;
+
+            --color-border-primary: #DEE2E6;
+            --color-border-focus: var(--color-accent-main);
+
+            --color-accent-main: #FFC107;
+            --color-accent-focus-ring: rgb(255 193 7 / 25%);
+
+            --color-status-danger: #DC3545;
+            --color-status-warning: #FD7E14;
+            --color-status-success: #198754;
+
+            --shadow-color: 220 23% 10%;
+            --shadow-elevation-low:
+                0.3px 0.5px 0.7px hsl(var(--shadow-color) / 0.11),
+                0.4px 0.8px 1px -1.2px hsl(var(--shadow-color) / 0.11),
+                1px 2px 2.5px -2.5px hsl(var(--shadow-color) / 0.11);
+            --shadow-elevation-medium:
+                0.3px 0.5px 0.7px hsl(var(--shadow-color) / 0.1),
+                0.8px 1.6px 2px -0.8px hsl(var(--shadow-color) / 0.1),
+                2.1px 4.1px 5.2px -1.7px hsl(var(--shadow-color) / 0.1),
+                5px 10px 12.6px -2.5px hsl(var(--shadow-color) / 0.1);
         }
 
         html.dark {
-            --bg-primary: #121212;
-            --bg-secondary: #1E1E1E;
-            --bg-tertiary: #2C2C2C;
-            --text-primary: #EAEAEA;
-            --text-secondary: #888888;
-            --border-color: #3A3A3A;
-            --accent: #FFC107;
-            --accent-text: #212529;
-            --danger: #EF5350;
-            --warning: #FFA726;
-            --success: #4CAF50;
-            --shadow-color: rgba(0, 0, 0, 0.2);
+            /* ┌────────────────────────────────────────────────────────────────────┐
+            │ G. DARK THEME OVERRIDES                                            │
+            └────────────────────────────────────────────────────────────────────┘ */
+            --color-bg-primary: #121212;
+            --color-bg-secondary: #1E1E1E;
+            --color-bg-tertiary: #2C2C2C;
+
+            --color-text-primary: #EAEAEA;
+            --color-text-secondary: #888888;
+
+            --color-border-primary: #3A3A3A;
+
+            --color-status-danger: #EF5350;
+            --color-status-warning: #FFA726;
+            --color-status-success: #4CAF50;
+
+            --shadow-color: 220 23% 5%;
         }
 
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            transition: background-color 0.3s ease, color 0.3s ease;
+
+        /* ==========================================================================
+           2. GENERIC :: Reset & Normalizations
+           ========================================================================== */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        
-        h1, h2, h3, h4, h5, h6 { font-weight: 800; }
-        body, p, span, div { line-height: 1.6; }
-        
-        /* ================================================================================
-        2. LAYOUT & SPACING
-        ================================================================================ */
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background-color: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            transition: background-color var(--transition-speed-normal) var(--transition-curve-smooth),
+                        color var(--transition-speed-normal) var(--transition-curve-smooth);
+        }
+
+        /* ==========================================================================
+           3. BASE :: Unclassed HTML Elements
+           ========================================================================== */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: var(--font-weight-black);
+            line-height: 1.2;
+        }
+
+        /* ==========================================================================
+           4. OBJECTS :: Layout-related classes
+           ========================================================================== */
         .main-content {
             padding-left: var(--sidebar-width);
-            transition: padding-left 0.3s ease;
+            transition: padding-left var(--transition-speed-normal) var(--transition-curve-bounce);
         }
 
+        /* ==========================================================================
+           5. COMPONENTS :: Styled, reusable UI patterns
+           ========================================================================== */
+
+        /* -------------------------------------------------------------------------- */
+        /* A. SIDEBAR                                                                 */
+        /* -------------------------------------------------------------------------- */
         .sidebar {
-            background-color: var(--bg-secondary);
-            border-right: 1px solid var(--border-color);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: var(--color-bg-secondary);
+            border-right: var(--border-width) solid var(--color-border-primary);
+            transition: transform var(--transition-speed-normal) var(--transition-curve-bounce);
             height: 100vh;
         }
+
         .sidebar-nav-link {
             position: relative;
-            transition: background-color 0.2s ease, color 0.2s ease;
+            transition: background-color var(--transition-speed-fast) var(--transition-curve-smooth),
+                        color var(--transition-speed-fast) var(--transition-curve-smooth);
         }
-        .sidebar-nav-link:before {
+
+        .sidebar-nav-link::before {
             content: '';
             position: absolute;
             left: 0;
             top: 50%;
-            transform: translateY(-50%) scaleY(0);
             width: 4px;
             height: 60%;
-            background-color: var(--accent);
+            background-color: var(--color-accent-main);
             border-radius: 0 4px 4px 0;
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(-50%) scaleY(0);
+            transition: transform var(--transition-speed-fast) var(--transition-curve-bounce);
         }
-        .sidebar-nav-link:hover:before,
-        .sidebar-nav-link.active:before {
+
+        .sidebar-nav-link:hover:not(.active) {
+            background-color: var(--color-bg-tertiary);
+        }
+        .sidebar-nav-link:hover::before {
             transform: translateY(-50%) scaleY(1);
         }
-        .sidebar-nav-link.active {
-            background-color: var(--accent);
-            color: var(--accent-text);
-            font-weight: 700;
-        }
-        .sidebar-nav-link:not(.active):hover { background-color: var(--bg-tertiary); }
 
-        .industrial-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 2px var(--shadow-color);
-            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        .sidebar-nav-link.active {
+            background-color: var(--color-accent-main);
+            color: var(--color-text-on-accent);
+            font-weight: var(--font-weight-bold);
         }
+        .sidebar-nav-link.active::before {
+            transform: translateY(-50%) scaleY(1);
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* B. CARD                                                                    */
+        /* -------------------------------------------------------------------------- */
+        .industrial-card {
+            background-color: var(--color-bg-secondary);
+            border: var(--border-width) solid var(--color-border-primary);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-elevation-low);
+            transition: transform var(--transition-speed-fast) var(--transition-curve-bounce),
+                        box-shadow var(--transition-speed-fast) var(--transition-curve-bounce),
+                        border-color var(--transition-speed-fast) var(--transition-curve-smooth);
+        }
+
         .industrial-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 16px var(--shadow-color);
-            border-color: var(--accent);
+            box-shadow: var(--shadow-elevation-medium);
+            border-color: var(--color-accent-main);
         }
-        
-        /* ================================================================================
-        3. INTERACTIVE ELEMENTS & FORMS
-        ================================================================================ */
-        .btn {
-            padding: 0.65rem 1.25rem;
-            border-radius: 0.375rem;
-            font-weight: 700;
-            transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
-            border: 1px solid transparent;
-            text-align: center;
-        }
-        .btn-primary {
-            background-color: var(--accent);
-            color: var(--accent-text);
-            border-bottom: 3px solid rgba(0,0,0,0.25);
-        }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .btn-primary:active { transform: translateY(1px); border-bottom-width: 1px; }
-        
-        .btn-secondary {
-            background-color: transparent;
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-        .btn-secondary:hover { background-color: var(--bg-tertiary); border-color: var(--text-primary); }
-        
-        .btn-danger { background-color: transparent; color: var(--danger); border: 1px solid var(--danger); }
-        .btn-danger:hover { background-color: var(--danger); color: white; }
 
+        /* -------------------------------------------------------------------------- */
+        /* C. BUTTON                                                                  */
+        /* -------------------------------------------------------------------------- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-5);
+            border-radius: var(--radius-sm);
+            font-weight: var(--font-weight-bold);
+            text-align: center;
+            border: var(--border-width) solid transparent;
+            cursor: pointer;
+            transition: transform var(--transition-speed-fast) var(--transition-curve-bounce),
+                        box-shadow var(--transition-speed-fast) var(--transition-curve-bounce),
+                        background-color var(--transition-speed-fast) var(--transition-curve-smooth),
+                        border-color var(--transition-speed-fast) var(--transition-curve-smooth);
+            user-select: none;
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--color-accent-main);
+            outline-offset: 2px;
+        }
+
+        .btn--primary {
+            background-color: var(--color-accent-main);
+            color: var(--color-text-on-accent);
+            border-bottom: 3px solid color-mix(in srgb, var(--color-text-primary) 25%, transparent);
+        }
+        .btn--primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-elevation-low);
+        }
+        .btn--primary:active {
+            transform: translateY(1px);
+            border-bottom-width: 1px;
+        }
+
+        .btn--secondary {
+            background-color: transparent;
+            color: var(--color-text-primary);
+            border-color: var(--color-border-primary);
+        }
+        .btn--secondary:hover {
+            background-color: var(--color-bg-tertiary);
+            border-color: var(--color-text-primary);
+        }
+
+        .btn--danger {
+            background-color: transparent;
+            color: var(--color-status-danger);
+            border-color: var(--color-status-danger);
+        }
+        .btn--danger:hover {
+            background-color: var(--color-status-danger);
+            color: var(--color-text-on-danger);
+        }
+
+        /* -------------------------------------------------------------------------- */
+        /* D. FORMS                                                                   */
+        /* -------------------------------------------------------------------------- */
         .filter-control-group {
-            background-color: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            padding: 0.25rem 0.75rem;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            background-color: var(--color-bg-tertiary);
+            border: var(--border-width) solid var(--color-border-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-1) var(--space-3);
+            transition: border-color var(--transition-speed-fast) var(--transition-curve-smooth),
+                        box-shadow var(--transition-speed-fast) var(--transition-curve-smooth);
         }
+
         .filter-control-group:focus-within {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+            border-color: var(--color-border-focus);
+            box-shadow: 0 0 0 3px var(--color-accent-focus-ring);
         }
+
         .filter-control-group label {
             font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--text-secondary);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-secondary);
             display: block;
         }
+
         .filter-control-input {
             background-color: transparent;
             border: none;
             outline: none;
             width: 100%;
             padding: 0.1rem 0;
-            color: var(--text-primary);
-            font-weight: 500;
+            color: var(--color-text-primary);
+            font-weight: var(--font-weight-medium);
+            font-family: inherit;
         }
-        .filter-control-input::placeholder { color: var(--text-secondary); }
+
+        .filter-control-input::placeholder {
+            color: var(--color-text-secondary);
+            opacity: 0.8;
+        }
 
         .industrial-input {
             background-color: transparent;
             border: none;
-            border-bottom: 2px solid var(--border-color);
+            border-bottom: 2px solid var(--color-border-primary);
             border-radius: 0;
-            padding: 0.75rem 0.25rem;
+            padding: var(--space-3) var(--space-1);
             width: 100%;
-            transition: border-color 0.2s ease;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color var(--transition-speed-fast) var(--transition-curve-smooth);
         }
+
         .industrial-input:focus {
             outline: none;
-            border-bottom-color: var(--accent);
-            box-shadow: none;
+            border-bottom-color: var(--color-border-focus);
             --tw-ring-color: transparent;
         }
-        
+
+        /* -------------------------------------------------------------------------- */
+        /* E. UTILITY & MISC COMPONENTS                                               */
+        /* -------------------------------------------------------------------------- */
         .blurred-value {
             filter: blur(8px);
             user-select: none;
             cursor: pointer;
-            transition: filter 0.2s ease;
+            transition: filter var(--transition-speed-normal) var(--transition-curve-smooth);
         }
-        
-        .swal2-popup { font-family: 'Inter', sans-serif; background-color: var(--bg-secondary) !important; color: var(--text-primary) !important; border: 1px solid var(--border-color) !important; }
-        .swal2-title { color: var(--text-primary) !important; }
-        .swal2-confirm { background-color: var(--accent) !important; color: var(--accent-text) !important; }
-        .swal2-deny { background-color: var(--danger) !important; }
-        .swal2-cancel { background-color: var(--bg-tertiary) !important; }
 
+        /* SweetAlert2 Theming */
+        .swal2-popup {
+            font-family: var(--font-family-base);
+            background-color: var(--color-bg-secondary) !important;
+            color: var(--color-text-primary) !important;
+            border: var(--border-width) solid var(--color-border-primary) !important;
+            border-radius: var(--radius-lg) !important;
+        }
+        .swal2-title { color: var(--color-text-primary) !important; }
+        .swal2-confirm { background-color: var(--color-accent-main) !important; color: var(--color-text-on-accent) !important; }
+        .swal2-deny { background-color: var(--color-status-danger) !important; }
+        .swal2-cancel { background-color: var(--color-bg-tertiary) !important; }
+
+        /* Skeleton Loader Animation */
         @keyframes breathing {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
+            0%, 100% { background-color: var(--color-bg-tertiary); }
+            50% { background-color: color-mix(in srgb, var(--color-bg-tertiary) 80%, var(--color-bg-secondary)); }
         }
-        .skeleton-breathe > div > div {
-            animation: breathing 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        .skeleton-breathe .skeleton-item {
+            animation: breathing 2s var(--transition-curve-bounce) infinite;
         }
-        .skeleton-breathe > div > div:nth-child(2) { animation-delay: 0.1s; }
-        .skeleton-breathe > div > div:nth-child(3) { animation-delay: 0.2s; }
+        .skeleton-breathe .skeleton-item:nth-child(2n) { animation-delay: 100ms; }
+        .skeleton-breathe .skeleton-item:nth-child(3n) { animation-delay: 200ms; }
 
+
+        /* ==========================================================================
+           6. MEDIA QUERIES :: Responsive Breakpoints
+           ========================================================================== */
         @media (max-width: 1024px) {
             .main-content { padding-left: 0; }
-            .sidebar { transform: translateX(-100%); box-shadow: 5px 0 15px rgba(0,0,0,0.2); z-index: 50; }
+            .sidebar {
+                transform: translateX(-100%);
+                box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+                z-index: 50;
+            }
             .sidebar.open { transform: translateX(0); }
             .mobile-backdrop {
                 position: fixed;
                 inset: 0;
                 background-color: rgba(0,0,0,0.5);
                 z-index: 49;
-                transition: opacity 0.3s ease;
+                transition: opacity var(--transition-speed-normal) var(--transition-curve-smooth);
             }
         }
     </style>
 </head>
-<body class="antialiased bg-[var(--bg-primary)] text-[var(--text-primary)]">
+<body class="antialiased">
 
-    <div id="login-view" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-8">
+    <div id="login-view" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-8 bg-[var(--color-bg-primary)]">
         <div class="text-center">
-            <div class="inline-block bg-[var(--text-primary)] p-4 rounded-lg mb-6">
-                <i data-lucide="gem" class="w-12 h-12 text-[var(--bg-primary)]"></i>
+            <div class="inline-block bg-[var(--color-text-primary)] p-4 rounded-lg mb-6">
+                <i data-lucide="gem" class="w-12 h-12 text-[var(--color-bg-primary)]"></i>
             </div>
             <h1 class="text-4xl font-black">Welcome to Vinayaka Industries DB</h1>
-            <p class="text-lg text-[var(--text-secondary)] mt-2 mb-8">The Professional Component Inventory Platform.</p>
-            <button id="signin-button-main" class="btn btn-primary text-lg">Sign In with Google</button>
+            <p class="text-lg text-[var(--color-text-secondary)] mt-2 mb-8">The Professional Component Inventory Platform.</p>
+            <button id="signin-button-main" class="btn btn--primary text-lg">Sign In with Google</button>
         </div>
     </div>
 
@@ -245,8 +423,8 @@
         <div id="mobile-backdrop" class="mobile-backdrop hidden lg:hidden"></div>
 
         <aside class="sidebar fixed top-0 left-0 w-[var(--sidebar-width)] flex flex-col">
-            <div class="flex items-center gap-4 p-5 h-[var(--header-height)] border-b border-[var(--border-color)] flex-shrink-0">
-                <div class="bg-[var(--text-primary)] p-2.5 rounded-lg"><i data-lucide="gem" class="w-6 h-6 text-[var(--bg-primary)]"></i></div>
+            <div class="flex items-center gap-4 p-5 h-[var(--header-height)] border-b border-[var(--color-border-primary)] flex-shrink-0">
+                <div class="bg-[var(--color-text-primary)] p-2.5 rounded-lg"><i data-lucide="gem" class="w-6 h-6 text-[var(--color-bg-primary)]"></i></div>
                 <h1 class="text-xl font-black">Vinayaka Industries</h1>
             </div>
             
@@ -254,19 +432,19 @@
                 <a href="#" id="nav-dashboard" class="sidebar-nav-link active flex items-center gap-4 px-4 py-3 rounded-lg">
                     <i data-lucide="layout-grid" class="w-5 h-5"></i><span>Dashboard</span>
                 </a>
-                <a href="#" id="nav-reports" class="sidebar-nav-link flex items-center gap-4 px-4 py-3 text-[var(--text-secondary)] rounded-lg font-medium">
+                <a href="#" id="nav-reports" class="sidebar-nav-link flex items-center gap-4 px-4 py-3 text-[var(--color-text-secondary)] rounded-lg font-medium">
                     <i data-lucide="bar-chart-2" class="w-5 h-5"></i><span>Reports</span>
                 </a>
             </nav>
 
-            <div class="p-4 border-t border-[var(--border-color)] flex-shrink-0">
+            <div class="p-4 border-t border-[var(--color-border-primary)] flex-shrink-0">
                 <div id="user-profile-area">
-                    <div id="auth-signed-out-view" class="p-2 rounded-lg cursor-pointer group hover:bg-[var(--bg-tertiary)] transition-colors">
+                    <div id="auth-signed-out-view" class="p-2 rounded-lg cursor-pointer group hover:bg-[var(--color-bg-tertiary)] transition-colors">
                         <div class="flex items-center gap-3">
-                            <div class="w-11 h-11 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center border border-dashed border-[var(--border-color)]"><i data-lucide="user-x" class="text-[var(--text-secondary)]"></i></div>
+                            <div class="w-11 h-11 rounded-full bg-[var(--color-bg-tertiary)] flex items-center justify-center border border-dashed border-[var(--color-border-primary)]"><i data-lucide="user-x" class="text-[var(--color-text-secondary)]"></i></div>
                             <div>
-                                <p class="font-semibold text-[var(--text-secondary)]">Not Signed In</p>
-                                <p class="text-xs text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-colors">Click to sign in</p>
+                                <p class="font-semibold text-[var(--color-text-secondary)]">Not Signed In</p>
+                                <p class="text-xs text-[var(--color-text-secondary)] group-hover:text-[var(--color-accent-main)] transition-colors">Click to sign in</p>
                             </div>
                         </div>
                     </div>
@@ -276,18 +454,18 @@
                                 <img id="user-dp" class="w-11 h-11 rounded-full" src="" alt="User profile picture">
                                 <div>
                                     <p id="user-name" class="font-semibold"></p>
-                                    <p class="text-xs text-green-500 font-medium">Online</p>
+                                    <p class="text-xs text-[var(--color-status-success)] font-medium">Online</p>
                                 </div>
                             </div>
-                            <button id="sign-out-btn" aria-label="Sign out" class="p-2 rounded-full hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] transition-colors">
+                            <button id="sign-out-btn" aria-label="Sign out" class="p-2 rounded-full hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] transition-colors">
                                 <i data-lucide="log-out" class="w-5 h-5"></i>
                             </button>
                         </div>
                     </div>
                 </div>
                 <div class="mt-2 flex items-center justify-between p-2">
-                    <label for="theme-toggle" class="text-sm font-medium text-[var(--text-secondary)]">Theme</label>
-                    <button id="theme-toggle" aria-label="Toggle light and dark theme" class="p-2 rounded-full hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] transition-colors">
+                    <label for="theme-toggle" class="text-sm font-medium text-[var(--color-text-secondary)]">Theme</label>
+                    <button id="theme-toggle" aria-label="Toggle light and dark theme" class="p-2 rounded-full hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] transition-colors">
                         <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
                         <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
                     </button>
@@ -296,22 +474,22 @@
         </aside>
 
         <main class="main-content flex-1 flex flex-col min-h-screen">
-            <header class="sticky top-0 z-30 bg-[var(--bg-primary)]/80 backdrop-blur-sm h-[var(--header-height)] flex items-center justify-between px-6 lg:px-8 border-b border-[var(--border-color)]">
+            <header class="sticky top-0 z-30 bg-[var(--color-bg-primary)]/80 backdrop-blur-sm h-[var(--header-height)] flex items-center justify-between px-6 lg:px-8 border-b border-[var(--color-border-primary)]">
                 <div class="flex items-center gap-4">
-                     <button id="menuBtn" aria-label="Open sidebar menu" class="lg:hidden p-2 text-[var(--text-secondary)] -ml-2"><i data-lucide="menu" class="w-6 h-6"></i></button>
-                     <h2 class="text-2xl font-black" id="page-title">Dashboard</h2>
+                    <button id="menuBtn" aria-label="Open sidebar menu" class="lg:hidden p-2 text-[var(--color-text-secondary)] -ml-2"><i data-lucide="menu" class="w-6 h-6"></i></button>
+                    <h2 class="text-2xl font-black" id="page-title">Dashboard</h2>
                 </div>
                 <div class="flex items-center gap-2 sm:gap-4">
-                     <div id="layout-switcher" class="flex items-center gap-1 bg-[var(--bg-tertiary)] p-1 rounded-lg border border-[var(--border-color)]">
-                         <button id="grid-view-btn" aria-label="Switch to grid view" class="p-2 rounded-md"><i data-lucide="layout-grid"></i></button>
-                         <button id="list-view-btn" aria-label="Switch to list view" class="p-2 rounded-md"><i data-lucide="list"></i></button>
-                         <button id="table-view-btn" aria-label="Switch to table view" class="p-2 rounded-md"><i data-lucide="table-2"></i></button>
-                         <button id="kanban-view-btn" aria-label="Switch to kanban view" class="p-2 rounded-md"><i data-lucide="trello"></i></button>
-                     </div>
-                     <button id="compare-btn" class="btn btn-secondary hidden">Compare (0)</button>
-                     <button id="addPartBtn" class="btn btn-primary flex items-center gap-2 disabled:bg-gray-400 disabled:text-gray-600 disabled:cursor-not-allowed disabled:border-b-0" disabled>
-                         <i data-lucide="plus" class="w-5 h-5"></i><span class="hidden sm:inline">Add Component</span>
-                     </button>
+                    <div id="layout-switcher" class="flex items-center gap-1 bg-[var(--color-bg-tertiary)] p-1 rounded-lg border border-[var(--color-border-primary)]">
+                        <button id="grid-view-btn" aria-label="Switch to grid view" class="p-2 rounded-md"><i data-lucide="layout-grid"></i></button>
+                        <button id="list-view-btn" aria-label="Switch to list view" class="p-2 rounded-md"><i data-lucide="list"></i></button>
+                        <button id="table-view-btn" aria-label="Switch to table view" class="p-2 rounded-md"><i data-lucide="table-2"></i></button>
+                        <button id="kanban-view-btn" aria-label="Switch to kanban view" class="p-2 rounded-md"><i data-lucide="trello"></i></button>
+                    </div>
+                    <button id="compare-btn" class="btn btn--secondary hidden">Compare (0)</button>
+                    <button id="addPartBtn" class="btn btn--primary disabled:bg-gray-400 disabled:text-gray-600 disabled:cursor-not-allowed disabled:border-b-0" disabled>
+                        <i data-lucide="plus" class="w-5 h-5"></i><span class="hidden sm:inline">Add Component</span>
+                    </button>
                 </div>
             </header>
 
@@ -321,32 +499,32 @@
                         <h2 class="text-2xl font-black mb-4">Analytics Overview</h2>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                             <div class="industrial-card p-6 flex flex-col justify-between">
-                                <p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Total Components</p>
+                                <p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Total Components</p>
                                 <p id="total-components" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p>
                             </div>
                             <div class="industrial-card p-6 flex flex-col justify-between">
                                 <div class="flex justify-between items-start">
-                                    <p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Inventory Value</p>
-                                    <button id="value-toggle-btn" aria-label="Toggle inventory value visibility" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"><i data-lucide="eye-off" class="w-5 h-5"></i></button>
+                                    <p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Inventory Value</p>
+                                    <button id="value-toggle-btn" aria-label="Toggle inventory value visibility" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"><i data-lucide="eye-off" class="w-5 h-5"></i></button>
                                 </div>
                                 <p id="total-value" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">₹0</p>
                             </div>
                             <div class="industrial-card p-6 flex flex-col justify-between">
-                                <p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Low Stock Items</p>
+                                <p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Low Stock Items</p>
                                 <p id="low-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p>
                             </div>
                             <div class="industrial-card p-6 flex flex-col justify-between">
-                                <p class="text-sm font-semibold text-[var(--text-secondary)] opacity-80">Out of Stock</p>
-                                <p id="out-of-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2 text-[var(--danger)]">0</p>
+                                <p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Out of Stock</p>
+                                <p id="out-of-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2 text-[var(--color-status-danger)]">0</p>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-4 mb-8">
+                    <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg p-4 mb-8">
                         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
                             <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <div class="lg:col-span-1">
                                     <div class="filter-control-group flex items-center gap-2">
-                                        <i data-lucide="search" class="w-5 h-5 text-[var(--text-secondary)] flex-shrink-0"></i>
+                                        <i data-lucide="search" class="w-5 h-5 text-[var(--color-text-secondary)] flex-shrink-0"></i>
                                         <input type="text" id="search" placeholder="Search components..." class="filter-control-input">
                                     </div>
                                 </div>
@@ -374,7 +552,7 @@
                 
                     <div id="skeleton-loader" class="hidden"></div>
                     <div id="searchResults" class="hidden"></div>
-                    <div id="no-results" class="hidden text-center py-16 industrial-card"><i data-lucide="search-x" class="w-16 h-16 mx-auto text-[var(--text-secondary)]"></i><h3 class="mt-4 text-2xl font-bold">No Components Found</h3><p class="mt-2 text-[var(--text-secondary)]">Your database is empty or your search returned no results.</p></div>
+                    <div id="no-results" class="hidden text-center py-16 industrial-card"><i data-lucide="search-x" class="w-16 h-16 mx-auto text-[var(--color-text-secondary)]"></i><h3 class="mt-4 text-2xl font-bold">No Components Found</h3><p class="mt-2 text-[var(--color-text-secondary)]">Your database is empty or your search returned no results.</p></div>
                 
                     <div id="pagination-controls" class="flex justify-center items-center gap-4 mt-8"></div>
                 </div>
@@ -390,8 +568,8 @@
     </div>
 
     <div id="formModal" role="dialog" aria-modal="true" aria-labelledby="form-title" class="fixed inset-0 z-50 justify-center items-start p-4 overflow-y-auto bg-black/70 hidden">
-        <div class="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg shadow-2xl w-full max-w-4xl my-8 flex flex-col">
-            <div class="flex justify-between items-center p-6 border-b border-[var(--border-color)]"><h2 id="form-title" class="text-2xl font-black">Add New Component</h2><button type="button" id="closeFormModalBtn" aria-label="Close form" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
+        <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg shadow-2xl w-full max-w-4xl my-8 flex flex-col">
+            <div class="flex justify-between items-center p-6 border-b border-[var(--color-border-primary)]"><h2 id="form-title" class="text-2xl font-black">Add New Component</h2><button type="button" id="closeFormModalBtn" aria-label="Close form" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
             <form id="partForm" class="p-6 space-y-6 overflow-y-auto">
                 <input type="hidden" id="edit-id">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -406,18 +584,18 @@
                     <div><label for="image-links-input">Image Links (comma-separated)</label><textarea id="image-links-input" placeholder="Paste one or more comma-separated Google Drive links..." class="industrial-input mt-1" rows="3"></textarea></div>
                     <div><label for="note">Note</label><textarea id="note" rows="3" class="mt-1 industrial-input"></textarea></div>
                 </div>
-                <div id="spec-fields-container" class="hidden"><h3 class="text-lg font-bold border-b border-[var(--border-color)] pb-2 mb-4">Specifications</h3><div id="spec-fields" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4"></div></div>
+                <div id="spec-fields-container" class="hidden"><h3 class="text-lg font-bold border-b border-[var(--color-border-primary)] pb-2 mb-4">Specifications</h3><div id="spec-fields" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4"></div></div>
             </form>
-            <div class="p-6 border-t border-[var(--border-color)] bg-[var(--bg-primary)] flex justify-end gap-3"><button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button><button type="submit" form="partForm" class="btn btn-primary flex items-center justify-center">Save Component</button></div>
+            <div class="p-6 border-t border-[var(--color-border-primary)] bg-[var(--color-bg-primary)] flex justify-end gap-3"><button type="button" id="cancelBtn" class="btn btn--secondary">Cancel</button><button type="submit" form="partForm" class="btn btn--primary">Save Component</button></div>
         </div>
     </div>
 
-    <div id="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title" class="detail-modal fixed inset-0 z-50 justify-center items-center p-4 hidden opacity-0 scale-95">
+    <div id="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title" class="fixed inset-0 z-50 justify-center items-center p-4 hidden opacity-0 scale-95 transition-all duration-300">
         <div class="fixed inset-0 bg-black/70" id="detail-backdrop"></div>
-        <div class="relative bg-[var(--bg-secondary)] w-full max-w-6xl max-h-[90vh] rounded-lg border border-[var(--border-color)] flex flex-col">
-            <div class="flex justify-between items-center p-4 border-b border-[var(--border-color)] flex-shrink-0">
+        <div class="relative bg-[var(--color-bg-secondary)] w-full max-w-6xl max-h-[90vh] rounded-lg border border-[var(--color-border-primary)] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b border-[var(--color-border-primary)] flex-shrink-0">
                 <h2 id="detail-title" class="text-xl font-black">Component Datasheet</h2>
-                <button id="detail-close-btn" aria-label="Close details panel" class="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-full hover:bg-[var(--bg-tertiary)]"><i data-lucide="x"></i></button>
+                <button id="detail-close-btn" aria-label="Close details panel" class="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] rounded-full hover:bg-[var(--color-bg-tertiary)]"><i data-lucide="x"></i></button>
             </div>
             <div id="detail-content" class="grid lg:grid-cols-3 gap-0 overflow-y-auto">
                 <!-- Content will be injected here by JS -->
@@ -426,8 +604,8 @@
     </div>
 
     <div id="comparison-modal" role="dialog" aria-modal="true" aria-labelledby="comparison-title" class="fixed inset-0 z-50 justify-center items-start p-4 overflow-y-auto bg-black/70 hidden">
-        <div class="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg shadow-2xl w-full max-w-7xl my-8 flex flex-col">
-            <div class="flex justify-between items-center p-6 border-b border-[var(--border-color)]"><h2 id="comparison-title" class="text-2xl font-black">Compare Components</h2><button type="button" id="closeComparisonModalBtn" aria-label="Close comparison" class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
+        <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg shadow-2xl w-full max-w-7xl my-8 flex flex-col">
+            <div class="flex justify-between items-center p-6 border-b border-[var(--color-border-primary)]"><h2 id="comparison-title" class="text-2xl font-black">Compare Components</h2><button type="button" id="closeComparisonModalBtn" aria-label="Close comparison" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
             <div id="comparison-content" class="p-6 overflow-x-auto"></div>
         </div>
     </div>
@@ -590,7 +768,7 @@
         
         async function loadAllData() {
             const cachedData = JSON.parse(localStorage.getItem('inventoryData'));
-            if (cachedData && (Date.now() - cachedData.timestamp < 3600000)) {
+            if (cachedData && (Date.now() - cachedData.timestamp < 3600000)) { // 1 hour cache
                 allItems = cachedData.items;
                 allSales = cachedData.sales;
                 populateFilters();
@@ -791,12 +969,12 @@
             const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
             const firstImage = getDriveThumbnail(images[0]) || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.itemName || 'N/A')}&background=E9ECEF&color=212529&size=512&bold=true`;
             const quantity = parseInt(item.quantity) || 0;
-            const statusColor = quantity === 0 ? 'bg-[var(--danger)]' : quantity < 5 ? 'bg-[var(--warning)]' : 'bg-green-500';
+            const statusColor = quantity === 0 ? 'bg-[var(--color-status-danger)]' : quantity < 5 ? 'bg-[var(--color-status-warning)]' : 'bg-[var(--color-status-success)]';
             const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
             const isChecked = comparisonList.has(item.id);
 
             card.innerHTML = `
-                <div class="relative image-gallery bg-[var(--bg-tertiary)]" data-images="${images.join(',')}">
+                <div class="relative image-gallery bg-[var(--color-bg-tertiary)]" data-images="${images.join(',')}">
                     <img loading="lazy" src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-52 object-contain" onerror="this.src='https://ui-avatars.com/api/?name=Error&background=F8D7DA&color=721C24&size=512&bold=true';">
                     ${images.length > 1 ? `<button aria-label="Previous image" class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="-1"><i data-lucide="chevron-left"></i></button><button aria-label="Next image" class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
                     <div class="absolute top-2 left-2 flex items-center gap-2 text-xs font-bold px-2 py-1 rounded text-white ${statusColor}">${statusText}</div>
@@ -804,9 +982,9 @@
                 </div>
                 <div class="p-4 flex-grow flex flex-col">
                     <h3 class="font-bold leading-tight capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3>
-                    <p class="text-sm text-[var(--text-secondary)] mt-1">Price: <span class="font-semibold text-[var(--text-primary)]">₹${item.price || 'N/A'}</span></p>
+                    <p class="text-sm text-[var(--color-text-secondary)] mt-1">Price: <span class="font-semibold text-[var(--color-text-primary)]">₹${item.price || 'N/A'}</span></p>
                     <div class="mt-auto pt-4 text-right">
-                        <button class="view-details-btn text-sm font-bold text-[var(--accent)] hover:underline" data-id="${item.id}">View Details &rarr;</button>
+                        <button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">View Details &rarr;</button>
                     </div>
                 </div>`;
             return card;
@@ -814,20 +992,20 @@
 
         function createListCard(item) {
             const card = document.createElement('div');
-            card.className = 'industrial-card list-item p-4 flex items-center gap-4';
+            card.className = 'industrial-card p-4 flex items-center gap-4';
             const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.itemName || 'N/A')}&background=E9ECEF&color=212529&size=128&bold=true`;
             const quantity = parseInt(item.quantity) || 0;
-            const statusColor = quantity === 0 ? 'text-[var(--danger)]' : quantity < 5 ? 'text-[var(--warning)]' : 'text-green-500';
+            const statusColor = quantity === 0 ? 'text-[var(--color-status-danger)]' : quantity < 5 ? 'text-[var(--color-status-warning)]' : 'text-[var(--color-status-success)]';
             const isChecked = comparisonList.has(item.id);
 
             card.innerHTML = `
                 <input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5 flex-shrink-0" ${isChecked ? 'checked' : ''}>
-                <img loading="lazy" src="${image}" class="w-16 h-16 rounded-md object-contain flex-shrink-0 bg-[var(--bg-tertiary)]" onerror="this.src='https://ui-avatars.com/api/?name=Error&background=F8D7DA&color=721C24&size=128&bold=true';">
+                <img loading="lazy" src="${image}" class="w-16 h-16 rounded-md object-contain flex-shrink-0 bg-[var(--color-bg-tertiary)]" onerror="this.src='https://ui-avatars.com/api/?name=Error&background=F8D7DA&color=721C24&size=128&bold=true';">
                 <div class="flex-1 grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
                     <h3 class="md:col-span-2 font-semibold capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3>
-                    <p class="text-[var(--text-secondary)]">₹${item.price || 'N/A'}</p>
+                    <p class="text-[var(--color-text-secondary)]">₹${item.price || 'N/A'}</p>
                     <p class="${statusColor} font-medium">${quantity > 0 ? `${quantity} in Stock` : 'Out of Stock'}</p>
-                    <div class="md:text-right"><button class="view-details-btn text-sm font-bold text-[var(--accent)] hover:underline" data-id="${item.id}">Details</button></div>
+                    <div class="md:text-right"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button></div>
                 </div>`;
             return card;
         }
@@ -835,7 +1013,7 @@
         function createTableView(items) {
             const table = document.createElement('table');
             table.className = 'w-full text-left border-collapse industrial-card';
-            let head = `<thead><tr class="border-b border-[var(--border-color)]">
+            let head = `<thead><tr class="border-b border-[var(--color-border-primary)]">
                 <th class="p-4"></th>
                 <th class="p-4 font-semibold">Component</th>
                 <th class="p-4 font-semibold">Price</th>
@@ -846,14 +1024,14 @@
             let body = '<tbody>';
             items.forEach(item => {
                 const quantity = parseInt(item.quantity) || 0;
-                const statusColor = quantity === 0 ? 'text-[var(--danger)]' : quantity < 5 ? 'text-[var(--warning)]' : 'text-green-500';
+                const statusColor = quantity === 0 ? 'text-[var(--color-status-danger)]' : quantity < 5 ? 'text-[var(--color-status-warning)]' : 'text-[var(--color-status-success)]';
                 const isChecked = comparisonList.has(item.id);
-                body += `<tr class="border-b border-[var(--border-color)] last:border-b-0 hover:bg-[var(--bg-tertiary)]">
+                body += `<tr class="border-b border-[var(--color-border-primary)] last:border-b-0 hover:bg-[var(--color-bg-tertiary)]">
                     <td class="p-4"><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5" ${isChecked ? 'checked' : ''}></td>
                     <td class="p-4 capitalize font-medium">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</td>
-                    <td class="p-4 text-[var(--text-secondary)]">₹${item.price || 'N/A'}</td>
+                    <td class="p-4 text-[var(--color-text-secondary)]">₹${item.price || 'N/A'}</td>
                     <td class="p-4 font-medium ${statusColor}">${quantity}</td>
-                    <td class="p-4"><button class="view-details-btn text-sm font-bold text-[var(--accent)] hover:underline" data-id="${item.id}">Details</button></td>
+                    <td class="p-4"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button></td>
                 </tr>`;
             });
             body += '</tbody>';
@@ -864,9 +1042,9 @@
         function createKanbanView(items) {
             const container = document.createElement('div');
             const columns = {
-                inStock: { title: 'In Stock', items: [], color: 'bg-green-500' },
-                lowStock: { title: 'Low Stock', items: [], color: 'bg-[var(--warning)]' },
-                outOfStock: { title: 'Out of Stock', items: [], color: 'bg-[var(--danger)]' },
+                inStock: { title: 'In Stock', items: [], color: 'var(--color-status-success)' },
+                lowStock: { title: 'Low Stock', items: [], color: 'var(--color-status-warning)' },
+                outOfStock: { title: 'Out of Stock', items: [], color: 'var(--color-status-danger)' },
             };
 
             items.forEach(item => {
@@ -887,20 +1065,20 @@
                             <h4 class="font-bold capitalize pr-2">${[item.model, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h4>
                             <input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5 flex-shrink-0" ${isChecked ? 'checked' : ''}>
                         </div>
-                        <p class="text-sm text-[var(--text-secondary)]">${item.device || ''} ${item.size || ''}</p>
-                        <div class="mt-4 pt-4 border-t border-[var(--border-color)] flex justify-between items-center">
+                        <p class="text-sm text-[var(--color-text-secondary)]">${item.device || ''} ${item.size || ''}</p>
+                        <div class="mt-4 pt-4 border-t border-[var(--color-border-primary)] flex justify-between items-center">
                             <span class="font-semibold">Qty: ${item.quantity}</span>
-                            <button class="view-details-btn text-sm font-bold text-[var(--accent)] hover:underline" data-id="${item.id}">Details</button>
+                            <button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button>
                         </div>
                     </div>`;
                 }).join('');
 
                 colDiv.innerHTML = `
-                    <div class="flex items-center gap-3 pb-2 border-b-4" style="border-color: var(--${key === 'inStock' ? 'success' : key === 'lowStock' ? 'warning' : 'danger'});">
+                    <div class="flex items-center gap-3 pb-2 border-b-4" style="border-color: ${col.color};">
                         <h3 class="text-lg font-black">${col.title}</h3>
-                        <span class="font-bold text-sm bg-[var(--bg-tertiary)] px-2.5 py-0.5 rounded-full">${col.items.length}</span>
+                        <span class="font-bold text-sm bg-[var(--color-bg-tertiary)] px-2.5 py-0.5 rounded-full">${col.items.length}</span>
                     </div>
-                    <div class="flex flex-col gap-4">${cardsHtml || '<p class="text-sm text-center text-[var(--text-secondary)] p-4">No items in this category.</p>'}</div>
+                    <div class="flex flex-col gap-4">${cardsHtml || '<p class="text-sm text-center text-[var(--color-text-secondary)] p-4">No items in this category.</p>'}</div>
                 `;
                 container.appendChild(colDiv);
             }
@@ -912,9 +1090,9 @@
             localStorage.setItem('layout', layout);
             
             ['gridViewBtn', 'listViewBtn', 'tableViewBtn', 'kanbanViewBtn'].forEach(btnId => {
-                dom[btnId].classList.remove('bg-[var(--bg-secondary)]', 'text-[var(--accent)]');
+                dom[btnId].classList.remove('bg-[var(--color-bg-secondary)]', 'text-[var(--color-accent-main)]');
             });
-            dom[layout + 'ViewBtn'].classList.add('bg-[var(--bg-secondary)]', 'text-[var(--accent)]');
+            dom[layout + 'ViewBtn'].classList.add('bg-[var(--color-bg-secondary)]', 'text-[var(--color-accent-main)]');
             
             processAndRenderItems();
         }
@@ -925,7 +1103,9 @@
             dom.noResults.classList.add('hidden');
             if (show) {
                 let skeletonHtml = '';
-                for(let i = 0; i < 12; i++) { skeletonHtml += `<div class="industrial-card p-4 space-y-4"><div class="h-48 rounded bg-[var(--bg-tertiary)]"></div><div class="space-y-2"><div class="h-6 w-3/4 rounded bg-[var(--bg-tertiary)]"></div><div class="h-4 w-1/2 rounded bg-[var(--bg-tertiary)]"></div></div></div>`; }
+                for(let i = 0; i < 12; i++) { 
+                    skeletonHtml += `<div class="industrial-card p-4 space-y-4"><div class="skeleton-item h-48 rounded"></div><div class="space-y-2"><div class="skeleton-item h-6 w-3/4 rounded"></div><div class="skeleton-item h-4 w-1/2 rounded"></div></div></div>`; 
+                }
                 dom.skeletonLoader.innerHTML = `<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 skeleton-breathe">${skeletonHtml}</div>`;
             }
         }
@@ -1071,7 +1251,7 @@
             Object.keys(item).forEach(key => {
                 if (key.startsWith('spec_') && item[key]) {
                     const label = key.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-                    const specRow = `<div class="flex justify-between py-2"><dt class="text-[var(--text-secondary)]">${label}</dt><dd class="font-semibold text-right">${item[key]}</dd></div>`;
+                    const specRow = `<div class="flex justify-between py-2"><dt class="text-[var(--color-text-secondary)]">${label}</dt><dd class="font-semibold text-right">${item[key]}</dd></div>`;
                     if (teethKeys.includes(key)) {
                         teethSpecsHtml += specRow;
                     } else {
@@ -1081,36 +1261,36 @@
             });
 
             dom.detailContent.innerHTML = `
-                <div class="lg:col-span-2 p-6 flex items-center justify-center bg-[var(--bg-primary)] image-gallery" data-images="${images.join(',')}" data-current-index="0">
+                <div class="lg:col-span-2 p-6 flex items-center justify-center bg-[var(--color-bg-primary)] image-gallery" data-images="${images.join(',')}" data-current-index="0">
                     ${images.length > 0 ? `
                         <div class="relative w-full h-full">
                            <img loading="lazy" src="${getDriveThumbnail(images[0])}" class="gallery-image w-full max-h-[75vh] h-full object-contain rounded-lg" onerror="this.src='https://ui-avatars.com/api/?name=No+Image&background=E9ECEF&color=212529&size=512&bold=true';">
                            ${images.length > 1 ? `<button aria-label="Previous image" class="detail-gallery-arrow absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/75 transition-colors" data-direction="-1"><i data-lucide="chevron-left" class="pointer-events-none"></i></button><button aria-label="Next image" class="detail-gallery-arrow absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/75 transition-colors" data-direction="1"><i data-lucide="chevron-right" class="pointer-events-none"></i></button>` : ''}
                         </div>
-                    ` : `<div class="h-full flex items-center justify-center text-[var(--text-secondary)]">No Images</div>`}
+                    ` : `<div class="h-full flex items-center justify-center text-[var(--color-text-secondary)]">No Images</div>`}
                 </div>
-                <div class="lg:col-span-1 p-6 space-y-6 border-l border-[var(--border-color)]">
+                <div class="lg:col-span-1 p-6 space-y-6 border-l border-[var(--color-border-primary)]">
                     <div>
-                        <p class="text-sm font-bold text-[var(--accent)] uppercase">${item.itemName || 'Component'}</p>
+                        <p class="text-sm font-bold text-[var(--color-accent-main)] uppercase">${item.itemName || 'Component'}</p>
                         <h3 class="text-3xl font-black capitalize">${[item.model, item.device, item.size].filter(Boolean).join(' ').toLowerCase()}</h3>
                     </div>
                     
-                    <div class="bg-[var(--bg-tertiary)] p-4 rounded-lg border border-[var(--border-color)]">
+                    <div class="bg-[var(--color-bg-tertiary)] p-4 rounded-lg border border-[var(--color-border-primary)]">
                         <h4 class="text-lg font-bold mb-3">Stock & Ordering</h4>
                         <dl class="space-y-2">
-                           <div class="flex justify-between items-baseline"><dt class="text-[var(--text-secondary)]">Price</dt><dd class="text-2xl font-bold">₹${item.price || 'N/A'}</dd></div>
-                           <div class="flex justify-between items-baseline"><dt class="text-[var(--text-secondary)]">Quantity</dt><dd class="text-2xl font-bold">${item.quantity || '0'}</dd></div>
+                           <div class="flex justify-between items-baseline"><dt class="text-[var(--color-text-secondary)]">Price</dt><dd class="text-2xl font-bold">₹${item.price || 'N/A'}</dd></div>
+                           <div class="flex justify-between items-baseline"><dt class="text-[var(--color-text-secondary)]">Quantity</dt><dd class="text-2xl font-bold">${item.quantity || '0'}</dd></div>
                         </dl>
                         <div class="flex items-center gap-3 mt-4">
-                           <button data-id="${item.id}" class="edit-btn flex-1 btn btn-secondary flex items-center justify-center gap-2"><i data-lucide="edit"></i>Edit</button>
-                           <button data-id="${item.id}" class="delete-btn flex-1 btn btn-danger flex items-center justify-center gap-2"><i data-lucide="trash-2"></i>Delete</button>
+                           <button data-id="${item.id}" class="edit-btn btn btn--secondary flex-1"><i data-lucide="edit"></i>Edit</button>
+                           <button data-id="${item.id}" class="delete-btn btn btn--danger flex-1"><i data-lucide="trash-2"></i>Delete</button>
                         </div>
                     </div>
 
-                    ${teethSpecsHtml ? `<div><h4 class="text-lg font-bold mb-2">Teeth Details</h4><dl class="text-sm divide-y divide-[var(--border-color)] border-y border-[var(--border-color)]">${teethSpecsHtml}</dl></div>` : ''}
-                    ${otherSpecsHtml ? `<div><h4 class="text-lg font-bold mb-2">General Specifications</h4><dl class="text-sm divide-y divide-[var(--border-color)] border-y border-[var(--border-color)]">${otherSpecsHtml}</dl></div>` : ''}
+                    ${teethSpecsHtml ? `<div><h4 class="text-lg font-bold mb-2">Teeth Details</h4><dl class="text-sm divide-y divide-[var(--color-border-primary)] border-y border-[var(--color-border-primary)]">${teethSpecsHtml}</dl></div>` : ''}
+                    ${otherSpecsHtml ? `<div><h4 class="text-lg font-bold mb-2">General Specifications</h4><dl class="text-sm divide-y divide-[var(--color-border-primary)] border-y border-[var(--color-border-primary)]">${otherSpecsHtml}</dl></div>` : ''}
 
-                    ${item.note ? `<div><h4 class="text-lg font-bold mb-2">Notes</h4><p class="text-sm p-3 bg-[var(--bg-tertiary)] rounded border border-[var(--border-color)]">${item.note}</p></div>` : ''}
+                    ${item.note ? `<div><h4 class="text-lg font-bold mb-2">Notes</h4><p class="text-sm p-3 bg-[var(--color-bg-tertiary)] rounded border border-[var(--color-border-primary)]">${item.note}</p></div>` : ''}
                 </div>`;
             lucide.createIcons();
         }
@@ -1155,7 +1335,7 @@
             const lowStockCount = items.filter(item => (parseInt(item.quantity) || 0) < 5 && (parseInt(item.quantity) || 0) > 0).length;
             const lowStockEl = document.getElementById('low-stock');
             lowStockEl.textContent = lowStockCount;
-            lowStockEl.style.color = lowStockCount > 0 ? 'var(--warning)' : 'var(--success)';
+            lowStockEl.style.color = lowStockCount > 0 ? 'var(--color-status-warning)' : 'var(--color-status-success)';
             
             const outOfStockCount = items.filter(item => (parseInt(item.quantity) || 0) === 0).length;
             document.getElementById('out-of-stock').textContent = outOfStockCount;
@@ -1187,9 +1367,9 @@
             const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
             dom.paginationControls.innerHTML = '';
             if (totalPages <= 1) return;
-            let html = `<button data-page="${currentPage - 1}" class="btn btn-secondary" ${currentPage === 1 ? 'disabled' : ''}>&larr; Prev</button>`;
-            html += `<span class="font-semibold text-[var(--text-secondary)]">Page ${currentPage} of ${totalPages}</span>`;
-            html += `<button data-page="${currentPage + 1}" class="btn btn-secondary" ${currentPage === totalPages ? 'disabled' : ''}>Next &rarr;</button>`;
+            let html = `<button data-page="${currentPage - 1}" class="btn btn--secondary" ${currentPage === 1 ? 'disabled' : ''}>&larr; Prev</button>`;
+            html += `<span class="font-semibold text-[var(--color-text-secondary)]">Page ${currentPage} of ${totalPages}</span>`;
+            html += `<button data-page="${currentPage + 1}" class="btn btn--secondary" ${currentPage === totalPages ? 'disabled' : ''}>Next &rarr;</button>`;
             dom.paginationControls.innerHTML = html;
         }
 
@@ -1243,8 +1423,8 @@
         // ================================================================================
         function renderReportCharts() {
             const isDark = dom.html.classList.contains('dark');
-            const textColor = isDark ? '#888888' : '#6C757D';
-            const gridColor = isDark ? '#3A3A3A' : '#DEE2E6';
+            const textColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text-secondary');
+            const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--color-border-primary');
 
             const monthlyRevenue = allSales.reduce((acc, sale) => {
                 const month = new Date(sale.date).toLocaleString('default', { month: 'short', year: 'numeric' });
@@ -1319,15 +1499,15 @@
                 });
             });
 
-            let tableHTML = '<table class="w-full text-left border-collapse"><thead><tr><th class="p-3 font-semibold border-b-2 border-[var(--border-color)]">Feature</th>';
+            let tableHTML = '<table class="w-full text-left border-collapse"><thead><tr><th class="p-3 font-semibold border-b-2 border-[var(--color-border-primary)]">Feature</th>';
             itemsToCompare.forEach(item => {
-                tableHTML += `<th class="p-3 font-semibold border-b-2 border-[var(--border-color)] capitalize">${[item.model, item.itemName].filter(Boolean).join(' ').toLowerCase()}</th>`;
+                tableHTML += `<th class="p-3 font-semibold border-b-2 border-[var(--color-border-primary)] capitalize">${[item.model, item.itemName].filter(Boolean).join(' ').toLowerCase()}</th>`;
             });
             tableHTML += '</tr></thead><tbody>';
 
             allKeys.forEach(key => {
                 const label = key.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-                tableHTML += `<tr class="border-b border-[var(--border-color)] last:border-0"><td class="p-3 font-medium text-[var(--text-secondary)]">${label}</td>`;
+                tableHTML += `<tr class="border-b border-[var(--color-border-primary)] last:border-0"><td class="p-3 font-medium text-[var(--color-text-secondary)]">${label}</td>`;
                 itemsToCompare.forEach(item => {
                     tableHTML += `<td class="p-3">${item[key] || 'N/A'}</td>`;
                 });
@@ -1396,7 +1576,7 @@
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Yes, delete it!',
-                    confirmButtonColor: 'var(--danger)',
+                    confirmButtonColor: 'var(--color-status-danger)',
                     cancelButtonText: 'Cancel'
                 }).then((result) => {
                     if (result.isConfirmed) {
