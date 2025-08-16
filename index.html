@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VINAYAKA INDUSTRIES | Component Database</title>
+    <title>Vinayaka | Component Database</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -616,12 +616,12 @@
         // ================================================================================
         // 1. CONFIGURATION & STATE MANAGEMENT
         // ================================================================================
-        const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
-        const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com';
+        const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw'; // Replace with your API key
+        const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com'; // Replace with your Client ID
         const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
         const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile";
-        const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ'; 
-        const INVENTORY_RANGE = 'Sheet1!A:AC';
+        const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ'; // Replace with your Spreadsheet ID
+        const INVENTORY_RANGE = 'Sheet1!A:ZZ'; // Use a wide range to ensure all columns are read
         const SALES_RANGE = 'SalesLog!A:D';
 
         let allItems = [];
@@ -630,6 +630,7 @@
         let gapiInited = false;
         let gisInited = false;
         let tokenClient;
+        let sheetHeaders = []; // <-- FIX: To store actual headers from the sheet
         let currentLayout = 'grid';
         let currentPage = 1;
         const ITEMS_PER_PAGE = 12;
@@ -694,7 +695,6 @@
             comparisonContent: document.getElementById('comparison-content'),
         };
 
-        const COLUMN_HEADERS = ['id', 'model', 'device', 'size', 'itemName', 'price', 'quantity', 'imageLinks', 'note', 'spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_width', 'spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_splineOd', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'];
         const specDefinitions = { 'Planetary Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeeth'], 'Sun Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd'], 'Ring Gear': ['spec_teeth', 'spec_outerDiameter', 'spec_innerDiameter'], 'Spline/Pinion Shaft': ['spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_length', 'spec_splineOd'], 'Track Motor Shaft': ['spec_length', 'spec_outerDiameter', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'], 'Bearing': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_width'], 'Bushes': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length'], };
         
         // ================================================================================
@@ -761,6 +761,7 @@
                 dom.authSignedOutView.classList.remove('hidden');
                 allItems = [];
                 allSales = [];
+                sheetHeaders = [];
                 localStorage.removeItem('inventoryData');
                 processAndRenderItems();
             }
@@ -771,12 +772,14 @@
             if (cachedData && (Date.now() - cachedData.timestamp < 3600000)) { // 1 hour cache
                 allItems = cachedData.items;
                 allSales = cachedData.sales;
+                sheetHeaders = cachedData.headers;
                 populateFilters();
                 processAndRenderItems();
                 renderReportCharts();
-            } else {
-                showSkeletonLoader(true);
-            }
+                return; // <-- Important: exit if using cache
+            } 
+            
+            showSkeletonLoader(true);
 
             try {
                 const responses = await Promise.all([
@@ -785,11 +788,23 @@
                 ]);
                 
                 const inventoryValues = responses[0].result.values;
-                const freshItems = (inventoryValues && inventoryValues.length > 1) ? inventoryValues.slice(1).map((row, index) => {
-                    const item = (inventoryValues[0] || []).reduce((obj, header, i) => ({...obj, [header]: row[i]}), {});
+                // --- FIX: Check for empty sheet and capture headers ---
+                if (!inventoryValues || inventoryValues.length === 0) {
+                    Swal.fire('Sheet Error', 'The inventory sheet is empty or could not be read.', 'error');
+                    showSkeletonLoader(false);
+                    dom.noResults.classList.remove('hidden');
+                    return;
+                }
+                sheetHeaders = inventoryValues[0]; // <-- The critical fix: store the actual headers
+                
+                const freshItems = inventoryValues.slice(1).map((row, index) => {
+                    const item = sheetHeaders.reduce((obj, header, i) => {
+                        obj[header] = row[i];
+                        return obj;
+                    }, {});
                     item.rowIndex = index + 2;
                     return item;
-                }).filter(item => item.id && item.id.trim() !== '') : [];
+                }).filter(item => item.id && item.id.trim() !== '');
 
                 const salesValues = responses[1].result.values;
                 const freshSales = (salesValues && salesValues.length > 1) ? salesValues.slice(1).map(row => ({
@@ -804,6 +819,7 @@
                 localStorage.setItem('inventoryData', JSON.stringify({
                     items: allItems,
                     sales: allSales,
+                    headers: sheetHeaders, // <-- Store headers in cache
                     timestamp: Date.now()
                 }));
 
@@ -831,7 +847,7 @@
             }
 
             const submitButton = e.currentTarget.querySelector('button[type="submit"]');
-            const originalButtonText = submitButton.innerHTML;
+            const originalButtonHTML = submitButton.innerHTML;
             submitButton.innerHTML = `<svg class="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...`;
             submitButton.disabled = true;
 
@@ -841,7 +857,7 @@
             try {
                 await action(editId);
             } finally {
-                submitButton.innerHTML = originalButtonText;
+                submitButton.innerHTML = originalButtonHTML;
                 submitButton.disabled = false;
             }
         }
@@ -849,9 +865,10 @@
         async function addComponent() {
             const newItem = collectFormData();
             newItem.id = Date.now();
-            const newRow = COLUMN_HEADERS.map(header => newItem[header] || "");
+            // --- FIX: Use dynamic headers to build the row array ---
+            const newRow = sheetHeaders.map(header => newItem[header] || "");
             try {
-                await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SPREADSHEET_ID, range: INVENTORY_RANGE, valueInputOption: 'USER_ENTERED', resource: { values: [newRow] } });
+                await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SPREADSHEET_ID, range: 'Sheet1!A1', valueInputOption: 'USER_ENTERED', resource: { values: [newRow] } });
                 Swal.fire({ title: 'Success!', text: 'Component added successfully.', icon: 'success', timer: 2000, showConfirmButton: false });
                 closeFormModal();
                 localStorage.removeItem('inventoryData');
@@ -868,8 +885,11 @@
             }
             const updatedItem = collectFormData();
             updatedItem.id = id;
-            const updatedRow = COLUMN_HEADERS.map(header => updatedItem[header] || "");
-            const updateRange = `Sheet1!A${itemToUpdate.rowIndex}:AC${itemToUpdate.rowIndex}`;
+            // --- FIX: Use dynamic headers to build the row array ---
+            const updatedRow = sheetHeaders.map(header => updatedItem[header] || "");
+            // --- FIX: Dynamically calculate the update range ---
+            const endColumn = columnToLetter(sheetHeaders.length);
+            const updateRange = `Sheet1!A${itemToUpdate.rowIndex}:${endColumn}${itemToUpdate.rowIndex}`;
             try {
                 await gapi.client.sheets.spreadsheets.values.update({ spreadsheetId: SPREADSHEET_ID, range: updateRange, valueInputOption: 'USER_ENTERED', resource: { values: [updatedRow] }});
                 Swal.fire({ title: 'Success!', text: 'Component updated successfully.', icon: 'success', timer: 2000, showConfirmButton: false });
@@ -1298,6 +1318,18 @@
         // ================================================================================
         // 5. ANALYTICS & HELPERS
         // ================================================================================
+        
+        // --- FIX: Helper function to convert column number to Letter (e.g., 1 -> A, 27 -> AA) ---
+        function columnToLetter(column) {
+            let temp, letter = '';
+            while (column > 0) {
+                temp = (column - 1) % 26;
+                letter = String.fromCharCode(temp + 65) + letter;
+                column = (column - temp - 1) / 26;
+            }
+            return letter;
+        }
+
         function isDuplicate() {
             const form = dom.partForm;
             const model = form.querySelector('#model').value.trim().toLowerCase();
