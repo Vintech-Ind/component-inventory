@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- The 'dark' class is controlled by JS based on user preference -->
+<!-- The 'dark' class and theme are controlled by JS -->
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title> | Component Database</title>
+  <title>Vinayaka Industries | Component Database</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -16,10 +16,11 @@
 
   <style>
     /* ==========================================================================
-       VINAYAKA INDUSTRIES :: COMPONENT DATABASE STYLESHEET
+       VINAYAKA INDUSTRIES :: COMPONENT DATABASE STYLESHEET V2
        ========================================================================== */
     :root {
       --sidebar-width: 260px;
+      --sidebar-width-collapsed: 80px;
       --header-height: 72px;
       --font-family-base: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
       --font-weight-normal: 400;
@@ -28,53 +29,38 @@
       --font-weight-bold: 700;
       --font-weight-black: 800;
 
-      --space-1: 0.25rem;
-      --space-2: 0.5rem;
-      --space-3: 0.75rem;
-      --space-4: 1rem;
-      --space-5: 1.25rem;
-      --space-6: 1.5rem;
-      --space-8: 2rem;
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem;
 
       --border-width: 1px;
-      --radius-sm: 0.25rem;
-      --radius-md: 0.5rem;
-      --radius-lg: 0.75rem;
+      --radius-sm: 0.25rem; --radius-md: 0.5rem; --radius-lg: 0.75rem;
 
-      --transition-speed-fast: 150ms;
-      --transition-speed-normal: 300ms;
+      --transition-speed-fast: 150ms; --transition-speed-normal: 300ms;
       --transition-curve-bounce: cubic-bezier(0.4, 0, 0.2, 1);
       --transition-curve-smooth: ease-in-out;
 
+      /* THEMEABLE COLORS (HSL for easy changes) */
+      --color-accent-h: 45;
+      --color-accent-s: 100%;
+      --color-accent-l: 52%;
+      --color-accent-main: hsl(var(--color-accent-h), var(--color-accent-s), var(--color-accent-l));
+      --color-accent-focus-ring: hsla(var(--color-accent-h), var(--color-accent-s), var(--color-accent-l), 25%);
+
+      /* LIGHT THEME */
       --color-bg-primary: #F8F9FA;
       --color-bg-secondary: #FFFFFF;
       --color-bg-tertiary: #E9ECEF;
-
       --color-text-primary: #212529;
       --color-text-secondary: #6C757D;
       --color-text-on-accent: #212529;
       --color-text-on-danger: #FFFFFF;
-
       --color-border-primary: #DEE2E6;
       --color-border-focus: var(--color-accent-main);
-
-      --color-accent-main: #FFC107;
-      --color-accent-focus-ring: rgb(255 193 7 / 25%);
-
       --color-status-danger: #DC3545;
       --color-status-warning: #FD7E14;
       --color-status-success: #198754;
-
       --shadow-color: 220 23% 10%;
-      --shadow-elevation-low:
-        0.3px 0.5px 0.7px hsl(var(--shadow-color) / 0.11),
-        0.4px 0.8px 1px -1.2px hsl(var(--shadow-color) / 0.11),
-        1px 2px 2.5px -2.5px hsl(var(--shadow-color) / 0.11);
-      --shadow-elevation-medium:
-        0.3px 0.5px 0.7px hsl(var(--shadow-color) / 0.1),
-        0.8px 1.6px 2px -0.8px hsl(var(--shadow-color) / 0.1),
-        2.1px 4.1px 5.2px -1.7px hsl(var(--shadow-color) / 0.1),
-        5px 10px 12.6px -2.5px hsl(var(--shadow-color) / 0.1);
+      --shadow-elevation-low: 0.3px 0.5px 0.7px hsl(var(--shadow-color) / 0.11), 0.4px 0.8px 1px -1.2px hsl(var(--shadow-color) / 0.11), 1px 2px 2.5px -2.5px hsl(var(--shadow-color) / 0.11);
+      --shadow-elevation-medium: 0.3px 0.5px 0.7px hsl(var(--shadow-color) / 0.1), 0.8px 1.6px 2px -0.8px hsl(var(--shadow-color) / 0.1), 2.1px 4.1px 5.2px -1.7px hsl(var(--shadow-color) / 0.1), 5px 10px 12.6px -2.5px hsl(var(--shadow-color) / 0.1);
     }
     html.dark {
       --color-bg-primary: #121212;
@@ -96,32 +82,55 @@
       background-color: var(--color-bg-primary);
       color: var(--color-text-primary);
       line-height: 1.6;
-      transition: background-color var(--transition-speed-normal) var(--transition-curve-smooth),
-                  color var(--transition-speed-normal) var(--transition-curve-smooth);
+      transition: background-color var(--transition-speed-normal) var(--transition-curve-smooth), color var(--transition-speed-normal) var(--transition-curve-smooth);
     }
-
     h1,h2,h3,h4,h5,h6 { font-weight: var(--font-weight-black); line-height: 1.2; }
-    .main-content { padding-left: var(--sidebar-width); transition: padding-left var(--transition-speed-normal) var(--transition-curve-bounce); }
 
-    .sidebar { background-color: var(--color-bg-secondary); border-right: var(--border-width) solid var(--color-border-primary); transition: transform var(--transition-speed-normal) var(--transition-curve-bounce); height: 100vh; }
+    /* NEW: Animated Transitions */
+    .fade-in { animation: fadeIn var(--transition-speed-normal) var(--transition-curve-smooth); }
+    .scale-in { animation: scaleIn var(--transition-speed-normal) var(--transition-curve-bounce); }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+    /* UPDATED: Sidebar & Main Content for Collapse Feature */
+    .main-content { padding-left: var(--sidebar-width); transition: padding-left var(--transition-speed-normal) var(--transition-curve-bounce); }
+    .sidebar { background-color: var(--color-bg-secondary); border-right: var(--border-width) solid var(--color-border-primary); transition: width var(--transition-speed-normal) var(--transition-curve-bounce), transform var(--transition-speed-normal) var(--transition-curve-bounce); height: 100vh; }
+    body.sidebar-collapsed .main-content { padding-left: var(--sidebar-width-collapsed); }
+    body.sidebar-collapsed .sidebar { width: var(--sidebar-width-collapsed); }
+    body.sidebar-collapsed .sidebar-nav-link span,
+    body.sidebar-collapsed .sidebar-header-title,
+    body.sidebar-collapsed .profile-info,
+    body.sidebar-collapsed #sidebar-collapse-btn .collapse-text { display: none; }
+    body.sidebar-collapsed #sidebar-collapse-btn .expand-text { display: inline; }
+    body.sidebar-collapsed .sidebar-header { justify-content: center; }
+    body.sidebar-collapsed .sidebar-nav-link { justify-content: center; }
+    
+    /* UPDATED: Sidebar Navigation Links */
     .sidebar-nav-link { position: relative; transition: background-color var(--transition-speed-fast) var(--transition-curve-smooth), color var(--transition-speed-fast) var(--transition-curve-smooth); }
     .sidebar-nav-link::before { content: ''; position: absolute; left: 0; top: 50%; width: 4px; height: 60%; background-color: var(--color-accent-main); border-radius: 0 4px 4px 0; transform: translateY(-50%) scaleY(0); transition: transform var(--transition-speed-fast) var(--transition-curve-bounce); }
     .sidebar-nav-link:hover:not(.active) { background-color: var(--color-bg-tertiary); }
     .sidebar-nav-link:hover::before { transform: translateY(-50%) scaleY(1); }
     .sidebar-nav-link.active { background-color: var(--color-accent-main); color: var(--color-text-on-accent); font-weight: var(--font-weight-bold); }
     .sidebar-nav-link.active::before { transform: translateY(-50%) scaleY(1); }
+    
+    /* NEW: Collapsible Nav Sections */
+    .nav-section summary { list-style: none; cursor: pointer; }
+    .nav-section summary::-webkit-details-marker { display: none; }
+    .nav-section .chevron { transition: transform var(--transition-speed-fast) var(--transition-curve-smooth); }
+    .nav-section[open] > summary .chevron { transform: rotate(90deg); }
+    body.sidebar-collapsed .nav-section summary .chevron { display: none; }
+    body.sidebar-collapsed .nav-section-content { padding-left: 0; }
+    body.sidebar-collapsed .nav-section[open] .sidebar-nav-link { background-color: var(--color-bg-tertiary); }
 
+
+    /* Industrial Card & Table */
     .industrial-card { background-color: var(--color-bg-secondary); border: var(--border-width) solid var(--color-border-primary); border-radius: var(--radius-md); box-shadow: var(--shadow-elevation-low); transition: transform var(--transition-speed-fast) var(--transition-curve-bounce), box-shadow var(--transition-speed-fast) var(--transition-curve-bounce), border-color var(--transition-speed-fast) var(--transition-curve-smooth); }
     .industrial-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-elevation-medium); border-color: var(--color-accent-main); }
-    
-    .industrial-card th {
-      position: -webkit-sticky; /* Safari */
-      position: sticky;
-      top: 0;
-      background-color: var(--color-bg-secondary);
-      z-index: 10;
-    }
+    .industrial-card th { position: -webkit-sticky; position: sticky; top: 0; background-color: var(--color-bg-secondary); z-index: 10; }
+    .industrial-table tbody tr:nth-child(even) { background-color: var(--color-bg-tertiary); }
+    .industrial-table tbody tr:hover { background-color: color-mix(in srgb, var(--color-accent-main) 15%, transparent); }
 
+    /* Buttons & Inputs */
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); padding: var(--space-3) var(--space-5); border-radius: var(--radius-sm); font-weight: var(--font-weight-bold); text-align: center; border: var(--border-width) solid transparent; cursor: pointer; transition: transform var(--transition-speed-fast) var(--transition-curve-bounce), box-shadow var(--transition-speed-fast) var(--transition-curve-bounce), background-color var(--transition-speed-fast) var(--transition-curve-smooth), border-color var(--transition-speed-fast) var(--transition-curve-smooth); user-select: none; }
     .btn:focus-visible { outline: 2px solid var(--color-accent-main); outline-offset: 2px; }
     .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; box-shadow: none !important; border-bottom-width: 3px !important; }
@@ -132,7 +141,6 @@
     .btn--secondary:hover:not(:disabled) { background-color: var(--color-bg-tertiary); border-color: var(--color-text-primary); }
     .btn--danger { background-color: transparent; color: var(--color-status-danger); border-color: var(--color-status-danger); }
     .btn--danger:hover:not(:disabled) { background-color: var(--color-status-danger); color: var(--color-text-on-danger); }
-
     .filter-control-group { background-color: var(--color-bg-tertiary); border: var(--border-width) solid var(--color-border-primary); border-radius: var(--radius-md); padding: var(--space-1) var(--space-3); transition: border-color var(--transition-speed-fast) var(--transition-curve-smooth), box-shadow var(--transition-speed-fast) var(--transition-curve-smooth); }
     .filter-control-group:focus-within { border-color: var(--color-border-focus); box-shadow: 0 0 0 3px var(--color-accent-focus-ring); }
     .filter-control-group label { font-size: 0.7rem; font-weight: var(--font-weight-semibold); color: var(--color-text-secondary); display: block; }
@@ -140,92 +148,63 @@
     .filter-control-input::placeholder { color: var(--color-text-secondary); opacity: 0.8; }
     .industrial-input { background-color: transparent; border: none; border-bottom: 2px solid var(--color-border-primary); border-radius: 0; padding: var(--space-3) var(--space-1); width: 100%; font-family: inherit; font-size: 1rem; transition: border-color var(--transition-speed-fast) var(--transition-curve-smooth); }
     .industrial-input:focus { outline: none; border-bottom-color: var(--color-border-focus); --tw-ring-color: transparent; }
-
+    
+    /* Misc & Modals */
     .blurred-value { filter: blur(8px); user-select: none; cursor: pointer; transition: filter var(--transition-speed-normal) var(--transition-curve-smooth); }
-
     .swal2-popup { font-family: var(--font-family-base); background-color: var(--color-bg-secondary) !important; color: var(--color-text-primary) !important; border: var(--border-width) solid var(--color-border-primary) !important; border-radius: var(--radius-lg) !important; }
     .swal2-title { color: var(--color-text-primary) !important; }
     .swal2-confirm { background-color: var(--color-accent-main) !important; color: var(--color-text-on-accent) !important; }
     .swal2-deny { background-color: var(--color-status-danger) !important; }
     .swal2-cancel { background-color: var(--color-bg-tertiary) !important; }
-
     @keyframes breathing { 0%,100%{ background-color: var(--color-bg-tertiary);} 50%{ background-color: color-mix(in srgb, var(--color-bg-tertiary) 80%, var(--color-bg-secondary)); } }
     .skeleton-breathe .skeleton-item { animation: breathing 2s var(--transition-curve-bounce) infinite; }
     .skeleton-breathe .skeleton-item:nth-child(2n){ animation-delay: 100ms; }
     .skeleton-breathe .skeleton-item:nth-child(3n){ animation-delay: 200ms; }
+    .edit-mode-banner { background-color: color-mix(in srgb, var(--color-accent-main) 20%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--color-accent-main) 40%, transparent); padding: 0.75rem 1.5rem; font-size: 0.9rem; font-weight: var(--font-weight-semibold); display: flex; align-items: center; gap: 0.5rem; color: var(--color-text-primary); }
 
-    .industrial-table tbody tr:nth-child(even) {
-      background-color: var(--color-bg-tertiary);
-    }
-    .industrial-table tbody tr:hover {
-      background-color: color-mix(in srgb, var(--color-accent-main) 15%, transparent);
-    }
-    .edit-mode-banner {
-      background-color: color-mix(in srgb, var(--color-accent-main) 20%, transparent);
-      border-bottom: 1px solid color-mix(in srgb, var(--color-accent-main) 40%, transparent);
-      padding: 0.75rem 1.5rem;
-      font-size: 0.9rem;
-      font-weight: var(--font-weight-semibold);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--color-text-primary);
-    }
-
-    /* ==========================================================================
-       NEW: RESPONSIVE TABLE STYLES
-       ========================================================================== */
-    @media (max-width: 768px) {
-      .industrial-table thead {
-        display: none; /* Hide table headers on mobile */
-      }
-      .industrial-table tr {
-        display: block; /* Make each row a block element */
-        border: none;
-        border-bottom: 2px solid var(--color-border-primary);
-        margin-bottom: 1rem;
-        padding-bottom: 1rem;
-      }
-      .industrial-table tr:last-child {
-        margin-bottom: 0;
-        border-bottom: none;
-        padding-bottom: 0;
-      }
-      .industrial-table tbody tr:nth-child(even) {
-        background-color: transparent; /* Disable alternating row color */
-      }
-      .industrial-table td {
-        display: flex; /* Use flexbox for alignment */
-        justify-content: space-between; /* Align label and value */
-        align-items: center;
-        text-align: right; /* Align cell content to the right */
-        padding: 0.75rem 0.25rem;
-        border-bottom: 1px solid var(--color-bg-tertiary);
-      }
-       .industrial-table td:last-child {
-        border-bottom: none;
-      }
-      .industrial-table td::before {
-        content: attr(data-label); /* Use data-label for the header text */
-        font-weight: var(--font-weight-bold);
-        text-align: left;
-        margin-right: 1rem;
-        color: var(--color-text-secondary);
-      }
-    }
-
+    /* NEW: Command Palette */
+    #command-palette { transition: opacity var(--transition-speed-fast) var(--transition-curve-smooth), transform var(--transition-speed-fast) var(--transition-curve-smooth); }
+    #command-palette-results .result-item.selected { background-color: var(--color-accent-main); color: var(--color-text-on-accent); }
+    #command-palette-results .result-item.selected .result-item-desc { color: var(--color-text-on-accent); opacity: 0.8; }
+    
+    /* NEW: Notification Center */
+    #notification-center { transition: transform var(--transition-speed-normal) var(--transition-curve-bounce); transform: translateX(100%); }
+    #notification-center.open { transform: translateX(0); }
+    #notification-bell-btn::after { content: ''; position: absolute; top: 0.6rem; right: 0.6rem; width: 8px; height: 8px; border-radius: 99px; background-color: var(--color-status-danger); display: none; }
+    #notification-bell-btn.has-unread::after { display: block; }
+    
+    /* NEW: Profile Dropdown */
+    #profile-dropdown { transition: opacity var(--transition-speed-fast) var(--transition-curve-smooth), transform var(--transition-speed-fast) var(--transition-curve-smooth); }
+    
+    /* NEW: Quick Actions FAB */
+    #quick-actions-fab-container button { transition: all var(--transition-speed-normal) var(--transition-curve-bounce); }
+    #quick-actions-fab-container.open .main-fab { transform: rotate(135deg); }
+    #quick-actions-fab-container.open .action-fab-1 { transform: translateY(-60px) scale(1); opacity: 1; }
+    #quick-actions-fab-container.open .action-fab-2 { transform: translateY(-120px) scale(1); opacity: 1; }
+    
+    /* RESPONSIVE STYLES */
     @media (max-width: 1024px) {
       .main-content { padding-left: 0; }
-      .sidebar { transform: translateX(-100%); box-shadow: 5px 0 15px rgba(0,0,0,0.2); z-index: 50; }
+      .sidebar { transform: translateX(-100%); box-shadow: 5px 0 15px rgba(0,0,0,0.2); z-index: 50; width: var(--sidebar-width) !important; }
       .sidebar.open { transform: translateX(0); }
+      body.sidebar-collapsed .main-content { padding-left: 0; }
       .mobile-backdrop { position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 49; transition: opacity var(--transition-speed-normal) var(--transition-curve-smooth); }
+    }
+    @media (max-width: 768px) {
+      .industrial-table thead { display: none; }
+      .industrial-table tr { display: block; border: none; border-bottom: 2px solid var(--color-border-primary); margin-bottom: 1rem; padding-bottom: 1rem; }
+      .industrial-table tr:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+      .industrial-table tbody tr:nth-child(even) { background-color: transparent; }
+      .industrial-table td { display: flex; justify-content: space-between; align-items: center; text-align: right; padding: 0.75rem 0.25rem; border-bottom: 1px solid var(--color-bg-tertiary); }
+      .industrial-table td:last-child { border-bottom: none; }
+      .industrial-table td::before { content: attr(data-label); font-weight: var(--font-weight-bold); text-align: left; margin-right: 1rem; color: var(--color-text-secondary); }
     }
   </style>
 </head>
 <body class="antialiased">
 
   <!-- Login -->
-  <div id="login-view" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-8 bg-[var(--color-bg-primary)]">
+  <div id="login-view" class="fixed inset-0 z-[100] flex flex-col items-center justify-center p-8 bg-[var(--color-bg-primary)]">
     <div class="text-center">
       <div class="inline-block bg-[var(--color-text-primary)] p-4 rounded-lg mb-6">
         <i data-lucide="gem" class="w-12 h-12 text-[var(--color-bg-primary)]"></i>
@@ -242,55 +221,77 @@
 
     <!-- Sidebar -->
     <aside class="sidebar fixed top-0 left-0 w-[var(--sidebar-width)] flex flex-col">
-      <div class="flex items-center gap-3 p-5 h-[var(--header-height)] border-b border-[var(--color-border-primary)] flex-shrink-0">
+      <div class="sidebar-header flex items-center gap-3 p-5 h-[var(--header-height)] border-b border-[var(--color-border-primary)] flex-shrink-0">
         <div class="bg-[var(--color-accent-main)] p-2.5 rounded-lg flex items-center justify-center">
           <i data-lucide="gem" class="w-6 h-6 text-[var(--color-text-on-accent)]"></i>
         </div>
-        <h1 class="text-xl font-black">Vinayaka DB</h1>
+        <h1 class="sidebar-header-title text-xl font-black">Vinayaka DB</h1>
       </div>
 
-      <nav class="flex-1 px-4 py-6 space-y-2">
+      <!-- NEW: Collapsible Nav -->
+      <nav class="flex-1 px-4 py-6 space-y-1">
         <a href="#" id="nav-dashboard" class="sidebar-nav-link active flex items-center gap-4 px-4 py-3 rounded-lg">
-          <i data-lucide="layout-grid" class="w-5 h-5"></i><span>Dashboard</span>
+          <i data-lucide="layout-grid" class="w-5 h-5"></i><span class="truncate">Dashboard</span>
         </a>
+        <details class="nav-section">
+          <summary class="sidebar-nav-link flex items-center justify-between gap-4 px-4 py-3 text-[var(--color-text-secondary)] rounded-lg font-medium">
+            <div class="flex items-center gap-4"><i data-lucide="archive" class="w-5 h-5"></i><span class="truncate">Inventory</span></div>
+            <i data-lucide="chevron-right" class="chevron w-4 h-4"></i>
+          </summary>
+          <div class="nav-section-content pl-4 pt-1 space-y-1">
+            <a href="#" id="nav-manage" class="sidebar-nav-link flex items-center gap-4 px-4 py-3 text-[var(--color-text-secondary)] rounded-lg font-medium">
+              <i data-lucide="list" class="w-5 h-5"></i><span class="truncate">Manage</span>
+            </a>
+            <a href="#" id="nav-add-new" class="sidebar-nav-link flex items-center gap-4 px-4 py-3 text-[var(--color-text-secondary)] rounded-lg font-medium">
+              <i data-lucide="plus-circle" class="w-5 h-5"></i><span class="truncate">Add New</span>
+            </a>
+          </div>
+        </details>
         <a href="#" id="nav-reports" class="sidebar-nav-link flex items-center gap-4 px-4 py-3 text-[var(--color-text-secondary)] rounded-lg font-medium">
-          <i data-lucide="bar-chart-2" class="w-5 h-5"></i><span>Reports</span>
+          <i data-lucide="bar-chart-2" class="w-5 h-5"></i><span class="truncate">Reports</span>
         </a>
       </nav>
 
-      <div class="p-4 border-t border-[var(--color-border-primary)] flex-shrink-0">
-        <div id="user-profile-area">
+      <!-- Sidebar Footer -->
+      <div class="p-4 border-t border-[var(--color-border-primary)] flex-shrink-0 space-y-2">
+        <!-- NEW: Integration Shortcuts -->
+        <div class="grid grid-cols-3 gap-2">
+            <a href="https://drive.google.com" target="_blank" class="btn btn--secondary !p-2" title="Google Drive"><i data-lucide="folder-symlink"></i></a>
+            <a href="#" class="btn btn--secondary !p-2" title="SAP CPI"><i data-lucide="database"></i></a>
+            <a href="mailto:" class="btn btn--secondary !p-2" title="Email"><i data-lucide="mail"></i></a>
+        </div>
+        <!-- NEW: Profile Dropdown -->
+        <div id="user-profile-area" class="relative">
           <div id="auth-signed-out-view" class="p-2 rounded-lg cursor-pointer group hover:bg-[var(--color-bg-tertiary)] transition-colors">
             <div class="flex items-center gap-3">
               <div class="w-11 h-11 rounded-full bg-[var(--color-bg-tertiary)] flex items-center justify-center border border-dashed border-[var(--color-border-primary)]"><i data-lucide="user-x" class="text-[var(--color-text-secondary)]"></i></div>
-              <div>
-                <p class="font-semibold text-[var(--color-text-secondary)]">Not Signed In</p>
-                <p class="text-xs text-[var(--color-text-secondary)] group-hover:text-[var(--color-accent-main)] transition-colors">Click to sign in</p>
-              </div>
+              <div class="profile-info"><p class="font-semibold text-[var(--color-text-secondary)]">Not Signed In</p><p class="text-xs text-[var(--color-text-secondary)] group-hover:text-[var(--color-accent-main)] transition-colors">Click to sign in</p></div>
             </div>
           </div>
           <div id="auth-signed-in-view" class="hidden">
-            <div class="flex items-center justify-between p-2">
+            <button id="profile-btn" class="w-full p-2 rounded-lg hover:bg-[var(--color-bg-tertiary)] transition-colors">
               <div class="flex items-center gap-3">
                 <img id="user-dp" class="w-11 h-11 rounded-full" src="" alt="User profile picture" onerror="this.onerror=null; this.src='https://placehold.co/44x44/E9ECEF/212529?text=U'">
-                <div>
-                  <p id="user-name" class="font-semibold"></p>
-                  <p class="text-xs text-[var(--color-status-success)] font-medium">Online</p>
-                </div>
+                <div class="profile-info text-left"><p id="user-name" class="font-semibold truncate"></p><p class="text-xs text-[var(--color-status-success)] font-medium">Online</p></div>
               </div>
-              <button id="sign-out-btn" aria-label="Sign out" class="p-2 rounded-full hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] transition-colors">
-                <i data-lucide="log-out" class="w-5 h-5"></i>
-              </button>
+            </button>
+            <div id="profile-dropdown" class="absolute bottom-full mb-2 w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg shadow-lg p-2 origin-bottom scale-95 opacity-0 hidden">
+                <div class="flex items-center justify-between p-2">
+                    <label class="text-sm font-medium text-[var(--color-text-secondary)]">Theme</label>
+                    <button id="theme-toggle" aria-label="Toggle light and dark theme" class="p-2 rounded-full hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] transition-colors"><i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i><i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i></button>
+                </div>
+                <div id="theme-swatches" class="grid grid-cols-5 gap-2 p-2"></div>
+                <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm rounded hover:bg-[var(--color-bg-tertiary)]">Help / Docs</a>
+                <button id="sign-out-btn" class="w-full flex items-center gap-3 px-3 py-2 text-sm rounded hover:bg-[var(--color-bg-tertiary)] text-[var(--color-status-danger)]"><i data-lucide="log-out" class="w-5 h-5"></i>Sign Out</button>
             </div>
           </div>
         </div>
-        <div class="mt-2 flex items-center justify-between p-2">
-          <label for="theme-toggle" class="text-sm font-medium text-[var(--color-text-secondary)]">Theme</label>
-          <button id="theme-toggle" aria-label="Toggle light and dark theme" class="p-2 rounded-full hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] transition-colors">
-            <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
-            <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
-          </button>
-        </div>
+        <!-- NEW: Sidebar Collapse Button -->
+        <button id="sidebar-collapse-btn" class="w-full btn btn--secondary !justify-start">
+            <i data-lucide="chevrons-left" class="collapse-text"></i>
+            <i data-lucide="chevrons-right" class="expand-text hidden"></i>
+            <span class="collapse-text">Collapse</span>
+        </button>
       </div>
     </aside>
 
@@ -302,6 +303,7 @@
           <h2 class="text-2xl font-black" id="page-title">Dashboard</h2>
         </div>
         <div class="flex items-center gap-2 sm:gap-4">
+          <button id="search-shortcut-btn" class="btn btn--secondary hidden sm:flex"><i data-lucide="search"></i><span class="hidden lg:inline">Search...</span><kbd class="hidden lg:inline ml-2 text-xs font-sans bg-white/10 border border-gray-400/20 rounded px-1.5 py-0.5">Ctrl K</kbd></button>
           <div id="layout-switcher" class="flex items-center gap-1 bg-[var(--color-bg-tertiary)] p-1 rounded-lg border border-[var(--color-border-primary)]">
             <button id="grid-view-btn" aria-label="Switch to grid view" class="p-2 rounded-md"><i data-lucide="layout-grid"></i></button>
             <button id="list-view-btn" aria-label="Switch to list view" class="p-2 rounded-md"><i data-lucide="list"></i></button>
@@ -309,85 +311,39 @@
             <button id="kanban-view-btn" aria-label="Switch to kanban view" class="p-2 rounded-md"><i data-lucide="trello"></i></button>
           </div>
           <button id="compare-btn" class="btn btn--secondary hidden">Compare (0)</button>
-          <button id="addPartBtn" class="btn btn--primary" disabled>
-            <i data-lucide="plus" class="w-5 h-5"></i><span class="hidden sm:inline">Add Component</span>
-          </button>
+          <!-- NEW: Notification Bell -->
+          <button id="notification-bell-btn" class="relative p-2 rounded-full hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] transition-colors"><i data-lucide="bell"></i></button>
         </div>
       </header>
 
       <div id="app" class="flex-1 w-full p-6 lg:p-8">
+        <!-- Dashboard View -->
         <div id="dashboard-view">
-          <div class="mb-8">
-            <h2 class="text-2xl font-black mb-4">Analytics Overview</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div class="industrial-card p-6 flex flex-col justify-between">
-                <p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Total Components</p>
-                <p id="total-components" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p>
-              </div>
-              <div class="industrial-card p-6 flex flex-col justify-between">
-                <div class="flex justify-between items-start">
-                  <p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Inventory Value</p>
-                  <button id="value-toggle-btn" aria-label="Toggle inventory value visibility" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"><i data-lucide="eye-off" class="w-5 h-5"></i></button>
+            <div class="mb-8">
+                <h2 class="text-2xl font-black mb-4">Analytics Overview</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Total Components</p><p id="total-components" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p></div>
+                    <div class="industrial-card p-6 flex flex-col justify-between"><div class="flex justify-between items-start"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Inventory Value</p><button id="value-toggle-btn" aria-label="Toggle inventory value visibility" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"><i data-lucide="eye-off" class="w-5 h-5"></i></button></div><p id="total-value" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">₹0</p></div>
+                    <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Low Stock Items</p><p id="low-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p></div>
+                    <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Out of Stock</p><p id="out-of-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2 text-[var(--color-status-danger)]">0</p></div>
                 </div>
-                <p id="total-value" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">₹0</p>
-              </div>
-              <div class="industrial-card p-6 flex flex-col justify-between">
-                <p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Low Stock Items</p>
-                <p id="low-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p>
-              </div>
-              <div class="industrial-card p-6 flex flex-col justify-between">
-                <p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Out of Stock</p>
-                <p id="out-of-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2 text-[var(--color-status-danger)]">0</p>
-              </div>
             </div>
-          </div>
-
-          <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg p-4 mb-8">
-            <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-              <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="lg:col-span-1">
-                  <div class="filter-control-group flex items-center gap-2">
-                    <i data-lucide="search" class="w-5 h-5 text-[var(--color-text-secondary)] flex-shrink-0"></i>
-                    <input type="text" id="search" placeholder="Search components..." class="filter-control-input">
-                  </div>
+            <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg p-4 mb-8">
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                    <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="lg:col-span-1"><div class="filter-control-group flex items-center gap-2"><i data-lucide="search" class="w-5 h-5 text-[var(--color-text-secondary)] flex-shrink-0"></i><input type="text" id="search" placeholder="Search components..." class="filter-control-input"></div></div>
+                        <div><div class="filter-control-group"><label for="filter-device">Device</label><select id="filter-device" class="filter-control-input"><option value="">All Devices</option></select></div></div>
+                        <div><div class="filter-control-group"><label for="filter-size">Size</label><select id="filter-size" class="filter-control-input"><option value="">All Sizes</option></select></div></div>
+                    </div>
+                    <div class="flex-shrink-0"><div class="filter-control-group"><label for="sort-by">Sort By</label><select id="sort-by" class="filter-control-input"><option value="model-asc">Model (A-Z)</option><option value="price-desc">Price (High-Low)</option><option value="quantity-asc">Quantity (Low-High)</option></select></div></div>
                 </div>
-                <div>
-                  <div class="filter-control-group">
-                    <label for="filter-device">Device</label>
-                    <select id="filter-device" class="filter-control-input"><option value="">All Devices</option></select>
-                  </div>
-                </div>
-                <div>
-                  <div class="filter-control-group">
-                    <label for="filter-size">Size</label>
-                    <select id="filter-size" class="filter-control-input"><option value="">All Sizes</option></select>
-                  </div>
-                </div>
-              </div>
-              <div class="flex-shrink-0">
-                <div class="filter-control-group">
-                  <label for="sort-by">Sort By</label>
-                  <select id="sort-by" class="filter-control-input">
-                    <option value="model-asc">Model (A-Z)</option>
-                    <option value="price-desc">Price (High-Low)</option>
-                    <option value="quantity-asc">Quantity (Low-High)</option>
-                  </select>
-                </div>
-              </div>
             </div>
-          </div>
-
-          <div id="skeleton-loader" class="hidden"></div>
-          <div id="searchResults" class="hidden"></div>
-          <div id="no-results" class="hidden text-center py-16 industrial-card">
-            <i data-lucide="search-x" class="w-16 h-16 mx-auto text-[var(--color-text-secondary)]"></i>
-            <h3 class="mt-4 text-2xl font-bold">No Components Found</h3>
-            <p class="mt-2 text-[var(--color-text-secondary)]">Your database is empty or your search returned no results.</p>
-          </div>
-
-          <div id="pagination-controls" class="flex justify-center items-center gap-4 mt-8"></div>
+            <div id="skeleton-loader" class="hidden"></div>
+            <div id="searchResults" class="hidden"></div>
+            <div id="no-results" class="hidden text-center py-16 industrial-card"><i data-lucide="search-x" class="w-16 h-16 mx-auto text-[var(--color-text-secondary)]"></i><h3 class="mt-4 text-2xl font-bold">No Components Found</h3><p class="mt-2 text-[var(--color-text-secondary)]">Your database is empty or your search returned no results.</p></div>
+            <div id="pagination-controls" class="flex justify-center items-center gap-4 mt-8"></div>
         </div>
-
+        <!-- Reports View -->
         <div id="reports-view" class="hidden space-y-8">
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div class="industrial-card p-6"><h3 class="font-semibold mb-4">Monthly Revenue</h3><canvas id="revenue-chart"></canvas></div>
@@ -398,96 +354,71 @@
     </main>
   </div>
 
+  <!-- MODALS & OVERLAYS -->
+  
   <!-- Add/Edit Form Modal -->
   <div id="formModal" role="dialog" aria-modal="true" aria-labelledby="form-title" class="fixed inset-0 z-50 justify-center items-start p-4 overflow-y-auto bg-black/70 hidden">
-    <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg shadow-2xl w-full max-w-4xl my-8 flex flex-col">
-      <div class="flex justify-between items-center p-6 border-b border-[var(--color-border-primary)]">
-        <h2 id="form-title" class="text-2xl font-black">Add New Component</h2>
-        <button type="button" id="closeFormModalBtn" aria-label="Close form" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
-      </div>
-
-      <div id="edit-mode-banner" class="edit-mode-banner hidden">
-        <i data-lucide="pencil" class="w-4 h-4"></i>
-        You are currently editing an existing component.
-      </div>
-
+    <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg shadow-2xl w-full max-w-4xl my-8 flex flex-col scale-in">
+      <div class="flex justify-between items-center p-6 border-b border-[var(--color-border-primary)]"><h2 id="form-title" class="text-2xl font-black">Add New Component</h2><button type="button" id="closeFormModalBtn" aria-label="Close form" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div>
+      <div id="edit-mode-banner" class="edit-mode-banner hidden"><i data-lucide="pencil" class="w-4 h-4"></i>You are currently editing an existing component.</div>
       <form id="partForm" class="p-6 space-y-6 overflow-y-auto">
         <input type="hidden" id="edit-id">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div><label for="model">Model*</label><input type="text" id="model" required class="mt-1 industrial-input"></div>
-          <div>
-            <label for="device">Device</label>
-            <select id="device" class="mt-1 industrial-input">
-              <option value="">(None)</option>
-              <option value="SWING DEVICE">Swing Device</option>
-              <option value="TRAVEL DEVICE">Travel Device</option>
-            </select>
-          </div>
-          <div>
-            <label for="size">Size</label>
-            <select id="size" class="mt-1 industrial-input">
-              <option value="">(None)</option>
-              <option value="SMALL">Small</option>
-              <option value="MIDDLE">Middle</option>
-              <option value="BIG">Big</option>
-            </select>
-          </div>
-          <div>
-            <label for="item-name-main">Item Name*</label>
-            <select id="item-name-main" required class="mt-1 industrial-input">
-              <option value="">Select item type...</option>
-              <option value="Planetary Gear">Planetary Gear</option>
-              <option value="Sun Gear">Sun Gear</option>
-              <option value="Ring Gear">Ring Gear</option>
-              <option value="Spline/Pinion Shaft">Spline/Pinion Shaft</option>
-              <option value="Track Motor Shaft">Track Motor Shaft</option>
-              <option value="Bearing">Bearing</option>
-              <option value="Bushes">Bushes</option>
-            </select>
-          </div>
+          <div><label for="device">Device</label><select id="device" class="mt-1 industrial-input"><option value="">(None)</option><option value="SWING DEVICE">Swing Device</option><option value="TRAVEL DEVICE">Travel Device</option></select></div>
+          <div><label for="size">Size</label><select id="size" class="mt-1 industrial-input"><option value="">(None)</option><option value="SMALL">Small</option><option value="MIDDLE">Middle</option><option value="BIG">Big</option></select></div>
+          <div><label for="item-name-main">Item Name*</label><select id="item-name-main" required class="mt-1 industrial-input"><option value="">Select item type...</option><option value="Planetary Gear">Planetary Gear</option><option value="Sun Gear">Sun Gear</option><option value="Ring Gear">Ring Gear</option><option value="Spline/Pinion Shaft">Spline/Pinion Shaft</option><option value="Track Motor Shaft">Track Motor Shaft</option><option value="Bearing">Bearing</option><option value="Bushes">Bushes</option></select></div>
           <div><label for="price">Price</label><input type="number" id="price" placeholder="e.g., 4500" min="0" step="0.01" class="mt-1 industrial-input"></div>
           <div><label for="quantity">Quantity*</label><input type="number" id="quantity" required value="1" min="0" step="1" class="mt-1 industrial-input"></div>
         </div>
-
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div><label for="image-links-input">Image Links (comma-separated)</label><textarea id="image-links-input" placeholder="Paste one or more comma-separated Google Drive links..." class="industrial-input mt-1" rows="3"></textarea></div>
           <div><label for="note">Note</label><textarea id="note" rows="3" class="mt-1 industrial-input"></textarea></div>
         </div>
-
-        <div id="spec-fields-container" class="hidden">
-          <h3 class="text-lg font-bold border-b border-[var(--color-border-primary)] pb-2 mb-4">Specifications</h3>
-          <div id="spec-fields" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4"></div>
-        </div>
+        <div id="spec-fields-container" class="hidden"><h3 class="text-lg font-bold border-b border-[var(--color-border-primary)] pb-2 mb-4">Specifications</h3><div id="spec-fields" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4"></div></div>
       </form>
-
-      <div class="p-6 border-t border-[var(--color-border-primary)] bg-[var(--color-bg-primary)] flex justify-end gap-3">
-        <button type="button" id="cancelBtn" class="btn btn--secondary">Cancel</button>
-        <button id="save-component-btn" type="submit" form="partForm" class="btn btn--primary">Save Component</button>
-      </div>
+      <div class="p-6 border-t border-[var(--color-border-primary)] bg-[var(--color-bg-primary)] flex justify-end gap-3"><button type="button" id="cancelBtn" class="btn btn--secondary">Cancel</button><button id="save-component-btn" type="submit" form="partForm" class="btn btn--primary">Save Component</button></div>
     </div>
   </div>
 
   <!-- Detail Modal -->
   <div id="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title" class="fixed inset-0 z-50 justify-center items-center p-4 hidden opacity-0 scale-95 transition-all duration-300">
     <div class="fixed inset-0 bg-black/70" id="detail-backdrop"></div>
-    <div class="relative bg-[var(--color-bg-secondary)] w-full max-w-6xl max-h-[90vh] rounded-lg border border-[var(--color-border-primary)] flex flex-col">
-      <div class="flex justify-between items-center p-4 border-b border-[var(--color-border-primary)] flex-shrink-0">
-        <h2 id="detail-title" class="text-xl font-black">Component Datasheet</h2>
-        <button id="detail-close-btn" aria-label="Close details panel" class="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] rounded-full hover:bg-[var(--color-bg-tertiary)]"><i data-lucide="x"></i></button>
-      </div>
-      <div id="detail-content" class="grid lg:grid-cols-3 gap-0 overflow-y-auto"></div>
-    </div>
+    <div class="relative bg-[var(--color-bg-secondary)] w-full max-w-6xl max-h-[90vh] rounded-lg border border-[var(--color-border-primary)] flex flex-col"><div class="flex justify-between items-center p-4 border-b border-[var(--color-border-primary)] flex-shrink-0"><h2 id="detail-title" class="text-xl font-black">Component Datasheet</h2><button id="detail-close-btn" aria-label="Close details panel" class="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] rounded-full hover:bg-[var(--color-bg-tertiary)]"><i data-lucide="x"></i></button></div><div id="detail-content" class="grid lg:grid-cols-3 gap-0 overflow-y-auto"></div></div>
   </div>
 
   <!-- Comparison Modal -->
   <div id="comparison-modal" role="dialog" aria-modal="true" aria-labelledby="comparison-title" class="fixed inset-0 z-50 justify-center items-start p-4 overflow-y-auto bg-black/70 hidden">
-    <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg shadow-2xl w-full max-w-7xl my-8 flex flex-col">
-      <div class="flex justify-between items-center p-6 border-b border-[var(--color-border-primary)]">
-        <h2 id="comparison-title" class="text-2xl font-black">Compare Components</h2>
-        <button type="button" id="closeComparisonModalBtn" aria-label="Close comparison" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
+    <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg shadow-2xl w-full max-w-7xl my-8 flex flex-col scale-in"><div class="flex justify-between items-center p-6 border-b border-[var(--color-border-primary)]"><h2 id="comparison-title" class="text-2xl font-black">Compare Components</h2><button type="button" id="closeComparisonModalBtn" aria-label="Close comparison" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button></div><div id="comparison-content" class="p-6 overflow-x-auto"></div></div>
+  </div>
+
+  <!-- NEW: Command Palette -->
+  <div id="command-palette" role="dialog" aria-modal="true" class="fixed inset-0 z-[60] justify-center items-start p-4 bg-black/70 hidden opacity-0 -translate-y-4">
+    <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg shadow-2xl w-full max-w-2xl mt-[10vh] flex flex-col">
+      <div class="flex items-center gap-4 p-4 border-b border-[var(--color-border-primary)]">
+        <i data-lucide="search" class="w-5 h-5 text-[var(--color-text-secondary)]"></i>
+        <input type="text" id="command-palette-input" placeholder="Search components or run commands..." class="w-full bg-transparent outline-none text-lg">
       </div>
-      <div id="comparison-content" class="p-6 overflow-x-auto"></div>
+      <ul id="command-palette-results" class="p-2 max-h-[50vh] overflow-y-auto"></ul>
     </div>
+  </div>
+
+  <!-- NEW: Notification Center -->
+  <div id="notification-center" class="fixed top-0 right-0 h-full w-full max-w-md bg-[var(--color-bg-secondary)] border-l border-[var(--color-border-primary)] z-[70] shadow-2xl flex flex-col">
+      <div class="flex justify-between items-center p-4 border-b border-[var(--color-border-primary)]">
+          <h2 class="text-xl font-black">Notifications</h2>
+          <button id="notification-close-btn" class="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] rounded-full hover:bg-[var(--color-bg-tertiary)]"><i data-lucide="x"></i></button>
+      </div>
+      <div id="notification-list" class="flex-1 p-4 overflow-y-auto space-y-3"></div>
+  </div>
+  
+  <!-- NEW: Quick Actions FAB -->
+  <div id="quick-actions-fab-container" class="fixed bottom-8 right-8 z-40">
+      <div class="relative">
+          <button title="Add Component" class="action-fab-1 absolute bottom-0 right-0 w-12 h-12 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] shadow-lg flex items-center justify-center scale-0 opacity-0"><i data-lucide="plus-circle"></i></button>
+          <button title="Create Report" class="action-fab-2 absolute bottom-0 right-0 w-12 h-12 rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] shadow-lg flex items-center justify-center scale-0 opacity-0"><i data-lucide="file-text"></i></button>
+          <button id="main-fab" title="Quick Actions" class="main-fab w-16 h-16 rounded-full bg-[var(--color-accent-main)] text-[var(--color-text-on-accent)] shadow-xl flex items-center justify-center"><i data-lucide="plus" class="w-8 h-8"></i></button>
+      </div>
   </div>
 
   <script src="https://apis.google.com/js/api.js"></script>
@@ -496,28 +427,22 @@
       // ================================================================================
       // 1. CONFIGURATION & STATE
       // ================================================================================
-      const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw'; // WARNING: Exposing API keys client-side is a security risk.
+      const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
       const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com';
-      const DISCOVERY_DOCS = [
-        "https://sheets.googleapis.com/$discovery/rest?version=v4",
-        "https://www.googleapis.com/discovery/v1/apis/oauth2/v2/rest"
-      ];
+      const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4", "https://www.googleapis.com/discovery/v1/apis/oauth2/v2/rest"];
       const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile";
-
       const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ';
       const SHEET_NAME = 'Sheet1';
       const SALES_SHEET_NAME = 'SalesLog';
       const AUDIT_SHEET_NAME = 'AuditLog';
       let SHEET_ID = null;
-
       const INVENTORY_RANGE = `${SHEET_NAME}!A:ZZ`;
       const SALES_RANGE = `${SALES_SHEET_NAME}!A:D`;
+      const AUDIT_RANGE = `${AUDIT_SHEET_NAME}!A:E`;
 
-      let allItems = [];
-      let allSales = [];
+      let allItems = [], allSales = [], allNotifications = [];
       let filteredItems = [];
-      let gapiInited = false;
-      let gisInited = false;
+      let gapiInited = false, gisInited = false;
       let tokenClient;
       let sheetHeaders = [];
       let currentUser = {};
@@ -528,12 +453,14 @@
       let isValueVisible = false;
       let searchDebounceTimer;
       let comparisonList = new Set();
+      let commandPaletteSelectedIndex = -1;
 
       const dom = {
         html: document.documentElement,
+        body: document.body,
         appWrapper: document.getElementById('app-wrapper'),
         loginView: document.getElementById('login-view'),
-        addPartBtn: document.getElementById('addPartBtn'),
+        addPartBtn: document.getElementById('nav-add-new'), // Updated
         searchResults: document.getElementById('searchResults'),
         noResults: document.getElementById('no-results'),
         authSignedInView: document.getElementById('auth-signed-in-view'),
@@ -570,6 +497,7 @@
         sortBy: document.getElementById('sort-by'),
         paginationControls: document.getElementById('pagination-controls'),
         navDashboard: document.getElementById('nav-dashboard'),
+        navManage: document.getElementById('nav-manage'),
         navReports: document.getElementById('nav-reports'),
         dashboardView: document.getElementById('dashboard-view'),
         reportsView: document.getElementById('reports-view'),
@@ -583,88 +511,41 @@
         closeComparisonModalBtn: document.getElementById('closeComparisonModalBtn'),
         comparisonContent: document.getElementById('comparison-content'),
         editModeBanner: document.getElementById('edit-mode-banner'),
-        saveBtn: document.getElementById('save-component-btn')
+        saveBtn: document.getElementById('save-component-btn'),
+        // NEW DOM ELEMENTS
+        commandPalette: document.getElementById('command-palette'),
+        commandPaletteInput: document.getElementById('command-palette-input'),
+        commandPaletteResults: document.getElementById('command-palette-results'),
+        searchShortcutBtn: document.getElementById('search-shortcut-btn'),
+        notificationCenter: document.getElementById('notification-center'),
+        notificationBellBtn: document.getElementById('notification-bell-btn'),
+        notificationCloseBtn: document.getElementById('notification-close-btn'),
+        notificationList: document.getElementById('notification-list'),
+        profileBtn: document.getElementById('profile-btn'),
+        profileDropdown: document.getElementById('profile-dropdown'),
+        sidebarCollapseBtn: document.getElementById('sidebar-collapse-btn'),
+        quickActionsFabContainer: document.getElementById('quick-actions-fab-container'),
+        mainFab: document.getElementById('main-fab'),
+        themeSwatches: document.getElementById('theme-swatches'),
       };
 
-      const specDefinitions = {
-        'Planetary Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeeth'],
-        'Sun Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd'],
-        'Ring Gear': ['spec_teeth', 'spec_outerDiameter', 'spec_innerDiameter'],
-        'Spline/Pinion Shaft': ['spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_length', 'spec_splineOd'],
-        'Track Motor Shaft': ['spec_length', 'spec_outerDiameter', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'],
-        'Bearing': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_width'],
-        'Bushes': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length'],
-      };
-
+      const specDefinitions = { 'Planetary Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeeth'], 'Sun Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd'], 'Ring Gear': ['spec_teeth', 'spec_outerDiameter', 'spec_innerDiameter'], 'Spline/Pinion Shaft': ['spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_length', 'spec_splineOd'], 'Track Motor Shaft': ['spec_length', 'spec_outerDiameter', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'], 'Bearing': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_width'], 'Bushes': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length'], };
+      
       // ================================================================================
       // 2. AUTHENTICATION & API
       // ================================================================================
-      async function initializeGapiClient() {
-        await gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS });
-        gapiInited = true;
-        maybeEnableButtons();
-      }
-      function initializeGis() {
-        tokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: CLIENT_ID,
-          scope: SCOPES,
-          callback: handleAuthResponse
-        });
-        gisInited = true;
-        maybeEnableButtons();
-      }
-      function maybeEnableButtons() {
-        if (gapiInited && gisInited) {
-          document.getElementById('auth-signed-out-view').onclick = handleAuthClick;
-          dom.signInButtonMain.onclick = handleAuthClick;
-          dom.signOutBtn.onclick = handleAuthClick;
-          lucide.createIcons();
-        }
-      }
-      function handleAuthResponse(resp) {
-        if (resp.error !== undefined) {
-          Swal.fire({ title: 'Authentication Error', text: 'Could not sign in. Please try again.', icon: 'error' });
-          updateAuthStatus(false);
-          return;
-        }
-        gapi.client.setToken(resp);
-        updateAuthStatus(true);
-      }
-      function handleAuthClick() {
-        if (!gapiInited || !gisInited) {
-          Swal.fire('Loading...', 'Authentication libraries are still loading. Please try again in a moment.', 'info');
-          return;
-        }
-        if (gapi.client.getToken() === null) {
-          tokenClient?.requestAccessToken({ prompt: 'consent' });
-        } else {
-          Swal.fire({ title: 'Sign Out', text: 'Are you sure you want to sign out?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, sign out'})
-            .then((result) => {
-              if (result.isConfirmed) {
-                gapi.client.setToken(null);
-                updateAuthStatus(false);
-              }
-            });
-        }
-      }
-
-      async function getSheetIdByName(title) {
-        const meta = await gapi.client.sheets.spreadsheets.get({
-          spreadsheetId: SPREADSHEET_ID,
-          fields: "sheets.properties(sheetId,title)"
-        });
-        const sheet = meta.result.sheets.find(s => s.properties.title === title);
-        return sheet ? sheet.properties.sheetId : null;
-      }
-
+      async function initializeGapiClient() { await gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS }); gapiInited = true; maybeEnableButtons(); }
+      function initializeGis() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: CLIENT_ID, scope: SCOPES, callback: handleAuthResponse }); gisInited = true; maybeEnableButtons(); }
+      function maybeEnableButtons() { if (gapiInited && gisInited) { document.getElementById('auth-signed-out-view').onclick = handleAuthClick; dom.signInButtonMain.onclick = handleAuthClick; dom.signOutBtn.onclick = handleAuthClick; lucide.createIcons(); } }
+      function handleAuthResponse(resp) { if (resp.error !== undefined) { Swal.fire({ title: 'Authentication Error', text: 'Could not sign in. Please try again.', icon: 'error' }); updateAuthStatus(false); return; } gapi.client.setToken(resp); updateAuthStatus(true); }
+      function handleAuthClick() { if (!gapiInited || !gisInited) { Swal.fire('Loading...', 'Authentication libraries are still loading. Please try again in a moment.', 'info'); return; } if (gapi.client.getToken() === null) { tokenClient?.requestAccessToken({ prompt: 'consent' }); } else { Swal.fire({ title: 'Sign Out', text: 'Are you sure you want to sign out?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, sign out'}).then((result) => { if (result.isConfirmed) { gapi.client.setToken(null); updateAuthStatus(false); } }); } }
+      async function getSheetIdByName(title) { const meta = await gapi.client.sheets.spreadsheets.get({ spreadsheetId: SPREADSHEET_ID, fields: "sheets.properties(sheetId,title)" }); const sheet = meta.result.sheets.find(s => s.properties.title === title); return sheet ? sheet.properties.sheetId : null; }
       async function updateAuthStatus(isSignedIn) {
         if (isSignedIn) {
           dom.loginView.classList.add('hidden');
           dom.appWrapper.classList.remove('hidden');
-          dom.addPartBtn.disabled = false;
           dom.authSignedInView.classList.remove('hidden');
           dom.authSignedOutView.classList.add('hidden');
-
           try {
             const userInfo = await gapi.client.oauth2.userinfo.get();
             dom.userName.textContent = userInfo.result.name || "User";
@@ -680,244 +561,103 @@
         } else {
           dom.loginView.classList.remove('hidden');
           dom.appWrapper.classList.add('hidden');
-          dom.addPartBtn.disabled = true;
           dom.authSignedInView.classList.add('hidden');
           dom.authSignedOutView.classList.remove('hidden');
-          allItems = [];
-          allSales = [];
-          sheetHeaders = [];
-          currentUser = {};
+          allItems = []; allSales = []; sheetHeaders = []; currentUser = {};
           localStorage.removeItem('inventoryData');
           processAndRenderItems();
         }
       }
-
       async function loadAllData() {
         const cached = JSON.parse(localStorage.getItem('inventoryData'));
         if (cached && (Date.now() - cached.timestamp < 3600000)) { // 1 hour cache
-          allItems = cached.items;
-          allSales = cached.sales;
-          sheetHeaders = cached.headers;
-          populateFilters();
-          processAndRenderItems();
-          renderReportCharts();
+          allItems = cached.items; allSales = cached.sales; sheetHeaders = cached.headers; allNotifications = cached.notifications || [];
+          populateFilters(); processAndRenderItems(); renderReportCharts(); renderNotifications();
           return;
         }
-
         showSkeletonLoader(true);
         try {
-          const [invRes, salesRes] = await Promise.all([
+          const [invRes, salesRes, auditRes] = await Promise.all([
             gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: INVENTORY_RANGE }),
-            gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: SALES_RANGE })
+            gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: SALES_RANGE }),
+            gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: AUDIT_RANGE })
           ]);
-
           const inventoryValues = invRes.result.values;
-          if (!inventoryValues || inventoryValues.length === 0) {
-            Swal.fire('Sheet Error', 'The inventory sheet is empty or could not be read.', 'error');
-            showSkeletonLoader(false);
-            dom.noResults.classList.remove('hidden');
-            return;
-          }
+          if (!inventoryValues || inventoryValues.length === 0) { Swal.fire('Sheet Error', 'The inventory sheet is empty or could not be read.', 'error'); showSkeletonLoader(false); dom.noResults.classList.remove('hidden'); return; }
           sheetHeaders = inventoryValues[0];
-
-          const freshItems = inventoryValues.slice(1)
-            .map((row, index) => {
-              const item = sheetHeaders.reduce((obj, header, i) => {
-                obj[header] = row[i];
-                return obj;
-              }, {});
-              item.rowIndex = index + 2;
-              return item;
-            })
-            .filter(item => item.id && item.id.trim() !== '');
-
+          const freshItems = inventoryValues.slice(1).map((row, index) => { const item = sheetHeaders.reduce((obj, header, i) => { obj[header] = row[i]; return obj; }, {}); item.rowIndex = index + 2; return item; }).filter(item => item.id && item.id.trim() !== '');
           const salesValues = salesRes.result.values;
-          const freshSales = (salesValues && salesValues.length > 1)
-            ? salesValues.slice(1).map(row => ({
-                itemId: row[0],
-                quantitySold: parseInt(row[1], 10),
-                salePrice: parseFloat(row[2]),
-                date: row[3]
-              }))
-            : [];
-          
-          allItems = freshItems;
-          allSales = freshSales;
-
-          localStorage.setItem('inventoryData', JSON.stringify({
-            items: allItems,
-            sales: allSales,
-            headers: sheetHeaders,
-            timestamp: Date.now()
-          }));
-        } catch (err) {
-          handleApiError(err, 'Data Loading Error');
-          updateAuthStatus(false);
-        } finally {
-          showSkeletonLoader(false);
-          populateFilters();
-          processAndRenderItems();
-          renderReportCharts();
-        }
+          const freshSales = (salesValues && salesValues.length > 1) ? salesValues.slice(1).map(row => ({ itemId: row[0], quantitySold: parseInt(row[1], 10), salePrice: parseFloat(row[2]), date: row[3] })) : [];
+          const auditValues = auditRes.result.values;
+          const freshNotifications = (auditValues && auditValues.length > 1) ? auditValues.slice(1).map(row => ({ timestamp: row[0], user: row[1], action: row[2], itemId: row[3], details: row[4] })).reverse() : [];
+          allItems = freshItems; allSales = freshSales; allNotifications = freshNotifications;
+          localStorage.setItem('inventoryData', JSON.stringify({ items: allItems, sales: allSales, headers: sheetHeaders, notifications: allNotifications, timestamp: Date.now() }));
+        } catch (err) { handleApiError(err, 'Data Loading Error'); updateAuthStatus(false);
+        } finally { showSkeletonLoader(false); populateFilters(); processAndRenderItems(); renderReportCharts(); renderNotifications(); }
       }
 
       // ================================================================================
       // 3. ADD / UPDATE / DELETE & AUDIT LOG
       // ================================================================================
-      
       async function logAction(action, itemId, details) {
-          if (!gapi.client.getToken()) return;
-
-          const timestamp = new Date().toISOString();
-          const user = currentUser.name || 'Unknown User';
-          const detailsString = JSON.stringify(details);
-
-          const newRow = [timestamp, user, action, itemId, detailsString];
-
-          try {
-              await gapi.client.sheets.spreadsheets.values.append({
-                  spreadsheetId: SPREADSHEET_ID,
-                  range: AUDIT_SHEET_NAME,
-                  valueInputOption: 'USER_ENTERED',
-                  resource: { values: [newRow] }
-              });
-          } catch (err) {
-              console.error("Failed to write to audit log:", err);
-              // Do not show an error to the user, as the primary action succeeded.
-          }
+        if (!gapi.client.getToken()) return;
+        const timestamp = new Date().toISOString();
+        const user = currentUser.name || 'Unknown User';
+        const detailsString = JSON.stringify(details);
+        const newRow = [timestamp, user, action, itemId, detailsString];
+        try {
+          await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SPREADSHEET_ID, range: AUDIT_SHEET_NAME, valueInputOption: 'USER_ENTERED', resource: { values: [newRow] } });
+        } catch (err) { console.error("Failed to write to audit log:", err); }
       }
-
-      /**
-       * UPDATED: Handles form submission with improved validation and feedback.
-       */
       async function handleFormSubmit(e) {
         e.preventDefault();
-        
-        // 1. Submit Button Handling
         const submitButton = dom.saveBtn;
         const originalButtonHTML = submitButton.innerHTML;
         submitButton.innerHTML = `<svg class="animate-spin h-5 w-5 text-black inline-block align-middle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...`;
         submitButton.disabled = true;
-
         try {
-            const formData = collectFormData();
-
-            // 2. Validation
-            if (!formData.model || !formData.itemName || !formData.quantity) {
-                Swal.fire('Validation Error', 'Please fill out all required fields (*).', 'warning');
-                return; // Stop execution
-            }
-            if (parseFloat(formData.price) < 0 || parseInt(formData.quantity, 10) < 0) {
-                Swal.fire('Invalid Input', 'Price and Quantity cannot be negative.', 'warning');
-                return; // Stop execution
-            }
-            if (isDuplicate()) {
-                Swal.fire('Duplicate Component', 'An item with the same model, device, size, and name already exists.', 'warning');
-                return; // Stop execution
-            }
-
-            const editId = dom.editId.value;
-            if (editId) {
-                await updateComponent(editId, formData);
-            } else {
-                await addComponent(formData);
-            }
-        } catch (err) {
-            // 3. Feedback: Centralized error handling for API calls
-            handleApiError(err, editId ? 'Update Error' : 'Save Error');
-        } finally {
-            // 7. Code Cleanliness: Always reset button state
-            submitButton.innerHTML = originalButtonHTML;
-            submitButton.disabled = false;
-        }
+          const formData = collectFormData();
+          if (!formData.model || !formData.itemName || !formData.quantity) { Swal.fire('Validation Error', 'Please fill out all required fields (*).', 'warning'); return; }
+          if (parseFloat(formData.price) < 0 || parseInt(formData.quantity, 10) < 0) { Swal.fire('Invalid Input', 'Price and Quantity cannot be negative.', 'warning'); return; }
+          if (isDuplicate()) { Swal.fire('Duplicate Component', 'An item with the same model, device, size, and name already exists.', 'warning'); return; }
+          const editId = dom.editId.value;
+          if (editId) { await updateComponent(editId, formData); } else { await addComponent(formData); }
+        } catch (err) { handleApiError(err, dom.editId.value ? 'Update Error' : 'Save Error');
+        } finally { submitButton.innerHTML = originalButtonHTML; submitButton.disabled = false; }
       }
-
       async function addComponent(newItemData) {
         newItemData.id = String(Date.now());
         const newRow = sheetHeaders.map(header => newItemData[header] || "");
-        
-        await gapi.client.sheets.spreadsheets.values.append({
-          spreadsheetId: SPREADSHEET_ID,
-          range: SHEET_NAME,
-          valueInputOption: 'USER_ENTERED',
-          resource: { values: [newRow] }
-        });
-
+        await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SPREADSHEET_ID, range: SHEET_NAME, valueInputOption: 'USER_ENTERED', resource: { values: [newRow] } });
         Swal.fire({ title: 'Success!', text: 'Component added successfully.', icon: 'success', timer: 1800, showConfirmButton: false });
         await logAction('CREATE', newItemData.id, newItemData);
-        
-        // 4. Auto-Close Modal
-        closeFormModal();
-        localStorage.removeItem('inventoryData');
-        await loadAllData();
+        closeFormModal(); localStorage.removeItem('inventoryData'); await loadAllData();
       }
-
       async function updateComponent(id, updatedItemData) {
         const itemToUpdate = allItems.find(item => item.id === id);
         if (!itemToUpdate) { throw new Error('Could not find the component to update.'); }
-
         updatedItemData.id = id;
         const updatedRow = sheetHeaders.map(header => updatedItemData[header] || "");
         const endColumn = columnToLetter(sheetHeaders.length);
         const updateRange = `${SHEET_NAME}!A${itemToUpdate.rowIndex}:${endColumn}${itemToUpdate.rowIndex}`;
-
-        await gapi.client.sheets.spreadsheets.values.update({
-          spreadsheetId: SPREADSHEET_ID,
-          range: updateRange,
-          valueInputOption: 'USER_ENTERED',
-          resource: { values: [updatedRow] }
-        });
-        
+        await gapi.client.sheets.spreadsheets.values.update({ spreadsheetId: SPREADSHEET_ID, range: updateRange, valueInputOption: 'USER_ENTERED', resource: { values: [updatedRow] } });
         Swal.fire({ title: 'Success!', text: 'Component updated successfully.', icon: 'success', timer: 1800, showConfirmButton: false });
-        
         const changes = {};
-        Object.keys(updatedItemData).forEach(key => {
-          if (itemToUpdate[key] !== updatedItemData[key]) {
-            changes[key] = { from: itemToUpdate[key] || '', to: updatedItemData[key] };
-          }
-        });
+        Object.keys(updatedItemData).forEach(key => { if (itemToUpdate[key] !== updatedItemData[key]) { changes[key] = { from: itemToUpdate[key] || '', to: updatedItemData[key] }; } });
         await logAction('UPDATE', id, changes);
-
-        // 4. Auto-Close Modal
-        closeFormModal();
-        localStorage.removeItem('inventoryData');
-        await loadAllData();
+        closeFormModal(); localStorage.removeItem('inventoryData'); await loadAllData();
       }
-
       async function deleteComponent(id) {
         const itemToDelete = allItems.find(item => item.id === id);
         if (!itemToDelete) { Swal.fire('Error', 'Could not find the component to delete.', 'error'); return; }
-        if (SHEET_ID == null) {
-          try { SHEET_ID = await getSheetIdByName(SHEET_NAME); } catch {}
-        }
-        if (SHEET_ID == null) {
-          Swal.fire('Delete Error', 'Could not resolve sheetId for deletion.', 'error');
-          return;
-        }
+        if (SHEET_ID == null) { try { SHEET_ID = await getSheetIdByName(SHEET_NAME); } catch {} }
+        if (SHEET_ID == null) { Swal.fire('Delete Error', 'Could not resolve sheetId for deletion.', 'error'); return; }
         try {
-          await gapi.client.sheets.spreadsheets.batchUpdate({
-            spreadsheetId: SPREADSHEET_ID,
-            resource: {
-              requests: [{
-                deleteDimension: {
-                  range: {
-                    sheetId: SHEET_ID,
-                    dimension: 'ROWS',
-                    startIndex: itemToDelete.rowIndex - 1,
-                    endIndex: itemToDelete.rowIndex
-                  }
-                }
-              }]
-            }
-          });
+          await gapi.client.sheets.spreadsheets.batchUpdate({ spreadsheetId: SPREADSHEET_ID, resource: { requests: [{ deleteDimension: { range: { sheetId: SHEET_ID, dimension: 'ROWS', startIndex: itemToDelete.rowIndex - 1, endIndex: itemToDelete.rowIndex } } }] } });
           Swal.fire('Deleted!', 'The component has been deleted.', 'success');
           await logAction('DELETE', id, itemToDelete);
-          closeDetailPanel();
-          localStorage.removeItem('inventoryData');
-          await loadAllData();
-        } catch (err) {
-          handleApiError(err, 'Delete Error');
-        }
+          closeDetailPanel(); localStorage.removeItem('inventoryData'); await loadAllData();
+        } catch (err) { handleApiError(err, 'Delete Error'); }
       }
 
       // ================================================================================
@@ -929,735 +669,249 @@
         const deviceFilter = dom.filterDevice.value;
         const sizeFilter = dom.filterSize.value;
         const sortBy = dom.sortBy.value;
-
-        filteredItems = allItems.filter(item => {
-          const searchMatch = Object.values(item).join(' ').toLowerCase().includes(searchTerm);
-          const deviceMatch = !deviceFilter || item.device === deviceFilter;
-          const sizeMatch = !sizeFilter || item.size === sizeFilter;
-          return searchMatch && deviceMatch && sizeMatch;
-        });
-
-        switch (sortBy) {
-          case 'price-desc': filteredItems.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0)); break;
-          case 'quantity-asc': filteredItems.sort((a, b) => (parseInt(a.quantity) || 0) - (parseInt(b.quantity) || 0)); break;
-          default: filteredItems.sort((a, b) => (a.model || '').localeCompare(b.model || '')); break;
-        }
-
-        updateAnalytics(allItems);
-        renderItems();
+        filteredItems = allItems.filter(item => { const searchMatch = Object.values(item).join(' ').toLowerCase().includes(searchTerm); const deviceMatch = !deviceFilter || item.device === deviceFilter; const sizeMatch = !sizeFilter || item.size === sizeFilter; return searchMatch && deviceMatch && sizeMatch; });
+        switch (sortBy) { case 'price-desc': filteredItems.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0)); break; case 'quantity-asc': filteredItems.sort((a, b) => (parseInt(a.quantity) || 0) - (parseInt(b.quantity) || 0)); break; default: filteredItems.sort((a, b) => (a.model || '').localeCompare(b.model || '')); break; }
+        updateAnalytics(allItems); renderItems();
       }
-
       function renderItems() {
         if (!gapiInited || !gapi.client || (typeof gapi.client.getToken !== 'function')) return;
-
         dom.searchResults.innerHTML = '';
         dom.noResults.classList.toggle('hidden', filteredItems.length > 0 || !gapi.client.getToken());
         dom.searchResults.classList.toggle('hidden', filteredItems.length === 0 && currentLayout !== 'kanban');
-
         const paginatedItems = filteredItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
-
-        if (paginatedItems.length === 0 && currentPage > 1) {
-          currentPage = 1;
-          renderItems();
-          return;
-        }
-
+        if (paginatedItems.length === 0 && currentPage > 1) { currentPage = 1; renderItems(); return; }
         const fragment = document.createDocumentFragment();
         switch (currentLayout) {
-          case 'grid':
-            dom.searchResults.className = 'grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5';
-            paginatedItems.forEach(item => fragment.appendChild(createGridCard(item)));
-            break;
-          case 'list':
-            dom.searchResults.className = 'space-y-3';
-            paginatedItems.forEach(item => fragment.appendChild(createListCard(item)));
-            break;
-          case 'table':
-            dom.searchResults.className = 'w-full overflow-x-auto industrial-card';
-            fragment.appendChild(createTableView(paginatedItems));
-            break;
-          case 'kanban':
-            dom.searchResults.className = 'grid lg:grid-cols-3 gap-6 items-start';
-            fragment.appendChild(createKanbanView(filteredItems));
-            break;
+          case 'grid': dom.searchResults.className = 'grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'; paginatedItems.forEach(item => fragment.appendChild(createGridCard(item))); break;
+          case 'list': dom.searchResults.className = 'space-y-3'; paginatedItems.forEach(item => fragment.appendChild(createListCard(item))); break;
+          case 'table': dom.searchResults.className = 'w-full overflow-x-auto industrial-card'; fragment.appendChild(createTableView(paginatedItems)); break;
+          case 'kanban': dom.searchResults.className = 'grid lg:grid-cols-3 gap-6 items-start'; fragment.appendChild(createKanbanView(filteredItems)); break;
         }
-        dom.searchResults.appendChild(fragment);
-        updatePaginationVisibility();
-        lucide.createIcons();
-        initGalleries();
-        renderPaginationControls();
+        dom.searchResults.appendChild(fragment); updatePaginationVisibility(); lucide.createIcons(); initGalleries(); renderPaginationControls();
       }
-
       function createGridCard(item) {
-        const card = document.createElement('div');
-        card.className = 'industrial-card overflow-hidden flex flex-col group';
+        const card = document.createElement('div'); card.className = 'industrial-card overflow-hidden flex flex-col group';
         const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
         const firstImage = getDriveThumbnail(images[0]) || `https://placehold.co/512x512/E9ECEF/212529?text=${encodeURIComponent(item.itemName || 'N/A')}`;
         const quantity = parseInt(item.quantity) || 0;
         const statusColor = quantity === 0 ? 'bg-[var(--color-status-danger)]' : quantity < 5 ? 'bg-[var(--color-status-warning)]' : 'bg-[var(--color-status-success)]';
         const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
         const isChecked = comparisonList.has(item.id);
-
-        card.innerHTML = `
-          <div class="relative image-gallery bg-[var(--color-bg-tertiary)]" data-images="${images.join(',')}">
-            <img loading="lazy" src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-52 object-contain" onerror="this.src='https://placehold.co/512x512/F8D7DA/721C24?text=Error';">
-            ${images.length > 1 ? `
-              <button aria-label="Previous image" class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="-1"><i data-lucide="chevron-left"></i></button>
-              <button aria-label="Next image" class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
-            <div class="absolute top-2 left-2 flex items-center gap-2 text-xs font-bold px-2 py-1 rounded text-white ${statusColor}">${statusText}</div>
-            <input type="checkbox" data-id="${item.id}" class="compare-checkbox absolute top-2 right-2 h-5 w-5" ${isChecked ? 'checked' : ''}>
-          </div>
-          <div class="p-4 flex-grow flex flex-col">
-            <h3 class="font-bold leading-tight capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3>
-            <p class="text-sm text-[var(--color-text-secondary)] mt-1">Price: <span class="font-semibold text-[var(--color-text-primary)]">₹${item.price || 'N/A'}</span></p>
-            <div class="mt-auto pt-4 text-right">
-              <button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">View Details &rarr;</button>
-            </div>
-          </div>`;
+        card.innerHTML = `<div class="relative image-gallery bg-[var(--color-bg-tertiary)]" data-images="${images.join(',')}"><img loading="lazy" src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-52 object-contain" onerror="this.src='https://placehold.co/512x512/F8D7DA/721C24?text=Error';">${images.length > 1 ? `<button aria-label="Previous image" class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="-1"><i data-lucide="chevron-left"></i></button><button aria-label="Next image" class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}<div class="absolute top-2 left-2 flex items-center gap-2 text-xs font-bold px-2 py-1 rounded text-white ${statusColor}">${statusText}</div><input type="checkbox" data-id="${item.id}" class="compare-checkbox absolute top-2 right-2 h-5 w-5" ${isChecked ? 'checked' : ''}></div><div class="p-4 flex-grow flex flex-col"><h3 class="font-bold leading-tight capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3><p class="text-sm text-[var(--color-text-secondary)] mt-1">Price: <span class="font-semibold text-[var(--color-text-primary)]">₹${item.price || 'N/A'}</span></p><div class="mt-auto pt-4 text-right"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">View Details &rarr;</button></div></div>`;
         return card;
       }
-
       function createListCard(item) {
-        const card = document.createElement('div');
-        card.className = 'industrial-card p-4 flex items-center gap-4';
+        const card = document.createElement('div'); card.className = 'industrial-card p-4 flex items-center gap-4';
         const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://placehold.co/128x128/E9ECEF/212529?text=${encodeURIComponent(item.itemName || 'N/A')}`;
         const quantity = parseInt(item.quantity) || 0;
         const statusColor = quantity === 0 ? 'text-[var(--color-status-danger)]' : quantity < 5 ? 'text-[var(--color-status-warning)]' : 'text-[var(--color-status-success)]';
         const isChecked = comparisonList.has(item.id);
-
-        card.innerHTML = `
-          <input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5 flex-shrink-0" ${isChecked ? 'checked' : ''}>
-          <img loading="lazy" src="${image}" class="w-16 h-16 rounded-md object-contain flex-shrink-0 bg-[var(--color-bg-tertiary)]" onerror="this.src='https://placehold.co/128x128/F8D7DA/721C24?text=Error';">
-          <div class="flex-1 grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
-            <h3 class="md:col-span-2 font-semibold capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3>
-            <p class="text-[var(--color-text-secondary)]">₹${item.price || 'N/A'}</p>
-            <p class="${statusColor} font-medium">${quantity > 0 ? `${quantity} in Stock` : 'Out of Stock'}</p>
-            <div class="md:text-right"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button></div>
-          </div>`;
+        card.innerHTML = `<input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5 flex-shrink-0" ${isChecked ? 'checked' : ''}><img loading="lazy" src="${image}" class="w-16 h-16 rounded-md object-contain flex-shrink-0 bg-[var(--color-bg-tertiary)]" onerror="this.src='https://placehold.co/128x128/F8D7DA/721C24?text=Error';"><div class="flex-1 grid grid-cols-1 md:grid-cols-5 gap-4 items-center"><h3 class="md:col-span-2 font-semibold capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3><p class="text-[var(--color-text-secondary)]">₹${item.price || 'N/A'}</p><p class="${statusColor} font-medium">${quantity > 0 ? `${quantity} in Stock` : 'Out of Stock'}</p><div class="md:text-right"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button></div></div>`;
         return card;
       }
-
-      /**
-       * UPDATED: Creates a table view with data-labels for responsiveness.
-       */
       function createTableView(items) {
-        const table = document.createElement('table');
-        table.className = 'w-full text-left border-collapse industrial-table';
-        const headers = [
-            { key: 'compare', label: ''},
-            { key: 'component', label: 'Component'},
-            { key: 'price', label: 'Price'},
-            { key: 'quantity', label: 'Quantity'},
-            { key: 'actions', label: 'Actions'}
-        ];
-
-        let head = `<thead><tr class="border-b border-[var(--color-border-primary)]">`;
-        headers.forEach(h => {
-            head += `<th class="p-4 font-semibold">${h.label}</th>`;
-        });
-        head += `</tr></thead>`;
-
+        const table = document.createElement('table'); table.className = 'w-full text-left border-collapse industrial-table';
+        const headers = [{ key: 'compare', label: ''}, { key: 'component', label: 'Component'}, { key: 'price', label: 'Price'}, { key: 'quantity', label: 'Quantity'}, { key: 'actions', label: 'Actions'}];
+        let head = `<thead><tr class="border-b border-[var(--color-border-primary)]">`; headers.forEach(h => { head += `<th class="p-4 font-semibold">${h.label}</th>`; }); head += `</tr></thead>`;
         let body = '<tbody>';
-        items.forEach(item => {
-          const quantity = parseInt(item.quantity) || 0;
-          const statusColor = quantity === 0 ? 'text-[var(--color-status-danger)]' : quantity < 5 ? 'text-[var(--color-status-warning)]' : 'text-[var(--color-status-success)]';
-          const isChecked = comparisonList.has(item.id);
-          body += `<tr class="border-b border-[var(--color-border-primary)] last:border-b-0">
-            <td data-label="${headers[0].label}" class="p-4"><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5" ${isChecked ? 'checked' : ''}></td>
-            <td data-label="${headers[1].label}" class="p-4 capitalize font-medium">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</td>
-            <td data-label="${headers[2].label}" class="p-4 text-[var(--color-text-secondary)]">₹${item.price || 'N/A'}</td>
-            <td data-label="${headers[3].label}" class="p-4 font-medium ${statusColor}">${quantity}</td>
-            <td data-label="${headers[4].label}" class="p-4"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button></td>
-          </tr>`;
-        });
-        body += '</tbody>';
-        table.innerHTML = head + body;
-        return table;
+        items.forEach(item => { const quantity = parseInt(item.quantity) || 0; const statusColor = quantity === 0 ? 'text-[var(--color-status-danger)]' : quantity < 5 ? 'text-[var(--color-status-warning)]' : 'text-[var(--color-status-success)]'; const isChecked = comparisonList.has(item.id); body += `<tr class="border-b border-[var(--color-border-primary)] last:border-b-0"><td data-label="${headers[0].label}" class="p-4"><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5" ${isChecked ? 'checked' : ''}></td><td data-label="${headers[1].label}" class="p-4 capitalize font-medium">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</td><td data-label="${headers[2].label}" class="p-4 text-[var(--color-text-secondary)]">₹${item.price || 'N/A'}</td><td data-label="${headers[3].label}" class="p-4 font-medium ${statusColor}">${quantity}</td><td data-label="${headers[4].label}" class="p-4"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button></td></tr>`; });
+        body += '</tbody>'; table.innerHTML = head + body; return table;
       }
-
       function createKanbanView(items) {
         const container = document.createElement('div');
-        const columns = {
-          inStock: { title: 'In Stock', items: [], color: 'var(--color-status-success)' },
-          lowStock: { title: 'Low Stock', items: [], color: 'var(--color-status-warning)' },
-          outOfStock: { title: 'Out of Stock', items: [], color: 'var(--color-status-danger)' },
-        };
-
-        items.forEach(item => {
-          const quantity = parseInt(item.quantity) || 0;
-          if (quantity === 0) columns.outOfStock.items.push(item);
-          else if (quantity < 5) columns.lowStock.items.push(item);
-          else columns.inStock.items.push(item);
-        });
-
-        for (const key in columns) {
-          const col = columns[key];
-          const colDiv = document.createElement('div');
-          colDiv.className = 'flex flex-col gap-4';
-          let cardsHtml = col.items.map(item => {
-            const isChecked = comparisonList.has(item.id);
-            return `<div class="industrial-card p-4">
-              <div class="flex justify-between items-start">
-                <h4 class="font-bold capitalize pr-2">${[item.model, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h4>
-                <input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5 flex-shrink-0" ${isChecked ? 'checked' : ''}>
-              </div>
-              <p class="text-sm text-[var(--color-text-secondary)]">${item.device || ''} ${item.size || ''}</p>
-              <div class="mt-4 pt-4 border-t border-[var(--color-border-primary)] flex justify-between items-center">
-                <span class="font-semibold">Qty: ${item.quantity}</span>
-                <button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button>
-              </div>
-            </div>`;
-          }).join('');
-
-          colDiv.innerHTML = `
-            <div class="flex items-center gap-3 pb-2 border-b-4" style="border-color: ${col.color};">
-              <h3 class="text-lg font-black">${col.title}</h3>
-              <span class="font-bold text-sm bg-[var(--color-bg-tertiary)] px-2.5 py-0.5 rounded-full">${col.items.length}</span>
-            </div>
-            <div class="flex flex-col gap-4">${cardsHtml || '<p class="text-sm text-center text-[var(--color-text-secondary)] p-4">No items in this category.</p>'}</div>
-          `;
-          container.appendChild(colDiv);
-        }
+        const columns = { inStock: { title: 'In Stock', items: [], color: 'var(--color-status-success)' }, lowStock: { title: 'Low Stock', items: [], color: 'var(--color-status-warning)' }, outOfStock: { title: 'Out of Stock', items: [], color: 'var(--color-status-danger)' }, };
+        items.forEach(item => { const quantity = parseInt(item.quantity) || 0; if (quantity === 0) columns.outOfStock.items.push(item); else if (quantity < 5) columns.lowStock.items.push(item); else columns.inStock.items.push(item); });
+        for (const key in columns) { const col = columns[key]; const colDiv = document.createElement('div'); colDiv.className = 'flex flex-col gap-4'; let cardsHtml = col.items.map(item => { const isChecked = comparisonList.has(item.id); return `<div class="industrial-card p-4"><div class="flex justify-between items-start"><h4 class="font-bold capitalize pr-2">${[item.model, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h4><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5 flex-shrink-0" ${isChecked ? 'checked' : ''}></div><p class="text-sm text-[var(--color-text-secondary)]">${item.device || ''} ${item.size || ''}</p><div class="mt-4 pt-4 border-t border-[var(--color-border-primary)] flex justify-between items-center"><span class="font-semibold">Qty: ${item.quantity}</span><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button></div></div>`; }).join(''); colDiv.innerHTML = `<div class="flex items-center gap-3 pb-2 border-b-4" style="border-color: ${col.color};"><h3 class="text-lg font-black">${col.title}</h3><span class="font-bold text-sm bg-[var(--color-bg-tertiary)] px-2.5 py-0.5 rounded-full">${col.items.length}</span></div><div class="flex flex-col gap-4">${cardsHtml || '<p class="text-sm text-center text-[var(--color-text-secondary)] p-4">No items in this category.</p>'}</div>`; container.appendChild(colDiv); }
         return container;
       }
-
       function switchLayout(layout) {
-        currentLayout = layout;
-        localStorage.setItem('layout', layout);
-
-        ['gridViewBtn', 'listViewBtn', 'tableViewBtn', 'kanbanViewBtn'].forEach(btnId => {
-          dom[btnId].classList.remove('bg-[var(--color-bg-secondary)]', 'text-[var(--color-accent-main)]');
-        });
+        currentLayout = layout; localStorage.setItem('layout', layout);
+        ['gridViewBtn', 'listViewBtn', 'tableViewBtn', 'kanbanViewBtn'].forEach(btnId => { dom[btnId].classList.remove('bg-[var(--color-bg-secondary)]', 'text-[var(--color-accent-main)]'); });
         dom[layout + 'ViewBtn'].classList.add('bg-[var(--color-bg-secondary)]', 'text-[var(--color-accent-main)]');
-
         processAndRenderItems();
       }
-
       function showSkeletonLoader(show) {
-        dom.skeletonLoader.classList.toggle('hidden', !show);
-        dom.searchResults.classList.add('hidden');
-        dom.noResults.classList.add('hidden');
-        if (show) {
-          let skeletonHtml = '';
-          for (let i = 0; i < 12; i++) {
-            skeletonHtml += `<div class="industrial-card p-4 space-y-4"><div class="skeleton-item h-48 rounded"></div><div class="space-y-2"><div class="skeleton-item h-6 w-3/4 rounded"></div><div class="skeleton-item h-4 w-1/2 rounded"></div></div></div>`;
-          }
-          dom.skeletonLoader.innerHTML = `<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 skeleton-breathe">${skeletonHtml}</div>`;
-        }
+        dom.skeletonLoader.classList.toggle('hidden', !show); dom.searchResults.classList.add('hidden'); dom.noResults.classList.add('hidden');
+        if (show) { let skeletonHtml = ''; for (let i = 0; i < 12; i++) { skeletonHtml += `<div class="industrial-card p-4 space-y-4"><div class="skeleton-item h-48 rounded"></div><div class="space-y-2"><div class="skeleton-item h-6 w-3/4 rounded"></div><div class="skeleton-item h-4 w-1/2 rounded"></div></div></div>`; } dom.skeletonLoader.innerHTML = `<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 skeleton-breathe">${skeletonHtml}</div>`; }
       }
-
       function initThemeAndLayout() {
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-          dom.html.classList.add('dark');
-        } else {
-          dom.html.classList.remove('dark');
-        }
+        // Theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) { dom.html.classList.add('dark'); } else { dom.html.classList.remove('dark'); }
+        // Accent Color
+        const savedAccent = localStorage.getItem('accentColor');
+        if (savedAccent) { applyTheme(JSON.parse(savedAccent)); }
+        populateThemeSwatches();
+        // Layout
         switchLayout(localStorage.getItem('layout') || 'grid');
+        // Sidebar
+        if (localStorage.getItem('sidebarCollapsed') === 'true') { dom.body.classList.add('sidebar-collapsed'); }
         updateValueVisibility();
       }
-
-      function toggleTheme() {
-        dom.html.classList.toggle('dark');
-        localStorage.setItem('theme', dom.html.classList.contains('dark') ? 'dark' : 'light');
-        if (revenueChart) renderReportCharts();
-      }
-
-      function getDriveThumbnail(url) {
-        if (!url) return null;
-        const match = url.match(/file\/d\/([a-zA-Z0-9_-]+)/);
-        return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w512-h512` : url;
-      }
-
-      function initGalleries() {
-        document.querySelectorAll('.image-gallery').forEach(gallery => {
-          const images = (gallery.dataset.images || '').split(',').map(link => link.trim()).filter(Boolean);
-          if (images.length <= 1) return;
-          let currentIndex = 0;
-          const imgElement = gallery.querySelector('.gallery-image');
-          gallery.querySelectorAll('.gallery-arrow').forEach(arrow => {
-            arrow.addEventListener('click', (e) => {
-              e.stopPropagation();
-              const direction = parseInt(e.currentTarget.dataset.direction);
-              currentIndex = (currentIndex + direction + images.length) % images.length;
-              imgElement.src = getDriveThumbnail(images[currentIndex]);
-            });
-          });
-        });
-      }
+      function toggleTheme() { dom.html.classList.toggle('dark'); localStorage.setItem('theme', dom.html.classList.contains('dark') ? 'dark' : 'light'); if (revenueChart) renderReportCharts(); }
+      function getDriveThumbnail(url) { if (!url) return null; const match = url.match(/file\/d\/([a-zA-Z0-9_-]+)/); return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w512-h512` : url; }
+      function initGalleries() { document.querySelectorAll('.image-gallery').forEach(gallery => { const images = (gallery.dataset.images || '').split(',').map(link => link.trim()).filter(Boolean); if (images.length <= 1) return; let currentIndex = 0; const imgElement = gallery.querySelector('.gallery-image'); gallery.querySelectorAll('.gallery-arrow').forEach(arrow => { arrow.addEventListener('click', (e) => { e.stopPropagation(); const direction = parseInt(e.currentTarget.dataset.direction); currentIndex = (currentIndex + direction + images.length) % images.length; imgElement.src = getDriveThumbnail(images[currentIndex]); }); }); }); }
 
       // ================================================================================
       // 5. MODALS & FORMS
       // ================================================================================
-      function openAddModal() {
-        dom.formTitle.textContent = 'Add New Component';
-        dom.editId.value = '';
-        dom.partForm.reset();
-        dom.specFieldsContainer.classList.add('hidden');
-        dom.specFields.innerHTML = '';
-        dom.editModeBanner.classList.add('hidden');
-        dom.formModal.classList.remove('hidden');
-        dom.formModal.classList.add('flex');
-        trapFocus(dom.formModal);
-      }
-
-      function openEditModal(item) {
-        dom.formTitle.textContent = 'Edit Component';
-        dom.editId.value = item.id;
-        dom.partForm.querySelector('#model').value = item.model || '';
-        dom.partForm.querySelector('#device').value = item.device || '';
-        dom.partForm.querySelector('#size').value = item.size || '';
-        dom.itemNameSelect.value = item.itemName || '';
-        dom.partForm.querySelector('#price').value = item.price || '';
-        dom.partForm.querySelector('#quantity').value = item.quantity || '0';
-        dom.imageLinksInput.value = item.imageLinks || '';
-        dom.partForm.querySelector('#note').value = item.note || '';
-        updateSpecFields();
-        Object.keys(item).forEach(key => {
-          if (key.startsWith('spec_')) {
-            const input = dom.partForm.querySelector(`[name="${key}"]`);
-            if (input) input.value = item[key];
-          }
-        });
-        dom.editModeBanner.classList.remove('hidden');
-        dom.formModal.classList.remove('hidden');
-        dom.formModal.classList.add('flex');
-        trapFocus(dom.formModal);
-      }
-
-      function closeFormModal() {
-        dom.formModal.classList.add('hidden');
-        dom.formModal.classList.remove('flex');
-        dom.partForm.reset();
-        dom.specFieldsContainer.classList.add('hidden');
-        dom.specFields.innerHTML = '';
-      }
-
-      function collectFormData() {
-        const formData = {
-          model: dom.partForm.querySelector('#model').value.trim(),
-          device: dom.partForm.querySelector('#device').value,
-          size: dom.partForm.querySelector('#size').value,
-          itemName: dom.itemNameSelect.value,
-          price: dom.partForm.querySelector('#price').value,
-          quantity: dom.partForm.querySelector('#quantity').value,
-          imageLinks: dom.imageLinksInput.value.trim(),
-          note: dom.partForm.querySelector('#note').value.trim(),
-        };
-        dom.partForm.querySelectorAll('#spec-fields input').forEach(input => { formData[input.name] = input.value.trim(); });
-        return formData;
-      }
-
-      function updateSpecFields() {
-        const selectedType = dom.itemNameSelect.value;
-        dom.specFields.innerHTML = '';
-        if (selectedType && specDefinitions[selectedType]) {
-          dom.specFieldsContainer.classList.remove('hidden');
-          specDefinitions[selectedType].forEach(specName => { dom.specFields.appendChild(createSpecInput(specName)); });
-        } else {
-          dom.specFieldsContainer.classList.add('hidden');
-        }
-      }
-
-      function createSpecInput(specName) {
-        const id = specName.replace(/_/g, '-');
-        const wrapper = document.createElement('div');
-        const labelText = specName.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-        wrapper.innerHTML = `<label for="${id}">${labelText}</label><input type="text" id="${id}" name="${specName}" class="mt-1 industrial-input">`;
-        return wrapper;
-      }
-
-      function openDetailPanel(item) {
-        populateDetailPanel(item);
-        dom.detailModal.classList.remove('hidden');
-        requestAnimationFrame(() => {
-          dom.detailModal.classList.remove('opacity-0', 'scale-95');
-          trapFocus(dom.detailModal);
-        });
-      }
-      function closeDetailPanel() {
-        dom.detailModal.classList.add('opacity-0', 'scale-95');
-        setTimeout(() => { dom.detailModal.classList.add('hidden'); }, 300);
-      }
-
+      function openAddModal() { dom.formTitle.textContent = 'Add New Component'; dom.editId.value = ''; dom.partForm.reset(); dom.specFieldsContainer.classList.add('hidden'); dom.specFields.innerHTML = ''; dom.editModeBanner.classList.add('hidden'); dom.formModal.classList.remove('hidden'); dom.formModal.classList.add('flex'); trapFocus(dom.formModal); }
+      function openEditModal(item) { dom.formTitle.textContent = 'Edit Component'; dom.editId.value = item.id; dom.partForm.querySelector('#model').value = item.model || ''; dom.partForm.querySelector('#device').value = item.device || ''; dom.partForm.querySelector('#size').value = item.size || ''; dom.itemNameSelect.value = item.itemName || ''; dom.partForm.querySelector('#price').value = item.price || ''; dom.partForm.querySelector('#quantity').value = item.quantity || '0'; dom.imageLinksInput.value = item.imageLinks || ''; dom.partForm.querySelector('#note').value = item.note || ''; updateSpecFields(); Object.keys(item).forEach(key => { if (key.startsWith('spec_')) { const input = dom.partForm.querySelector(`[name="${key}"]`); if (input) input.value = item[key]; } }); dom.editModeBanner.classList.remove('hidden'); dom.formModal.classList.remove('hidden'); dom.formModal.classList.add('flex'); trapFocus(dom.formModal); }
+      function closeFormModal() { dom.formModal.classList.add('hidden'); dom.formModal.classList.remove('flex'); dom.partForm.reset(); dom.specFieldsContainer.classList.add('hidden'); dom.specFields.innerHTML = ''; }
+      function collectFormData() { const formData = { model: dom.partForm.querySelector('#model').value.trim(), device: dom.partForm.querySelector('#device').value, size: dom.partForm.querySelector('#size').value, itemName: dom.itemNameSelect.value, price: dom.partForm.querySelector('#price').value, quantity: dom.partForm.querySelector('#quantity').value, imageLinks: dom.imageLinksInput.value.trim(), note: dom.partForm.querySelector('#note').value.trim(), }; dom.partForm.querySelectorAll('#spec-fields input').forEach(input => { formData[input.name] = input.value.trim(); }); return formData; }
+      function updateSpecFields() { const selectedType = dom.itemNameSelect.value; dom.specFields.innerHTML = ''; if (selectedType && specDefinitions[selectedType]) { dom.specFieldsContainer.classList.remove('hidden'); specDefinitions[selectedType].forEach(specName => { dom.specFields.appendChild(createSpecInput(specName)); }); } else { dom.specFieldsContainer.classList.add('hidden'); } }
+      function createSpecInput(specName) { const id = specName.replace(/_/g, '-'); const wrapper = document.createElement('div'); const labelText = specName.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()); wrapper.innerHTML = `<label for="${id}">${labelText}</label><input type="text" id="${id}" name="${specName}" class="mt-1 industrial-input">`; return wrapper; }
+      function openDetailPanel(item) { populateDetailPanel(item); dom.detailModal.classList.remove('hidden'); requestAnimationFrame(() => { dom.detailModal.classList.remove('opacity-0', 'scale-95'); trapFocus(dom.detailModal); }); }
+      function closeDetailPanel() { dom.detailModal.classList.add('opacity-0', 'scale-95'); setTimeout(() => { dom.detailModal.classList.add('hidden'); }, 300); }
       function populateDetailPanel(item) {
-        const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
-
-        let teethSpecsHtml = '';
-        let otherSpecsHtml = '';
-        const teethKeys = ['spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth'];
-
-        Object.keys(item).forEach(key => {
-          if (key.startsWith('spec_') && item[key]) {
-            const label = key.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-            const specRow = `<div class="flex justify-between py-2"><dt class="text-[var(--color-text-secondary)]">${label}</dt><dd class="font-semibold text-right">${item[key]}</dd></div>`;
-            if (teethKeys.includes(key)) teethSpecsHtml += specRow; else otherSpecsHtml += specRow;
-          }
-        });
-
-        dom.detailContent.innerHTML = `
-          <div class="lg:col-span-2 p-6 flex items-center justify-center bg-[var(--color-bg-primary)] image-gallery" data-images="${images.join(',')}" data-current-index="0">
-            ${images.length > 0 ? `
-              <div class="relative w-full h-full">
-                <img loading="lazy" src="${getDriveThumbnail(images[0])}" class="gallery-image w-full max-h-[75vh] h-full object-contain rounded-lg" onerror="this.src='https://placehold.co/512x512/E9ECEF/212529?text=No+Image';">
-                ${images.length > 1 ? `<button aria-label="Previous image" class="detail-gallery-arrow absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/75 transition-colors" data-direction="-1"><i data-lucide="chevron-left" class="pointer-events-none"></i></button><button aria-label="Next image" class="detail-gallery-arrow absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/75 transition-colors" data-direction="1"><i data-lucide="chevron-right" class="pointer-events-none"></i></button>` : ''}
-              </div>
-            ` : `<div class="h-full flex items-center justify-center text-[var(--color-text-secondary)]">No Images</div>`}
-          </div>
-          <div class="lg:col-span-1 p-6 space-y-6 border-l border-[var(--color-border-primary)]">
-            <div>
-              <p class="text-sm font-bold text-[var(--color-accent-main)] uppercase">${item.itemName || 'Component'}</p>
-              <h3 class="text-3xl font-black capitalize">${[item.model, item.device, item.size].filter(Boolean).join(' ').toLowerCase()}</h3>
-            </div>
-
-            <div class="bg-[var(--color-bg-tertiary)] p-4 rounded-lg border border-[var(--color-border-primary)]">
-              <h4 class="text-lg font-bold mb-3">Stock & Ordering</h4>
-              <dl class="space-y-2">
-                <div class="flex justify-between items-baseline"><dt class="text-[var(--color-text-secondary)]">Price</dt><dd class="text-2xl font-bold">₹${item.price || 'N/A'}</dd></div>
-                <div class="flex justify-between items-baseline"><dt class="text-[var(--color-text-secondary)]">Quantity</dt><dd class="text-2xl font-bold">${item.quantity || '0'}</dd></div>
-              </dl>
-              <div class="flex items-center gap-3 mt-4">
-                <button data-id="${item.id}" class="edit-btn btn btn--secondary flex-1"><i data-lucide="edit"></i>Edit</button>
-                <button data-id="${item.id}" class="delete-btn btn btn--danger flex-1"><i data-lucide="trash-2"></i>Delete</button>
-              </div>
-            </div>
-
-            ${teethSpecsHtml ? `<div><h4 class="text-lg font-bold mb-2">Teeth Details</h4><dl class="text-sm divide-y divide-[var(--color-border-primary)] border-y border-[var(--color-border-primary)]">${teethSpecsHtml}</dl></div>` : ''}
-            ${otherSpecsHtml ? `<div><h4 class="text-lg font-bold mb-2">General Specifications</h4><dl class="text-sm divide-y divide-[var(--color-border-primary)] border-y border-[var(--color-border-primary)]">${otherSpecsHtml}</dl></div>` : ''}
-
-            ${item.note ? `<div><h4 class="text-lg font-bold mb-2">Notes</h4><p class="text-sm p-3 bg-[var(--color-bg-tertiary)] rounded border border-[var(--color-border-primary)]">${item.note}</p></div>` : ''}
-          </div>`;
+        const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean); let teethSpecsHtml = ''; let otherSpecsHtml = ''; const teethKeys = ['spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth'];
+        Object.keys(item).forEach(key => { if (key.startsWith('spec_') && item[key]) { const label = key.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()); const specRow = `<div class="flex justify-between py-2"><dt class="text-[var(--color-text-secondary)]">${label}</dt><dd class="font-semibold text-right">${item[key]}</dd></div>`; if (teethKeys.includes(key)) teethSpecsHtml += specRow; else otherSpecsHtml += specRow; } });
+        dom.detailContent.innerHTML = `<div class="lg:col-span-2 p-6 flex items-center justify-center bg-[var(--color-bg-primary)] image-gallery" data-images="${images.join(',')}" data-current-index="0">${images.length > 0 ? `<div class="relative w-full h-full"><img loading="lazy" src="${getDriveThumbnail(images[0])}" class="gallery-image w-full max-h-[75vh] h-full object-contain rounded-lg" onerror="this.src='https://placehold.co/512x512/E9ECEF/212529?text=No+Image';">${images.length > 1 ? `<button aria-label="Previous image" class="detail-gallery-arrow absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/75 transition-colors" data-direction="-1"><i data-lucide="chevron-left" class="pointer-events-none"></i></button><button aria-label="Next image" class="detail-gallery-arrow absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/75 transition-colors" data-direction="1"><i data-lucide="chevron-right" class="pointer-events-none"></i></button>` : ''}</div>` : `<div class="h-full flex items-center justify-center text-[var(--color-text-secondary)]">No Images</div>`}</div><div class="lg:col-span-1 p-6 space-y-6 border-l border-[var(--color-border-primary)]"><div><p class="text-sm font-bold text-[var(--color-accent-main)] uppercase">${item.itemName || 'Component'}</p><h3 class="text-3xl font-black capitalize">${[item.model, item.device, item.size].filter(Boolean).join(' ').toLowerCase()}</h3></div><div class="bg-[var(--color-bg-tertiary)] p-4 rounded-lg border border-[var(--color-border-primary)]"><h4 class="text-lg font-bold mb-3">Stock & Ordering</h4><dl class="space-y-2"><div class="flex justify-between items-baseline"><dt class="text-[var(--color-text-secondary)]">Price</dt><dd class="text-2xl font-bold">₹${item.price || 'N/A'}</dd></div><div class="flex justify-between items-baseline"><dt class="text-[var(--color-text-secondary)]">Quantity</dt><dd class="text-2xl font-bold">${item.quantity || '0'}</dd></div></dl><div class="flex items-center gap-3 mt-4"><button data-id="${item.id}" class="edit-btn btn btn--secondary flex-1"><i data-lucide="edit"></i>Edit</button><button data-id="${item.id}" class="delete-btn btn btn--danger flex-1"><i data-lucide="trash-2"></i>Delete</button></div></div>${teethSpecsHtml ? `<div><h4 class="text-lg font-bold mb-2">Teeth Details</h4><dl class="text-sm divide-y divide-[var(--color-border-primary)] border-y border-[var(--color-border-primary)]">${teethSpecsHtml}</dl></div>` : ''}${otherSpecsHtml ? `<div><h4 class="text-lg font-bold mb-2">General Specifications</h4><dl class="text-sm divide-y divide-[var(--color-border-primary)] border-y border-[var(--color-border-primary)]">${otherSpecsHtml}</dl></div>` : ''}${item.note ? `<div><h4 class="text-lg font-bold mb-2">Notes</h4><p class="text-sm p-3 bg-[var(--color-bg-tertiary)] rounded border border-[var(--color-border-primary)]">${item.note}</p></div>` : ''}</div>`;
         lucide.createIcons();
       }
 
       // ================================================================================
       // 6. ANALYTICS & HELPERS
       // ================================================================================
-      function handleApiError(err, contextTitle) {
-          let userMessage = 'An unexpected error occurred. Please check your connection and try again.';
-          const error = err.result?.error;
-          
-          console.error(`API Error in ${contextTitle}:`, err);
-
-          if (error) {
-              if (error.code === 403 || error.status === 'PERMISSION_DENIED') {
-                  userMessage = 'You do not have permission to perform this action. Please check your Google Sheet permissions.';
-              } else if (error.code === 400) {
-                  userMessage = 'The data sent was invalid. Please check the form fields and try again.';
-              } else if (error.code === 404) {
-                  userMessage = 'Could not find the requested data. The spreadsheet or sheet may have been moved or deleted.';
-              }
-          }
-          Swal.fire({ title: contextTitle, text: userMessage, icon: 'error' });
-      }
-
-      function columnToLetter(column) {
-        let temp, letter = '';
-        while (column > 0) {
-          temp = (column - 1) % 26;
-          letter = String.fromCharCode(temp + 65) + letter;
-          column = (column - temp - 1) / 26;
-        }
-        return letter;
-      }
-
-      function isDuplicate() {
-        const form = dom.partForm;
-        const model = form.querySelector('#model').value.trim().toLowerCase();
-        const device = form.querySelector('#device').value.trim().toLowerCase();
-        const size = form.querySelector('#size').value.trim().toLowerCase();
-        const itemName = form.querySelector('#item-name-main').value.trim().toLowerCase();
-        const editId = form.querySelector('#edit-id').value;
-
-        return allItems.some(item => {
-          if (item.id === editId) return false;
-          return (item.model || '').trim().toLowerCase() === model &&
-                 (item.device || '').trim().toLowerCase() === device &&
-                 (item.size || '').trim().toLowerCase() === size &&
-                 (item.itemName || '').trim().toLowerCase() === itemName;
-        });
-      }
-
-      function populateFilters() {
-        const devices = [...new Set(allItems.map(item => item.device).filter(Boolean))];
-        const sizes = [...new Set(allItems.map(item => item.size).filter(Boolean))];
-        dom.filterDevice.innerHTML = '<option value="">All Devices</option>';
-        devices.forEach(d => dom.filterDevice.innerHTML += `<option value="${d}">${d}</option>`);
-        dom.filterSize.innerHTML = '<option value="">All Sizes</option>';
-        sizes.forEach(s => dom.filterSize.innerHTML += `<option value="${s}">${s}</option>`);
-      }
-
-      function updateAnalytics(items) {
-        document.getElementById('total-components').textContent = items.length;
-        const totalValue = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0), 0);
-        localStorage.setItem('inventoryTotalValue', totalValue);
-        updateValueVisibility();
-
-        const lowStockCount = items.filter(item => (parseInt(item.quantity) || 0) < 5 && (parseInt(item.quantity) || 0) > 0).length;
-        const lowStockEl = document.getElementById('low-stock');
-        lowStockEl.textContent = lowStockCount;
-        lowStockEl.style.color = lowStockCount > 0 ? 'var(--color-status-warning)' : 'var(--color-status-success)';
-
-        const outOfStockCount = items.filter(item => (parseInt(item.quantity) || 0) === 0).length;
-        document.getElementById('out-of-stock').textContent = outOfStockCount;
-      }
-
-      function toggleValueVisibility() {
-        isValueVisible = !isValueVisible;
-        updateValueVisibility();
-      }
-      function updateValueVisibility() {
-        const totalValue = parseFloat(localStorage.getItem('inventoryTotalValue') || '0');
-        dom.totalValue.textContent = `₹${totalValue.toLocaleString('en-IN')}`;
-        if (isValueVisible) {
-          dom.totalValue.classList.remove('blurred-value');
-          dom.valueToggleBtn.innerHTML = `<i data-lucide="eye" class="w-5 h-5"></i>`;
-        } else {
-          dom.totalValue.classList.add('blurred-value');
-          dom.valueToggleBtn.innerHTML = `<i data-lucide="eye-off" class="w-5 h-5"></i>`;
-        }
-        lucide.createIcons();
-      }
-
-      function updatePaginationVisibility() {
-        dom.paginationControls.style.display = currentLayout === 'kanban' ? 'none' : 'flex';
-      }
-      function renderPaginationControls() {
-        const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
-        dom.paginationControls.innerHTML = '';
-        if (totalPages <= 1) return;
-        let html = `<button data-page="${currentPage - 1}" class="btn btn--secondary" ${currentPage === 1 ? 'disabled' : ''}>&larr; Prev</button>`;
-        html += `<span class="font-semibold text-[var(--color-text-secondary)]">Page ${currentPage} of ${totalPages}</span>`;
-        html += `<button data-page="${currentPage + 1}" class="btn btn--secondary" ${currentPage === totalPages ? 'disabled' : ''}>Next &rarr;</button>`;
-        dom.paginationControls.innerHTML = html;
-      }
-
+      function handleApiError(err, contextTitle) { let userMessage = 'An unexpected error occurred. Please check your connection and try again.'; const error = err.result?.error; console.error(`API Error in ${contextTitle}:`, err); if (error) { if (error.code === 403 || error.status === 'PERMISSION_DENIED') { userMessage = 'You do not have permission to perform this action. Please check your Google Sheet permissions.'; } else if (error.code === 400) { userMessage = 'The data sent was invalid. Please check the form fields and try again.'; } else if (error.code === 404) { userMessage = 'Could not find the requested data. The spreadsheet or sheet may have been moved or deleted.'; } } Swal.fire({ title: contextTitle, text: userMessage, icon: 'error' }); }
+      function columnToLetter(column) { let temp, letter = ''; while (column > 0) { temp = (column - 1) % 26; letter = String.fromCharCode(temp + 65) + letter; column = (column - temp - 1) / 26; } return letter; }
+      function isDuplicate() { const form = dom.partForm; const model = form.querySelector('#model').value.trim().toLowerCase(); const device = form.querySelector('#device').value.trim().toLowerCase(); const size = form.querySelector('#size').value.trim().toLowerCase(); const itemName = form.querySelector('#item-name-main').value.trim().toLowerCase(); const editId = form.querySelector('#edit-id').value; return allItems.some(item => { if (item.id === editId) return false; return (item.model || '').trim().toLowerCase() === model && (item.device || '').trim().toLowerCase() === device && (item.size || '').trim().toLowerCase() === size && (item.itemName || '').trim().toLowerCase() === itemName; }); }
+      function populateFilters() { const devices = [...new Set(allItems.map(item => item.device).filter(Boolean))]; const sizes = [...new Set(allItems.map(item => item.size).filter(Boolean))]; dom.filterDevice.innerHTML = '<option value="">All Devices</option>'; devices.forEach(d => dom.filterDevice.innerHTML += `<option value="${d}">${d}</option>`); dom.filterSize.innerHTML = '<option value="">All Sizes</option>'; sizes.forEach(s => dom.filterSize.innerHTML += `<option value="${s}">${s}</option>`); }
+      function updateAnalytics(items) { document.getElementById('total-components').textContent = items.length; const totalValue = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0), 0); localStorage.setItem('inventoryTotalValue', totalValue); updateValueVisibility(); const lowStockCount = items.filter(item => (parseInt(item.quantity) || 0) < 5 && (parseInt(item.quantity) || 0) > 0).length; const lowStockEl = document.getElementById('low-stock'); lowStockEl.textContent = lowStockCount; lowStockEl.style.color = lowStockCount > 0 ? 'var(--color-status-warning)' : 'var(--color-status-success)'; const outOfStockCount = items.filter(item => (parseInt(item.quantity) || 0) === 0).length; document.getElementById('out-of-stock').textContent = outOfStockCount; }
+      function toggleValueVisibility() { isValueVisible = !isValueVisible; updateValueVisibility(); }
+      function updateValueVisibility() { const totalValue = parseFloat(localStorage.getItem('inventoryTotalValue') || '0'); dom.totalValue.textContent = `₹${totalValue.toLocaleString('en-IN')}`; if (isValueVisible) { dom.totalValue.classList.remove('blurred-value'); dom.valueToggleBtn.innerHTML = `<i data-lucide="eye" class="w-5 h-5"></i>`; } else { dom.totalValue.classList.add('blurred-value'); dom.valueToggleBtn.innerHTML = `<i data-lucide="eye-off" class="w-5 h-5"></i>`; } lucide.createIcons(); }
+      function updatePaginationVisibility() { dom.paginationControls.style.display = currentLayout === 'kanban' ? 'none' : 'flex'; }
+      function renderPaginationControls() { const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE); dom.paginationControls.innerHTML = ''; if (totalPages <= 1) return; let html = `<button data-page="${currentPage - 1}" class="btn btn--secondary" ${currentPage === 1 ? 'disabled' : ''}>&larr; Prev</button>`; html += `<span class="font-semibold text-[var(--color-text-secondary)]">Page ${currentPage} of ${totalPages}</span>`; html += `<button data-page="${currentPage + 1}" class="btn btn--secondary" ${currentPage === totalPages ? 'disabled' : ''}>Next &rarr;</button>`; dom.paginationControls.innerHTML = html; }
       function switchView(view) {
         document.querySelectorAll('.sidebar-nav-link').forEach(l => l.classList.remove('active'));
-        if (view === 'dashboard') {
-          dom.navDashboard.classList.add('active');
-          dom.dashboardView.classList.remove('hidden');
-          dom.reportsView.classList.add('hidden');
-          dom.layoutSwitcher.classList.remove('hidden');
-          dom.pageTitle.textContent = "Dashboard";
+        dom.dashboardView.classList.add('hidden');
+        dom.reportsView.classList.add('hidden');
+        dom.layoutSwitcher.classList.add('hidden');
+        if (view === 'dashboard' || view === 'manage') {
+            dom.navDashboard.classList.add('active');
+            dom.dashboardView.classList.remove('hidden');
+            dom.layoutSwitcher.classList.remove('hidden');
+            dom.pageTitle.textContent = "Dashboard";
         } else if (view === 'reports') {
-          dom.navReports.classList.add('active');
-          dom.dashboardView.classList.add('hidden');
-          dom.reportsView.classList.remove('hidden');
-          dom.layoutSwitcher.classList.add('hidden');
-          dom.pageTitle.textContent = "Reports";
+            dom.navReports.classList.add('active');
+            dom.reportsView.classList.remove('hidden');
+            dom.pageTitle.textContent = "Reports";
         }
       }
-
-      function toggleMobileSidebar() {
-        const isOpen = dom.sidebar.classList.toggle('open');
-        dom.mobileBackdrop.classList.toggle('hidden', !isOpen);
-      }
-
-      function trapFocus(element) {
-        const focusableEls = element.querySelectorAll('a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="number"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])');
-        const firstFocusableEl = focusableEls[0];
-        const lastFocusableEl = focusableEls[focusableEls.length - 1];
-        const KEYCODE_TAB = 9;
-
-        element.addEventListener('keydown', function(e) {
-          if (e.key !== 'Tab' && e.keyCode !== KEYCODE_TAB) return;
-          if (e.shiftKey) {
-            if (document.activeElement === firstFocusableEl) {
-              lastFocusableEl.focus();
-              e.preventDefault();
-            }
-          } else {
-            if (document.activeElement === lastFocusableEl) {
-              firstFocusableEl.focus();
-              e.preventDefault();
-            }
-          }
-        });
-        if (firstFocusableEl) firstFocusableEl.focus();
-      }
+      function toggleMobileSidebar() { const isOpen = dom.sidebar.classList.toggle('open'); dom.mobileBackdrop.classList.toggle('hidden', !isOpen); }
+      function trapFocus(element) { const focusableEls = element.querySelectorAll('a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="number"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])'); const firstFocusableEl = focusableEls[0]; const lastFocusableEl = focusableEls[focusableEls.length - 1]; const KEYCODE_TAB = 9; element.addEventListener('keydown', function(e) { if (e.key !== 'Tab' && e.keyCode !== KEYCODE_TAB) return; if (e.shiftKey) { if (document.activeElement === firstFocusableEl) { lastFocusableEl.focus(); e.preventDefault(); } } else { if (document.activeElement === lastFocusableEl) { firstFocusableEl.focus(); e.preventDefault(); } } }); if (firstFocusableEl) firstFocusableEl.focus(); }
 
       // ================================================================================
       // 7. CHARTS
       // ================================================================================
-      function renderReportCharts() {
-        const textColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text-secondary');
-        const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--color-border-primary');
-
-        const monthlyRevenue = allSales.reduce((acc, sale) => {
-          const month = new Date(sale.date).toLocaleString('default', { month: 'short', year: 'numeric' });
-          const revenue = sale.quantitySold * sale.salePrice;
-          acc[month] = (acc[month] || 0) + revenue;
-          return acc;
-        }, {});
-
-        const bestSellers = allSales.reduce((acc, sale) => {
-          const item = allItems.find(i => i.id === sale.itemId);
-          if (item) {
-            const itemName = [item.model, item.itemName].filter(Boolean).join(' ');
-            acc[itemName] = (acc[itemName] || 0) + sale.quantitySold;
-          }
-          return acc;
-        }, {});
-        const sortedBestSellers = Object.entries(bestSellers).sort((a, b) => b[1] - a[1]).slice(0, 5);
-
-        const chartOptions = {
-          plugins: { legend: { labels: { color: textColor } } },
-          scales: {
-            x: { ticks: { color: textColor }, grid: { color: gridColor } },
-            y: { ticks: { color: textColor }, grid: { color: gridColor } }
-          }
-        };
-
-        if (revenueChart) revenueChart.destroy();
-        revenueChart = new Chart(document.getElementById('revenue-chart'), {
-          type: 'bar',
-          data: { labels: Object.keys(monthlyRevenue), datasets: [{ label: 'Monthly Revenue', data: Object.values(monthlyRevenue), backgroundColor: 'rgba(255, 193, 7, 0.5)', borderColor: 'rgb(255, 193, 7)', borderWidth: 1 }] },
-          options: chartOptions
-        });
-
-        if (bestsellersChart) bestsellersChart.destroy();
-        bestsellersChart = new Chart(document.getElementById('bestsellers-chart'), {
-          type: 'doughnut',
-          data: { labels: sortedBestSellers.map(item => item[0]), datasets: [{ label: 'Quantity Sold', data: sortedBestSellers.map(item => item[1]), backgroundColor: ['#FFC107', '#FFCA28', '#FFD54F', '#FFE082', '#FFECB3'], borderColor: getComputedStyle(document.documentElement).getPropertyValue('--color-bg-secondary').trim() || '#FFFFFF' }] },
-          options: { plugins: { legend: { position: 'right', labels: { color: textColor } } } }
-        });
-      }
+      function renderReportCharts() { const textColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text-secondary'); const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--color-border-primary'); const monthlyRevenue = allSales.reduce((acc, sale) => { const month = new Date(sale.date).toLocaleString('default', { month: 'short', year: 'numeric' }); const revenue = sale.quantitySold * sale.salePrice; acc[month] = (acc[month] || 0) + revenue; return acc; }, {}); const bestSellers = allSales.reduce((acc, sale) => { const item = allItems.find(i => i.id === sale.itemId); if (item) { const itemName = [item.model, item.itemName].filter(Boolean).join(' '); acc[itemName] = (acc[itemName] || 0) + sale.quantitySold; } return acc; }, {}); const sortedBestSellers = Object.entries(bestSellers).sort((a, b) => b[1] - a[1]).slice(0, 5); const chartOptions = { plugins: { legend: { labels: { color: textColor } } }, scales: { x: { ticks: { color: textColor }, grid: { color: gridColor } }, y: { ticks: { color: textColor }, grid: { color: gridColor } } } }; if (revenueChart) revenueChart.destroy(); revenueChart = new Chart(document.getElementById('revenue-chart'), { type: 'bar', data: { labels: Object.keys(monthlyRevenue), datasets: [{ label: 'Monthly Revenue', data: Object.values(monthlyRevenue), backgroundColor: 'rgba(255, 193, 7, 0.5)', borderColor: 'rgb(255, 193, 7)', borderWidth: 1 }] }, options: chartOptions }); if (bestsellersChart) bestsellersChart.destroy(); bestsellersChart = new Chart(document.getElementById('bestsellers-chart'), { type: 'doughnut', data: { labels: sortedBestSellers.map(item => item[0]), datasets: [{ label: 'Quantity Sold', data: sortedBestSellers.map(item => item[1]), backgroundColor: ['#FFC107', '#FFCA28', '#FFD54F', '#FFE082', '#FFECB3'], borderColor: getComputedStyle(document.documentElement).getPropertyValue('--color-bg-secondary').trim() || '#FFFFFF' }] }, options: { plugins: { legend: { position: 'right', labels: { color: textColor } } } } }); }
 
       // ================================================================================
       // 8. COMPARISON
       // ================================================================================
-      function updateCompareButton() {
-        const count = comparisonList.size;
-        if (count >= 2) {
-          dom.compareBtn.classList.remove('hidden');
-          dom.compareBtn.textContent = `Compare (${count})`;
-        } else {
-          dom.compareBtn.classList.add('hidden');
+      function updateCompareButton() { const count = comparisonList.size; if (count >= 2) { dom.compareBtn.classList.remove('hidden'); dom.compareBtn.textContent = `Compare (${count})`; } else { dom.compareBtn.classList.add('hidden'); } }
+      function openComparisonModal() { const itemsToCompare = allItems.filter(item => comparisonList.has(item.id)); if (itemsToCompare.length < 2) return; const allKeys = new Set(['itemName', 'model', 'device', 'size', 'price', 'quantity']); itemsToCompare.forEach(item => { Object.keys(item).forEach(key => { if (key.startsWith('spec_') && item[key]) allKeys.add(key); }); }); let tableHTML = '<table class="w-full text-left border-collapse"><thead><tr><th class="p-3 font-semibold border-b-2 border-[var(--color-border-primary)]">Feature</th>'; itemsToCompare.forEach(item => { tableHTML += `<th class="p-3 font-semibold border-b-2 border-[var(--color-border-primary)] capitalize">${[item.model, item.itemName].filter(Boolean).join(' ').toLowerCase()}</th>`; }); tableHTML += '</tr></thead><tbody>'; allKeys.forEach(key => { const label = key.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()); tableHTML += `<tr class="border-b border-[var(--color-border-primary)] last:border-0"><td class="p-3 font-medium text-[var(--color-text-secondary)]">${label}</td>`; itemsToCompare.forEach(item => { tableHTML += `<td class="p-3">${item[key] || 'N/A'}</td>`; }); tableHTML += '</tr>'; }); tableHTML += '</tbody></table>'; dom.comparisonContent.innerHTML = tableHTML; dom.comparisonModal.classList.remove('hidden'); dom.comparisonModal.classList.add('flex'); }
+      function closeComparisonModal() { dom.comparisonModal.classList.add('hidden'); dom.comparisonModal.classList.remove('flex'); }
+
+      // ================================================================================
+      // 9. NEW FEATURES - PALETTE, NOTIFICATIONS, ETC.
+      // ================================================================================
+      function openCommandPalette() { dom.commandPalette.classList.remove('hidden'); requestAnimationFrame(() => { dom.commandPalette.classList.remove('opacity-0', '-translate-y-4'); dom.commandPaletteInput.focus(); }); }
+      function closeCommandPalette() { dom.commandPalette.classList.add('opacity-0', '-translate-y-4'); setTimeout(() => { dom.commandPalette.classList.add('hidden'); dom.commandPaletteInput.value = ''; dom.commandPaletteResults.innerHTML = ''; }, 150); }
+      function updateCommandPaletteResults() {
+        const query = dom.commandPaletteInput.value.toLowerCase();
+        const results = [];
+        const commands = [ { name: 'Add New Component', desc: 'Open the form to add a new part', icon: 'plus-circle', action: () => openAddModal() }, { name: 'Go to Dashboard', desc: 'Navigate to the main dashboard', icon: 'layout-grid', action: () => switchView('dashboard') }, { name: 'Go to Reports', desc: 'View analytics and charts', icon: 'bar-chart-2', action: () => switchView('reports') }, { name: 'Toggle Theme', desc: 'Switch between light and dark mode', icon: 'sun', action: () => toggleTheme() } ];
+        if (query.length > 0) {
+          commands.filter(c => c.name.toLowerCase().includes(query)).forEach(c => results.push({ type: 'command', ...c }));
+          allItems.filter(item => Object.values(item).join(' ').toLowerCase().includes(query)).slice(0, 5).forEach(item => results.push({ type: 'item', item }));
         }
+        dom.commandPaletteResults.innerHTML = results.map((r, index) => {
+          if (r.type === 'command') { return `<li class="result-item p-3 rounded-lg cursor-pointer flex items-center gap-4" data-index="${index}"><i data-lucide="${r.icon}" class="w-5 h-5 text-[var(--color-text-secondary)]"></i><div><p class="font-semibold">${r.name}</p><p class="result-item-desc text-sm text-[var(--color-text-secondary)]">${r.desc}</p></div></li>`; }
+          if (r.type === 'item') { const name = [r.item.model, r.item.device, r.item.size, r.item.itemName].filter(Boolean).join(' ').toLowerCase(); return `<li class="result-item p-3 rounded-lg cursor-pointer flex items-center gap-4" data-index="${index}"><i data-lucide="archive" class="w-5 h-5 text-[var(--color-text-secondary)]"></i><div><p class="font-semibold capitalize">${name}</p><p class="result-item-desc text-sm text-[var(--color-text-secondary)]">Qty: ${r.item.quantity} | Price: ₹${r.item.price || 'N/A'}</p></div></li>`; }
+        }).join('');
+        commandPaletteSelectedIndex = -1;
+        lucide.createIcons();
       }
-      function openComparisonModal() {
-        const itemsToCompare = allItems.filter(item => comparisonList.has(item.id));
-        if (itemsToCompare.length < 2) return;
-
-        const allKeys = new Set(['itemName', 'model', 'device', 'size', 'price', 'quantity']);
-        itemsToCompare.forEach(item => {
-          Object.keys(item).forEach(key => {
-            if (key.startsWith('spec_') && item[key]) allKeys.add(key);
-          });
-        });
-
-        let tableHTML = '<table class="w-full text-left border-collapse"><thead><tr><th class="p-3 font-semibold border-b-2 border-[var(--color-border-primary)]">Feature</th>';
-        itemsToCompare.forEach(item => {
-          tableHTML += `<th class="p-3 font-semibold border-b-2 border-[var(--color-border-primary)] capitalize">${[item.model, item.itemName].filter(Boolean).join(' ').toLowerCase()}</th>`;
-        });
-        tableHTML += '</tr></thead><tbody>';
-
-        allKeys.forEach(key => {
-          const label = key.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-          tableHTML += `<tr class="border-b border-[var(--color-border-primary)] last:border-0"><td class="p-3 font-medium text-[var(--color-text-secondary)]">${label}</td>`;
-          itemsToCompare.forEach(item => {
-            tableHTML += `<td class="p-3">${item[key] || 'N/A'}</td>`;
-          });
-          tableHTML += '</tr>';
-        });
-
-        tableHTML += '</tbody></table>';
-        dom.comparisonContent.innerHTML = tableHTML;
-        dom.comparisonModal.classList.remove('hidden');
-        dom.comparisonModal.classList.add('flex');
+      function handleCommandPaletteSelection(index) {
+        const query = dom.commandPaletteInput.value.toLowerCase();
+        const results = [];
+        const commands = [ { name: 'Add New Component', desc: 'Open the form to add a new part', icon: 'plus-circle', action: () => openAddModal() }, { name: 'Go to Dashboard', desc: 'Navigate to the main dashboard', icon: 'layout-grid', action: () => switchView('dashboard') }, { name: 'Go to Reports', desc: 'View analytics and charts', icon: 'bar-chart-2', action: () => switchView('reports') }, { name: 'Toggle Theme', desc: 'Switch between light and dark mode', icon: 'sun', action: () => toggleTheme() } ];
+        commands.filter(c => c.name.toLowerCase().includes(query)).forEach(c => results.push({ type: 'command', ...c }));
+        allItems.filter(item => Object.values(item).join(' ').toLowerCase().includes(query)).slice(0, 5).forEach(item => results.push({ type: 'item', item }));
+        
+        const selected = results[index];
+        if (!selected) return;
+        if (selected.type === 'command') { selected.action(); }
+        if (selected.type === 'item') { openDetailPanel(selected.item); }
+        closeCommandPalette();
       }
-      function closeComparisonModal() {
-        dom.comparisonModal.classList.add('hidden');
-        dom.comparisonModal.classList.remove('flex');
+      function renderNotifications() {
+        const lowStockItems = allItems.filter(item => parseInt(item.quantity) > 0 && parseInt(item.quantity) < 5);
+        let notificationsHtml = '';
+        lowStockItems.forEach(item => {
+            const name = [item.model, item.itemName].filter(Boolean).join(' ');
+            notificationsHtml += `<div class="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20"><div class="flex items-start gap-3"><i data-lucide="alert-triangle" class="w-5 h-5 text-yellow-500 mt-1"></i><div><p class="font-semibold">Low Stock Alert</p><p class="text-sm">"${name}" has only ${item.quantity} items left.</p></div></div></div>`;
+        });
+        allNotifications.slice(0, 20).forEach(n => {
+            let detailsText = '';
+            if (n.action === 'UPDATE') { try { const changes = JSON.parse(n.details); detailsText = Object.entries(changes).map(([key, val]) => `${key}: ${val.from} &rarr; ${val.to}`).join(', '); } catch { detailsText = '...'; } }
+            const item = allItems.find(i => i.id === n.itemId);
+            const itemName = item ? [item.model, item.itemName].filter(Boolean).join(' ') : `ID: ${n.itemId}`;
+            notificationsHtml += `<div class="p-3 rounded-lg hover:bg-[var(--color-bg-tertiary)]"><div class="flex items-start gap-3"><i data-lucide="history" class="w-5 h-5 text-[var(--color-text-secondary)] mt-1"></i><div><p><span class="font-semibold">${n.user}</span> ${n.action.toLowerCase()}d <span class="font-semibold">${itemName}</span></p><p class="text-xs text-[var(--color-text-secondary)]">${new Date(n.timestamp).toLocaleString()}</p>${detailsText ? `<p class="text-xs mt-1 p-2 bg-[var(--color-bg-tertiary)] rounded">${detailsText}</p>` : ''}</div></div></div>`;
+        });
+        dom.notificationList.innerHTML = notificationsHtml || `<p class="text-center text-[var(--color-text-secondary)] p-8">No notifications yet.</p>`;
+        const hasUnread = localStorage.getItem('hasUnreadNotifications') === 'true';
+        dom.notificationBellBtn.classList.toggle('has-unread', hasUnread);
+        lucide.createIcons();
+      }
+      function toggleNotificationCenter() {
+        const isOpen = dom.notificationCenter.classList.toggle('open');
+        if (isOpen) { localStorage.setItem('hasUnreadNotifications', 'false'); dom.notificationBellBtn.classList.remove('has-unread'); }
+      }
+      function toggleProfileDropdown() {
+        const isOpen = dom.profileDropdown.classList.toggle('hidden');
+        if (isOpen) { dom.profileDropdown.classList.remove('opacity-0', 'scale-95'); }
+        else { dom.profileDropdown.classList.add('opacity-0', 'scale-95'); }
+      }
+      function toggleSidebarCollapse() {
+        dom.body.classList.toggle('sidebar-collapsed');
+        localStorage.setItem('sidebarCollapsed', dom.body.classList.contains('sidebar-collapsed'));
+      }
+      function populateThemeSwatches() {
+        const themes = [ { name: 'Gold', h: 45, s: 100, l: 52 }, { name: 'Blue', h: 217, s: 91, l: 60 }, { name: 'Green', h: 145, s: 63, l: 42 }, { name: 'Red', h: 0, s: 84, l: 60 }, { name: 'Purple', h: 262, s: 85, l: 60 } ];
+        dom.themeSwatches.innerHTML = themes.map(t => `<button class="w-8 h-8 rounded-full border-2 border-[var(--color-border-primary)]" style="background-color: hsl(${t.h}, ${t.s}%, ${t.l}%)" data-h="${t.h}" data-s="${t.s}%" data-l="${t.l}%" title="${t.name}"></button>`).join('');
+      }
+      function applyTheme(theme) {
+        dom.html.style.setProperty('--color-accent-h', theme.h);
+        dom.html.style.setProperty('--color-accent-s', theme.s);
+        dom.html.style.setProperty('--color-accent-l', theme.l);
+        localStorage.setItem('accentColor', JSON.stringify(theme));
+        if (revenueChart) renderReportCharts();
       }
 
       // ================================================================================
-      // 9. EVENTS & INIT
+      // 10. EVENTS & INIT
       // ================================================================================
-      function handlePaginationClick(e) {
-        const button = e.target.closest('button');
-        if (button && !button.disabled) {
-          currentPage = parseInt(button.dataset.page);
-          renderItems();
-          window.scrollTo(0, 0);
-        }
-      }
-      function handleCardClick(e) {
-        const viewBtn = e.target.closest('.view-details-btn');
-        if (viewBtn) {
-          const itemId = viewBtn.dataset.id;
-          const item = allItems.find(i => i.id === itemId);
-          if (item) openDetailPanel(item);
-          return;
-        }
-        const checkbox = e.target.closest('.compare-checkbox');
-        if (checkbox) {
-          const itemId = checkbox.dataset.id;
-          if (checkbox.checked) comparisonList.add(itemId); else comparisonList.delete(itemId);
-          updateCompareButton();
-        }
-      }
+      function handlePaginationClick(e) { const button = e.target.closest('button'); if (button && !button.disabled) { currentPage = parseInt(button.dataset.page); renderItems(); window.scrollTo(0, 0); } }
+      function handleCardClick(e) { const viewBtn = e.target.closest('.view-details-btn'); if (viewBtn) { const itemId = viewBtn.dataset.id; const item = allItems.find(i => i.id === itemId); if (item) openDetailPanel(item); return; } const checkbox = e.target.closest('.compare-checkbox'); if (checkbox) { const itemId = checkbox.dataset.id; if (checkbox.checked) comparisonList.add(itemId); else comparisonList.delete(itemId); updateCompareButton(); } }
       function handleDetailPanelClick(e) {
-        const editBtn = e.target.closest('.edit-btn');
-        const deleteBtn = e.target.closest('.delete-btn');
-        const arrowBtn = e.target.closest('.detail-gallery-arrow');
-
-        if (editBtn) {
-          const itemId = editBtn.dataset.id;
-          const item = allItems.find(i => i.id === itemId);
-          if (item) { closeDetailPanel(); openEditModal(item); }
-        }
-        if (deleteBtn) {
-          const itemId = deleteBtn.dataset.id;
-          Swal.fire({
-            title: 'Are you absolutely sure?',
-            text: "This action cannot be undone!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, delete it!',
-            confirmButtonColor: '#d33',
-            cancelButtonText: 'Cancel'
-          }).then((result) => {
-            if (result.isConfirmed) deleteComponent(itemId);
-          });
-        }
-        if (arrowBtn) {
-          const gallery = arrowBtn.closest('.image-gallery');
-          const images = (gallery.dataset.images || '').split(',').map(link => link.trim()).filter(Boolean);
-          if (images.length <= 1) return;
-          let currentIndex = parseInt(gallery.dataset.currentIndex || '0');
-          const direction = parseInt(arrowBtn.dataset.direction);
-          currentIndex = (currentIndex + direction + images.length) % images.length;
-          gallery.querySelector('.gallery-image').src = getDriveThumbnail(images[currentIndex]);
-          gallery.dataset.currentIndex = currentIndex;
-        }
+        const editBtn = e.target.closest('.edit-btn'); const deleteBtn = e.target.closest('.delete-btn'); const arrowBtn = e.target.closest('.detail-gallery-arrow');
+        if (editBtn) { const itemId = editBtn.dataset.id; const item = allItems.find(i => i.id === itemId); if (item) { closeDetailPanel(); openEditModal(item); } }
+        if (deleteBtn) { const itemId = deleteBtn.dataset.id; Swal.fire({ title: 'Are you absolutely sure?', text: "This action cannot be undone!", icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, delete it!', confirmButtonColor: '#d33', cancelButtonText: 'Cancel' }).then((result) => { if (result.isConfirmed) deleteComponent(itemId); }); }
+        if (arrowBtn) { const gallery = arrowBtn.closest('.image-gallery'); const images = (gallery.dataset.images || '').split(',').map(link => link.trim()).filter(Boolean); if (images.length <= 1) return; let currentIndex = parseInt(gallery.dataset.currentIndex || '0'); const direction = parseInt(arrowBtn.dataset.direction); currentIndex = (currentIndex + direction + images.length) % images.length; gallery.querySelector('.gallery-image').src = getDriveThumbnail(images[currentIndex]); gallery.dataset.currentIndex = currentIndex; }
       }
-
+      
       // Initialize app
       initThemeAndLayout();
       gapi.load('client', initializeGapiClient);
-      const gisScript = document.createElement('script');
-      gisScript.src = 'https://accounts.google.com/gsi/client';
-      gisScript.async = true;
-      gisScript.defer = true;
-      gisScript.onload = initializeGis;
+      const gisScript = document.createElement('script'); gisScript.src = 'https://accounts.google.com/gsi/client'; gisScript.async = true; gisScript.defer = true; gisScript.onload = initializeGis;
       document.body.appendChild(gisScript);
 
+      // Event Listeners
       dom.partForm.addEventListener('submit', handleFormSubmit);
-
-      dom.search.addEventListener('input', () => {
-        clearTimeout(searchDebounceTimer);
-        searchDebounceTimer = setTimeout(() => {
-          currentPage = 1;
-          processAndRenderItems();
-        }, 300);
-      });
-
-      [dom.filterDevice, dom.filterSize, dom.sortBy].forEach(el => el.addEventListener('change', () => {
-        currentPage = 1;
-        processAndRenderItems();
-      }));
-
+      dom.search.addEventListener('input', () => { clearTimeout(searchDebounceTimer); searchDebounceTimer = setTimeout(() => { currentPage = 1; processAndRenderItems(); }, 300); });
+      [dom.filterDevice, dom.filterSize, dom.sortBy].forEach(el => el.addEventListener('change', () => { currentPage = 1; processAndRenderItems(); }));
       dom.addPartBtn.addEventListener('click', openAddModal);
       dom.closeFormModalBtn.addEventListener('click', closeFormModal);
       dom.cancelBtn.addEventListener('click', closeFormModal);
@@ -1674,17 +928,48 @@
       dom.searchResults.addEventListener('click', handleCardClick);
       dom.detailContent.addEventListener('click', handleDetailPanelClick);
       dom.paginationControls.addEventListener('click', handlePaginationClick);
-      [dom.navDashboard, dom.navReports].forEach(link => {
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
-          const view = e.currentTarget.id === 'nav-dashboard' ? 'dashboard' : 'reports';
-          switchView(view);
-          if (window.innerWidth < 1024) toggleMobileSidebar();
-        });
-      });
+      [dom.navDashboard, dom.navReports, dom.navManage].forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const view = e.currentTarget.id.replace('nav-', ''); switchView(view); if (window.innerWidth < 1024) toggleMobileSidebar(); }); });
       dom.valueToggleBtn.addEventListener('click', toggleValueVisibility);
       dom.compareBtn.addEventListener('click', openComparisonModal);
       dom.closeComparisonModalBtn.addEventListener('click', closeComparisonModal);
+
+      // NEW FEATURE EVENT LISTENERS
+      dom.searchShortcutBtn.addEventListener('click', openCommandPalette);
+      dom.commandPalette.addEventListener('click', (e) => { if (e.target === dom.commandPalette) closeCommandPalette(); });
+      dom.commandPaletteInput.addEventListener('input', updateCommandPaletteResults);
+      dom.commandPaletteResults.addEventListener('click', (e) => { const item = e.target.closest('.result-item'); if (item) { handleCommandPaletteSelection(parseInt(item.dataset.index)); } });
+      dom.notificationBellBtn.addEventListener('click', toggleNotificationCenter);
+      dom.notificationCloseBtn.addEventListener('click', toggleNotificationCenter);
+      dom.profileBtn.addEventListener('click', toggleProfileDropdown);
+      dom.sidebarCollapseBtn.addEventListener('click', toggleSidebarCollapse);
+      dom.mainFab.addEventListener('click', () => dom.quickActionsFabContainer.classList.toggle('open'));
+      dom.themeSwatches.addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') { applyTheme(e.target.dataset); } });
+      
+      // Global Listeners
+      document.addEventListener('click', (e) => {
+        if (!dom.profileBtn.contains(e.target) && !dom.profileDropdown.contains(e.target) && !dom.profileDropdown.classList.contains('hidden')) { toggleProfileDropdown(); }
+        if (!dom.quickActionsFabContainer.contains(e.target) && dom.quickActionsFabContainer.classList.contains('open')) { dom.quickActionsFabContainer.classList.remove('open'); }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (!dom.commandPalette.classList.contains('hidden')) closeCommandPalette();
+          else if (!dom.detailModal.classList.contains('hidden')) closeDetailPanel();
+          else if (!dom.formModal.classList.contains('hidden')) closeFormModal();
+          else if (dom.notificationCenter.classList.contains('open')) toggleNotificationCenter();
+        }
+        if (e.ctrlKey && e.key === 'k') { e.preventDefault(); openCommandPalette(); }
+        if (e.ctrlKey && e.key === 's' && !dom.formModal.classList.contains('hidden')) { e.preventDefault(); dom.saveBtn.click(); }
+        
+        // Command Palette Keyboard Navigation
+        if (!dom.commandPalette.classList.contains('hidden')) {
+          const results = dom.commandPaletteResults.querySelectorAll('.result-item');
+          if (results.length === 0) return;
+          if (e.key === 'ArrowDown') { e.preventDefault(); commandPaletteSelectedIndex = (commandPaletteSelectedIndex + 1) % results.length; }
+          else if (e.key === 'ArrowUp') { e.preventDefault(); commandPaletteSelectedIndex = (commandPaletteSelectedIndex - 1 + results.length) % results.length; }
+          else if (e.key === 'Enter') { e.preventDefault(); handleCommandPaletteSelection(commandPaletteSelectedIndex); }
+          results.forEach((r, i) => r.classList.toggle('selected', i === commandPaletteSelectedIndex));
+        }
+      });
     });
   </script>
 </body>
