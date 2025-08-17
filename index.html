@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vinayaka  | Component Database</title>
+  <title>Vinayaka Industries | Component Database</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -153,7 +153,6 @@
     .skeleton-breathe .skeleton-item:nth-child(2n){ animation-delay: 100ms; }
     .skeleton-breathe .skeleton-item:nth-child(3n){ animation-delay: 200ms; }
 
-    /* NEW: Table readability and Edit mode banner styles */
     .industrial-table tbody tr:nth-child(even) {
       background-color: var(--color-bg-tertiary);
     }
@@ -200,7 +199,6 @@
 
     <!-- Sidebar -->
     <aside class="sidebar fixed top-0 left-0 w-[var(--sidebar-width)] flex flex-col">
-      <!-- UPDATED: Logo and branding -->
       <div class="flex items-center gap-3 p-5 h-[var(--header-height)] border-b border-[var(--color-border-primary)] flex-shrink-0">
         <div class="bg-[var(--color-accent-main)] p-2.5 rounded-lg flex items-center justify-center">
           <i data-lucide="gem" class="w-6 h-6 text-[var(--color-text-on-accent)]"></i>
@@ -365,7 +363,6 @@
         <button type="button" id="closeFormModalBtn" aria-label="Close form" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
       </div>
 
-      <!-- NEW: Edit mode banner -->
       <div id="edit-mode-banner" class="edit-mode-banner hidden">
         <i data-lucide="pencil" class="w-4 h-4"></i>
         You are currently editing an existing component.
@@ -467,6 +464,7 @@
       const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ';
       const SHEET_NAME = 'Sheet1';
       const SALES_SHEET_NAME = 'SalesLog';
+      const AUDIT_SHEET_NAME = 'AuditLog'; // NEW: Audit log sheet name
       let SHEET_ID = null;
 
       const INVENTORY_RANGE = `${SHEET_NAME}!A:ZZ`;
@@ -479,6 +477,7 @@
       let gisInited = false;
       let tokenClient;
       let sheetHeaders = [];
+      let currentUser = {}; // NEW: Store current user info
       let currentLayout = 'grid';
       let currentPage = 1;
       const ITEMS_PER_PAGE = 12;
@@ -540,7 +539,7 @@
         comparisonModal: document.getElementById('comparison-modal'),
         closeComparisonModalBtn: document.getElementById('closeComparisonModalBtn'),
         comparisonContent: document.getElementById('comparison-content'),
-        editModeBanner: document.getElementById('edit-mode-banner'), // New DOM element
+        editModeBanner: document.getElementById('edit-mode-banner'),
         saveBtn: document.getElementById('save-component-btn')
       };
 
@@ -627,9 +626,12 @@
             const userInfo = await gapi.client.oauth2.userinfo.get();
             dom.userName.textContent = userInfo.result.name || "User";
             dom.userDp.src = userInfo.result.picture || `https://ui-avatars.com/api/?name=U&background=E9ECEF&color=212529`;
+            // NEW: Store user info for logging
+            currentUser = { name: userInfo.result.name, email: userInfo.result.email };
           } catch (e) {
             dom.userName.textContent = "User";
             dom.userDp.src = `https://ui-avatars.com/api/?name=U&background=E9ECEF&color=212529`;
+            currentUser = { name: 'User', email: 'Unknown' };
           }
           try { SHEET_ID = await getSheetIdByName(SHEET_NAME); } catch {}
           loadAllData();
@@ -642,6 +644,7 @@
           allItems = [];
           allSales = [];
           sheetHeaders = [];
+          currentUser = {};
           localStorage.removeItem('inventoryData');
           processAndRenderItems();
         }
@@ -717,8 +720,32 @@
       }
 
       // ================================================================================
-      // 3. ADD / UPDATE / DELETE
+      // 3. ADD / UPDATE / DELETE & AUDIT LOG
       // ================================================================================
+      
+      // NEW: Function to log actions to the AuditLog sheet
+      async function logAction(action, itemId, details) {
+          if (!gapi.client.getToken()) return;
+
+          const timestamp = new Date().toISOString();
+          const user = currentUser.name || 'Unknown User';
+          const detailsString = JSON.stringify(details);
+
+          const newRow = [timestamp, user, action, itemId, detailsString];
+
+          try {
+              await gapi.client.sheets.spreadsheets.values.append({
+                  spreadsheetId: SPREADSHEET_ID,
+                  range: AUDIT_SHEET_NAME,
+                  valueInputOption: 'USER_ENTERED',
+                  resource: { values: [newRow] }
+              });
+          } catch (err) {
+              console.error("Failed to write to audit log:", err);
+              // Do not show an error to the user, as the primary action succeeded.
+          }
+      }
+
       function buttonBusy(btn, busy) {
         if (!btn) return;
         if (busy) {
@@ -778,6 +805,7 @@
             resource: { values: [newRow] }
           });
           Swal.fire({ title: 'Success!', text: 'Component added successfully.', icon: 'success', timer: 1800, showConfirmButton: false });
+          await logAction('CREATE', newItem.id, newItem); // Log action
           closeFormModal();
           localStorage.removeItem('inventoryData');
           await loadAllData();
@@ -805,6 +833,16 @@
             resource: { values: [updatedRow] }
           });
           Swal.fire({ title: 'Success!', text: 'Component updated successfully.', icon: 'success', timer: 1800, showConfirmButton: false });
+          
+          // Log detailed changes
+          const changes = {};
+          Object.keys(updatedItem).forEach(key => {
+            if (itemToUpdate[key] !== updatedItem[key]) {
+              changes[key] = { from: itemToUpdate[key] || '', to: updatedItem[key] };
+            }
+          });
+          await logAction('UPDATE', id, changes);
+
           closeFormModal();
           localStorage.removeItem('inventoryData');
           await loadAllData();
@@ -840,6 +878,7 @@
             }
           });
           Swal.fire('Deleted!', 'The component has been deleted.', 'success');
+          await logAction('DELETE', id, itemToDelete); // Log action
           closeDetailPanel();
           localStorage.removeItem('inventoryData');
           await loadAllData();
@@ -967,7 +1006,6 @@
 
       function createTableView(items) {
         const table = document.createElement('table');
-        // UPDATED: Added class for zebra striping
         table.className = 'w-full text-left border-collapse industrial-table';
         let head = `<thead><tr class="border-b border-[var(--color-border-primary)]">
           <th class="p-4"></th>
@@ -982,7 +1020,6 @@
           const quantity = parseInt(item.quantity) || 0;
           const statusColor = quantity === 0 ? 'text-[var(--color-status-danger)]' : quantity < 5 ? 'text-[var(--color-status-warning)]' : 'text-[var(--color-status-success)]';
           const isChecked = comparisonList.has(item.id);
-          // UPDATED: Removed hover class from tr, now handled by CSS
           body += `<tr class="border-b border-[var(--color-border-primary)] last:border-b-0">
             <td class="p-4"><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5" ${isChecked ? 'checked' : ''}></td>
             <td class="p-4 capitalize font-medium">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</td>
@@ -1115,7 +1152,7 @@
         dom.partForm.reset();
         dom.specFieldsContainer.classList.add('hidden');
         dom.specFields.innerHTML = '';
-        dom.editModeBanner.classList.add('hidden'); // Hide banner for add mode
+        dom.editModeBanner.classList.add('hidden');
         dom.formModal.classList.remove('hidden');
         dom.formModal.classList.add('flex');
         trapFocus(dom.formModal);
@@ -1139,7 +1176,7 @@
             if (input) input.value = item[key];
           }
         });
-        dom.editModeBanner.classList.remove('hidden'); // Show banner for edit mode
+        dom.editModeBanner.classList.remove('hidden');
         dom.formModal.classList.remove('hidden');
         dom.formModal.classList.add('flex');
         trapFocus(dom.formModal);
