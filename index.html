@@ -182,6 +182,22 @@
     #quick-actions-fab-container.open .action-fab-1 { transform: translateY(-60px) scale(1); opacity: 1; }
     #quick-actions-fab-container.open .action-fab-2 { transform: translateY(-120px) scale(1); opacity: 1; }
     
+    /* NEW: Bulk Actions Bar */
+    #bulk-actions-bar {
+        transition: transform var(--transition-speed-normal) var(--transition-curve-bounce), opacity var(--transition-speed-normal) var(--transition-curve-smooth);
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    #bulk-actions-bar.visible {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    /* NEW: Comparison Highlight */
+    .comparison-diff {
+        background-color: color-mix(in srgb, var(--color-accent-main) 20%, transparent);
+    }
+    
     /* RESPONSIVE STYLES */
     @media (max-width: 1024px) {
       .main-content { padding-left: 0; }
@@ -233,7 +249,7 @@
         <a href="#" id="nav-dashboard" class="sidebar-nav-link active flex items-center gap-4 px-4 py-3 rounded-lg">
           <i data-lucide="layout-grid" class="w-5 h-5"></i><span class="truncate">Dashboard</span>
         </a>
-        <details class="nav-section">
+        <details class="nav-section" open>
           <summary class="sidebar-nav-link flex items-center justify-between gap-4 px-4 py-3 text-[var(--color-text-secondary)] rounded-lg font-medium">
             <div class="flex items-center gap-4"><i data-lucide="archive" class="w-5 h-5"></i><span class="truncate">Inventory</span></div>
             <i data-lucide="chevron-right" class="chevron w-4 h-4"></i>
@@ -247,9 +263,20 @@
             </a>
           </div>
         </details>
-        <a href="#" id="nav-reports" class="sidebar-nav-link flex items-center gap-4 px-4 py-3 text-[var(--color-text-secondary)] rounded-lg font-medium">
-          <i data-lucide="bar-chart-2" class="w-5 h-5"></i><span class="truncate">Reports</span>
-        </a>
+        <details class="nav-section">
+            <summary class="sidebar-nav-link flex items-center justify-between gap-4 px-4 py-3 text-[var(--color-text-secondary)] rounded-lg font-medium">
+              <div class="flex items-center gap-4"><i data-lucide="bar-chart-2" class="w-5 h-5"></i><span class="truncate">Reports</span></div>
+              <i data-lucide="chevron-right" class="chevron w-4 h-4"></i>
+            </summary>
+            <div class="nav-section-content pl-4 pt-1 space-y-1">
+              <a href="#" id="nav-reports" class="sidebar-nav-link flex items-center gap-4 px-4 py-3 text-[var(--color-text-secondary)] rounded-lg font-medium">
+                <i data-lucide="pie-chart" class="w-5 h-5"></i><span class="truncate">Sales Report</span>
+              </a>
+              <a href="#" id="nav-audit" class="sidebar-nav-link flex items-center gap-4 px-4 py-3 text-[var(--color-text-secondary)] rounded-lg font-medium">
+                <i data-lucide="history" class="w-5 h-5"></i><span class="truncate">Audit Log</span>
+              </a>
+            </div>
+          </details>
       </nav>
 
       <!-- Sidebar Footer -->
@@ -328,14 +355,19 @@
                     <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Out of Stock</p><p id="out-of-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2 text-[var(--color-status-danger)]">0</p></div>
                 </div>
             </div>
+            <!-- UPDATED: Advanced Filters Section -->
             <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg p-4 mb-8">
-                <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-                    <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div class="lg:col-span-1"><div class="filter-control-group flex items-center gap-2"><i data-lucide="search" class="w-5 h-5 text-[var(--color-text-secondary)] flex-shrink-0"></i><input type="text" id="search" placeholder="Search components..." class="filter-control-input"></div></div>
-                        <div><div class="filter-control-group"><label for="filter-device">Device</label><select id="filter-device" class="filter-control-input"><option value="">All Devices</option></select></div></div>
-                        <div><div class="filter-control-group"><label for="filter-size">Size</label><select id="filter-size" class="filter-control-input"><option value="">All Sizes</option></select></div></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="lg:col-span-2"><div class="filter-control-group flex items-center gap-2"><i data-lucide="search" class="w-5 h-5 text-[var(--color-text-secondary)] flex-shrink-0"></i><input type="text" id="search" placeholder="Search components..." class="filter-control-input"></div></div>
+                    <div><div class="filter-control-group"><label for="filter-device">Device</label><select id="filter-device" class="filter-control-input" multiple><option value="">All Devices</option></select></div></div>
+                    <div><div class="filter-control-group"><label for="filter-size">Size</label><select id="filter-size" class="filter-control-input" multiple><option value="">All Sizes</option></select></div></div>
+                </div>
+                <div class="mt-4 flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex-1"><div class="filter-control-group"><label for="sort-by">Sort By</label><select id="sort-by" class="filter-control-input"><option value="model-asc">Model (A-Z)</option><option value="price-desc">Price (High-Low)</option><option value="quantity-asc">Quantity (Low-High)</option></select></div></div>
+                    <div class="flex items-center gap-2">
+                        <button id="save-filter-btn" class="btn btn--secondary"><i data-lucide="save"></i> Save Filter</button>
+                        <div class="filter-control-group"><label for="saved-filters">Load Filter</label><select id="saved-filters" class="filter-control-input"><option value="">Select saved filter...</option></select></div>
                     </div>
-                    <div class="flex-shrink-0"><div class="filter-control-group"><label for="sort-by">Sort By</label><select id="sort-by" class="filter-control-input"><option value="model-asc">Model (A-Z)</option><option value="price-desc">Price (High-Low)</option><option value="quantity-asc">Quantity (Low-High)</option></select></div></div>
                 </div>
             </div>
             <div id="skeleton-loader" class="hidden"></div>
@@ -349,6 +381,16 @@
             <div class="industrial-card p-6"><h3 class="font-semibold mb-4">Monthly Revenue</h3><canvas id="revenue-chart"></canvas></div>
             <div class="industrial-card p-6"><h3 class="font-semibold mb-4">Best Selling Items (by Quantity)</h3><canvas id="bestsellers-chart"></canvas></div>
           </div>
+        </div>
+        <!-- NEW: Audit Log View -->
+        <div id="audit-view" class="hidden space-y-6">
+            <div class="industrial-card p-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div><div class="filter-control-group"><label for="audit-user-filter">Filter by User</label><select id="audit-user-filter" class="filter-control-input"><option value="">All Users</option></select></div></div>
+                    <div><div class="filter-control-group"><label for="audit-date-filter">Filter by Date</label><input type="date" id="audit-date-filter" class="filter-control-input"></div></div>
+                </div>
+            </div>
+            <div id="audit-log-content" class="industrial-card overflow-x-auto"></div>
         </div>
       </div>
     </main>
@@ -421,6 +463,13 @@
       </div>
   </div>
 
+  <!-- NEW: Bulk Actions Bar -->
+  <div id="bulk-actions-bar" class="fixed bottom-0 left-1/2 -translate-x-1/2 mb-4 z-40 bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg shadow-2xl p-3 flex items-center gap-4">
+      <p class="font-semibold text-sm"><span id="bulk-actions-count">0</span> items selected</p>
+      <button id="bulk-delete-btn" class="btn btn--danger"><i data-lucide="trash-2"></i> Delete</button>
+      <button id="bulk-export-btn" class="btn btn--secondary"><i data-lucide="download"></i> Export CSV</button>
+  </div>
+
   <script src="https://apis.google.com/js/api.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -454,6 +503,7 @@
       let searchDebounceTimer;
       let comparisonList = new Set();
       let commandPaletteSelectedIndex = -1;
+      let bulkSelectedItems = new Set();
 
       const dom = {
         html: document.documentElement,
@@ -499,8 +549,10 @@
         navDashboard: document.getElementById('nav-dashboard'),
         navManage: document.getElementById('nav-manage'),
         navReports: document.getElementById('nav-reports'),
+        navAudit: document.getElementById('nav-audit'),
         dashboardView: document.getElementById('dashboard-view'),
         reportsView: document.getElementById('reports-view'),
+        auditView: document.getElementById('audit-view'),
         layoutSwitcher: document.getElementById('layout-switcher'),
         pageTitle: document.getElementById('page-title'),
         valueToggleBtn: document.getElementById('value-toggle-btn'),
@@ -512,7 +564,6 @@
         comparisonContent: document.getElementById('comparison-content'),
         editModeBanner: document.getElementById('edit-mode-banner'),
         saveBtn: document.getElementById('save-component-btn'),
-        // NEW DOM ELEMENTS
         commandPalette: document.getElementById('command-palette'),
         commandPaletteInput: document.getElementById('command-palette-input'),
         commandPaletteResults: document.getElementById('command-palette-results'),
@@ -527,6 +578,16 @@
         quickActionsFabContainer: document.getElementById('quick-actions-fab-container'),
         mainFab: document.getElementById('main-fab'),
         themeSwatches: document.getElementById('theme-swatches'),
+        // NEW ADVANCED FEATURE DOM ELEMENTS
+        saveFilterBtn: document.getElementById('save-filter-btn'),
+        savedFilters: document.getElementById('saved-filters'),
+        bulkActionsBar: document.getElementById('bulk-actions-bar'),
+        bulkActionsCount: document.getElementById('bulk-actions-count'),
+        bulkDeleteBtn: document.getElementById('bulk-delete-btn'),
+        bulkExportBtn: document.getElementById('bulk-export-btn'),
+        auditLogContent: document.getElementById('audit-log-content'),
+        auditUserFilter: document.getElementById('audit-user-filter'),
+        auditDateFilter: document.getElementById('audit-date-filter'),
       };
 
       const specDefinitions = { 'Planetary Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeeth'], 'Sun Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd'], 'Ring Gear': ['spec_teeth', 'spec_outerDiameter', 'spec_innerDiameter'], 'Spline/Pinion Shaft': ['spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_length', 'spec_splineOd'], 'Track Motor Shaft': ['spec_length', 'spec_outerDiameter', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'], 'Bearing': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_width'], 'Bushes': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length'], };
@@ -572,7 +633,7 @@
         const cached = JSON.parse(localStorage.getItem('inventoryData'));
         if (cached && (Date.now() - cached.timestamp < 3600000)) { // 1 hour cache
           allItems = cached.items; allSales = cached.sales; sheetHeaders = cached.headers; allNotifications = cached.notifications || [];
-          populateFilters(); processAndRenderItems(); renderReportCharts(); renderNotifications();
+          populateFilters(); loadSavedFilters(); processAndRenderItems(); renderReportCharts(); renderNotifications();
           return;
         }
         showSkeletonLoader(true);
@@ -593,7 +654,7 @@
           allItems = freshItems; allSales = freshSales; allNotifications = freshNotifications;
           localStorage.setItem('inventoryData', JSON.stringify({ items: allItems, sales: allSales, headers: sheetHeaders, notifications: allNotifications, timestamp: Date.now() }));
         } catch (err) { handleApiError(err, 'Data Loading Error'); updateAuthStatus(false);
-        } finally { showSkeletonLoader(false); populateFilters(); processAndRenderItems(); renderReportCharts(); renderNotifications(); }
+        } finally { showSkeletonLoader(false); populateFilters(); loadSavedFilters(); processAndRenderItems(); renderReportCharts(); renderNotifications(); }
       }
 
       // ================================================================================
@@ -633,19 +694,29 @@
         await logAction('CREATE', newItemData.id, newItemData);
         closeFormModal(); localStorage.removeItem('inventoryData'); await loadAllData();
       }
-      async function updateComponent(id, updatedItemData) {
+      async function updateComponent(id, updatedItemData, isInline = false) {
         const itemToUpdate = allItems.find(item => item.id === id);
         if (!itemToUpdate) { throw new Error('Could not find the component to update.'); }
-        updatedItemData.id = id;
-        const updatedRow = sheetHeaders.map(header => updatedItemData[header] || "");
+        
+        const finalData = isInline ? { ...itemToUpdate, ...updatedItemData } : updatedItemData;
+        finalData.id = id;
+
+        const updatedRow = sheetHeaders.map(header => finalData[header] || "");
         const endColumn = columnToLetter(sheetHeaders.length);
         const updateRange = `${SHEET_NAME}!A${itemToUpdate.rowIndex}:${endColumn}${itemToUpdate.rowIndex}`;
         await gapi.client.sheets.spreadsheets.values.update({ spreadsheetId: SPREADSHEET_ID, range: updateRange, valueInputOption: 'USER_ENTERED', resource: { values: [updatedRow] } });
-        Swal.fire({ title: 'Success!', text: 'Component updated successfully.', icon: 'success', timer: 1800, showConfirmButton: false });
+        
+        if (!isInline) {
+            Swal.fire({ title: 'Success!', text: 'Component updated successfully.', icon: 'success', timer: 1800, showConfirmButton: false });
+        }
+        
         const changes = {};
         Object.keys(updatedItemData).forEach(key => { if (itemToUpdate[key] !== updatedItemData[key]) { changes[key] = { from: itemToUpdate[key] || '', to: updatedItemData[key] }; } });
         await logAction('UPDATE', id, changes);
-        closeFormModal(); localStorage.removeItem('inventoryData'); await loadAllData();
+        
+        if (!isInline) closeFormModal();
+        localStorage.removeItem('inventoryData'); 
+        await loadAllData();
       }
       async function deleteComponent(id) {
         const itemToDelete = allItems.find(item => item.id === id);
@@ -654,10 +725,9 @@
         if (SHEET_ID == null) { Swal.fire('Delete Error', 'Could not resolve sheetId for deletion.', 'error'); return; }
         try {
           await gapi.client.sheets.spreadsheets.batchUpdate({ spreadsheetId: SPREADSHEET_ID, resource: { requests: [{ deleteDimension: { range: { sheetId: SHEET_ID, dimension: 'ROWS', startIndex: itemToDelete.rowIndex - 1, endIndex: itemToDelete.rowIndex } } }] } });
-          Swal.fire('Deleted!', 'The component has been deleted.', 'success');
           await logAction('DELETE', id, itemToDelete);
-          closeDetailPanel(); localStorage.removeItem('inventoryData'); await loadAllData();
-        } catch (err) { handleApiError(err, 'Delete Error'); }
+          return true;
+        } catch (err) { handleApiError(err, 'Delete Error'); return false; }
       }
 
       // ================================================================================
@@ -666,10 +736,15 @@
       function processAndRenderItems() {
         if (!gapiInited) return;
         const searchTerm = dom.search.value.toLowerCase();
-        const deviceFilter = dom.filterDevice.value;
-        const sizeFilter = dom.filterSize.value;
+        const deviceFilter = Array.from(dom.filterDevice.selectedOptions).map(opt => opt.value).filter(Boolean);
+        const sizeFilter = Array.from(dom.filterSize.selectedOptions).map(opt => opt.value).filter(Boolean);
         const sortBy = dom.sortBy.value;
-        filteredItems = allItems.filter(item => { const searchMatch = Object.values(item).join(' ').toLowerCase().includes(searchTerm); const deviceMatch = !deviceFilter || item.device === deviceFilter; const sizeMatch = !sizeFilter || item.size === sizeFilter; return searchMatch && deviceMatch && sizeMatch; });
+        filteredItems = allItems.filter(item => { 
+            const searchMatch = Object.values(item).join(' ').toLowerCase().includes(searchTerm); 
+            const deviceMatch = deviceFilter.length === 0 || deviceFilter.includes(item.device);
+            const sizeMatch = sizeFilter.length === 0 || sizeFilter.includes(item.size);
+            return searchMatch && deviceMatch && sizeMatch; 
+        });
         switch (sortBy) { case 'price-desc': filteredItems.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0)); break; case 'quantity-asc': filteredItems.sort((a, b) => (parseInt(a.quantity) || 0) - (parseInt(b.quantity) || 0)); break; default: filteredItems.sort((a, b) => (a.model || '').localeCompare(b.model || '')); break; }
         updateAnalytics(allItems); renderItems();
       }
@@ -697,7 +772,8 @@
         const statusColor = quantity === 0 ? 'bg-[var(--color-status-danger)]' : quantity < 5 ? 'bg-[var(--color-status-warning)]' : 'bg-[var(--color-status-success)]';
         const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
         const isChecked = comparisonList.has(item.id);
-        card.innerHTML = `<div class="relative image-gallery bg-[var(--color-bg-tertiary)]" data-images="${images.join(',')}"><img loading="lazy" src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-52 object-contain" onerror="this.src='https://placehold.co/512x512/F8D7DA/721C24?text=Error';">${images.length > 1 ? `<button aria-label="Previous image" class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="-1"><i data-lucide="chevron-left"></i></button><button aria-label="Next image" class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}<div class="absolute top-2 left-2 flex items-center gap-2 text-xs font-bold px-2 py-1 rounded text-white ${statusColor}">${statusText}</div><input type="checkbox" data-id="${item.id}" class="compare-checkbox absolute top-2 right-2 h-5 w-5" ${isChecked ? 'checked' : ''}></div><div class="p-4 flex-grow flex flex-col"><h3 class="font-bold leading-tight capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3><p class="text-sm text-[var(--color-text-secondary)] mt-1">Price: <span class="font-semibold text-[var(--color-text-primary)]">₹${item.price || 'N/A'}</span></p><div class="mt-auto pt-4 text-right"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">View Details &rarr;</button></div></div>`;
+        const isBulkChecked = bulkSelectedItems.has(item.id);
+        card.innerHTML = `<div class="relative image-gallery bg-[var(--color-bg-tertiary)]" data-images="${images.join(',')}"><img loading="lazy" src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-52 object-contain" onerror="this.src='https://placehold.co/512x512/F8D7DA/721C24?text=Error';">${images.length > 1 ? `<button aria-label="Previous image" class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="-1"><i data-lucide="chevron-left"></i></button><button aria-label="Next image" class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}<div class="absolute top-2 left-2 flex items-center gap-2 text-xs font-bold px-2 py-1 rounded text-white ${statusColor}">${statusText}</div><div class="absolute top-2 right-2 flex flex-col gap-2"><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5" ${isChecked ? 'checked' : ''} title="Select for comparison"><input type="checkbox" data-id="${item.id}" class="bulk-checkbox h-5 w-5" ${isBulkChecked ? 'checked' : ''} title="Select for bulk action"></div></div><div class="p-4 flex-grow flex flex-col"><h3 class="font-bold leading-tight capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3><p class="text-sm text-[var(--color-text-secondary)] mt-1">Price: <span class="font-semibold text-[var(--color-text-primary)]">₹${item.price || 'N/A'}</span></p><div class="mt-auto pt-4 text-right"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">View Details &rarr;</button></div></div>`;
         return card;
       }
       function createListCard(item) {
@@ -706,22 +782,23 @@
         const quantity = parseInt(item.quantity) || 0;
         const statusColor = quantity === 0 ? 'text-[var(--color-status-danger)]' : quantity < 5 ? 'text-[var(--color-status-warning)]' : 'text-[var(--color-status-success)]';
         const isChecked = comparisonList.has(item.id);
-        card.innerHTML = `<input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5 flex-shrink-0" ${isChecked ? 'checked' : ''}><img loading="lazy" src="${image}" class="w-16 h-16 rounded-md object-contain flex-shrink-0 bg-[var(--color-bg-tertiary)]" onerror="this.src='https://placehold.co/128x128/F8D7DA/721C24?text=Error';"><div class="flex-1 grid grid-cols-1 md:grid-cols-5 gap-4 items-center"><h3 class="md:col-span-2 font-semibold capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3><p class="text-[var(--color-text-secondary)]">₹${item.price || 'N/A'}</p><p class="${statusColor} font-medium">${quantity > 0 ? `${quantity} in Stock` : 'Out of Stock'}</p><div class="md:text-right"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button></div></div>`;
+        const isBulkChecked = bulkSelectedItems.has(item.id);
+        card.innerHTML = `<input type="checkbox" data-id="${item.id}" class="bulk-checkbox h-5 w-5 flex-shrink-0" ${isBulkChecked ? 'checked' : ''}><img loading="lazy" src="${image}" class="w-16 h-16 rounded-md object-contain flex-shrink-0 bg-[var(--color-bg-tertiary)]" onerror="this.src='https://placehold.co/128x128/F8D7DA/721C24?text=Error';"><div class="flex-1 grid grid-cols-1 md:grid-cols-5 gap-4 items-center"><h3 class="md:col-span-2 font-semibold capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3><p class="text-[var(--color-text-secondary)]">₹${item.price || 'N/A'}</p><p class="${statusColor} font-medium">${quantity > 0 ? `${quantity} in Stock` : 'Out of Stock'}</p><div class="md:text-right flex items-center gap-2"><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5" ${isChecked ? 'checked' : ''} title="Select for comparison"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button></div></div>`;
         return card;
       }
       function createTableView(items) {
         const table = document.createElement('table'); table.className = 'w-full text-left border-collapse industrial-table';
-        const headers = [{ key: 'compare', label: ''}, { key: 'component', label: 'Component'}, { key: 'price', label: 'Price'}, { key: 'quantity', label: 'Quantity'}, { key: 'actions', label: 'Actions'}];
+        const headers = [{ key: 'bulk', label: `<input type="checkbox" id="select-all-checkbox" class="h-5 w-5" title="Select All">`}, { key: 'component', label: 'Component'}, { key: 'price', label: 'Price'}, { key: 'quantity', label: 'Quantity'}, { key: 'actions', label: 'Actions'}];
         let head = `<thead><tr class="border-b border-[var(--color-border-primary)]">`; headers.forEach(h => { head += `<th class="p-4 font-semibold">${h.label}</th>`; }); head += `</tr></thead>`;
         let body = '<tbody>';
-        items.forEach(item => { const quantity = parseInt(item.quantity) || 0; const statusColor = quantity === 0 ? 'text-[var(--color-status-danger)]' : quantity < 5 ? 'text-[var(--color-status-warning)]' : 'text-[var(--color-status-success)]'; const isChecked = comparisonList.has(item.id); body += `<tr class="border-b border-[var(--color-border-primary)] last:border-b-0"><td data-label="${headers[0].label}" class="p-4"><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5" ${isChecked ? 'checked' : ''}></td><td data-label="${headers[1].label}" class="p-4 capitalize font-medium">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</td><td data-label="${headers[2].label}" class="p-4 text-[var(--color-text-secondary)]">₹${item.price || 'N/A'}</td><td data-label="${headers[3].label}" class="p-4 font-medium ${statusColor}">${quantity}</td><td data-label="${headers[4].label}" class="p-4"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button></td></tr>`; });
+        items.forEach(item => { const quantity = parseInt(item.quantity) || 0; const statusColor = quantity === 0 ? 'text-[var(--color-status-danger)]' : quantity < 5 ? 'text-[var(--color-status-warning)]' : 'text-[var(--color-status-success)]'; const isChecked = comparisonList.has(item.id); const isBulkChecked = bulkSelectedItems.has(item.id); body += `<tr class="border-b border-[var(--color-border-primary)] last:border-b-0"><td data-label="${headers[0].label}" class="p-4"><input type="checkbox" data-id="${item.id}" class="bulk-checkbox h-5 w-5" ${isBulkChecked ? 'checked' : ''}></td><td data-label="${headers[1].label}" class="p-4 capitalize font-medium">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</td><td data-label="${headers[2].label}" class="p-4 text-[var(--color-text-secondary)] editable" data-id="${item.id}" data-field="price">₹${item.price || 'N/A'}</td><td data-label="${headers[3].label}" class="p-4 font-medium ${statusColor} editable" data-id="${item.id}" data-field="quantity">${quantity}</td><td data-label="${headers[4].label}" class="p-4 flex items-center gap-2"><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5" ${isChecked ? 'checked' : ''} title="Select for comparison"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button></td></tr>`; });
         body += '</tbody>'; table.innerHTML = head + body; return table;
       }
       function createKanbanView(items) {
         const container = document.createElement('div');
         const columns = { inStock: { title: 'In Stock', items: [], color: 'var(--color-status-success)' }, lowStock: { title: 'Low Stock', items: [], color: 'var(--color-status-warning)' }, outOfStock: { title: 'Out of Stock', items: [], color: 'var(--color-status-danger)' }, };
         items.forEach(item => { const quantity = parseInt(item.quantity) || 0; if (quantity === 0) columns.outOfStock.items.push(item); else if (quantity < 5) columns.lowStock.items.push(item); else columns.inStock.items.push(item); });
-        for (const key in columns) { const col = columns[key]; const colDiv = document.createElement('div'); colDiv.className = 'flex flex-col gap-4'; let cardsHtml = col.items.map(item => { const isChecked = comparisonList.has(item.id); return `<div class="industrial-card p-4"><div class="flex justify-between items-start"><h4 class="font-bold capitalize pr-2">${[item.model, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h4><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5 flex-shrink-0" ${isChecked ? 'checked' : ''}></div><p class="text-sm text-[var(--color-text-secondary)]">${item.device || ''} ${item.size || ''}</p><div class="mt-4 pt-4 border-t border-[var(--color-border-primary)] flex justify-between items-center"><span class="font-semibold">Qty: ${item.quantity}</span><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button></div></div>`; }).join(''); colDiv.innerHTML = `<div class="flex items-center gap-3 pb-2 border-b-4" style="border-color: ${col.color};"><h3 class="text-lg font-black">${col.title}</h3><span class="font-bold text-sm bg-[var(--color-bg-tertiary)] px-2.5 py-0.5 rounded-full">${col.items.length}</span></div><div class="flex flex-col gap-4">${cardsHtml || '<p class="text-sm text-center text-[var(--color-text-secondary)] p-4">No items in this category.</p>'}</div>`; container.appendChild(colDiv); }
+        for (const key in columns) { const col = columns[key]; const colDiv = document.createElement('div'); colDiv.className = 'flex flex-col gap-4'; let cardsHtml = col.items.map(item => { const isChecked = comparisonList.has(item.id); const isBulkChecked = bulkSelectedItems.has(item.id); return `<div class="industrial-card p-4"><div class="flex justify-between items-start"><h4 class="font-bold capitalize pr-2">${[item.model, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h4><div class="flex flex-col gap-2"><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5 flex-shrink-0" ${isChecked ? 'checked' : ''} title="Select for comparison"><input type="checkbox" data-id="${item.id}" class="bulk-checkbox h-5 w-5 flex-shrink-0" ${isBulkChecked ? 'checked' : ''} title="Select for bulk action"></div></div><p class="text-sm text-[var(--color-text-secondary)]">${item.device || ''} ${item.size || ''}</p><div class="mt-4 pt-4 border-t border-[var(--color-border-primary)] flex justify-between items-center"><span class="font-semibold">Qty: ${item.quantity}</span><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button></div></div>`; }).join(''); colDiv.innerHTML = `<div class="flex items-center gap-3 pb-2 border-b-4" style="border-color: ${col.color};"><h3 class="text-lg font-black">${col.title}</h3><span class="font-bold text-sm bg-[var(--color-bg-tertiary)] px-2.5 py-0.5 rounded-full">${col.items.length}</span></div><div class="flex flex-col gap-4">${cardsHtml || '<p class="text-sm text-center text-[var(--color-text-secondary)] p-4">No items in this category.</p>'}</div>`; container.appendChild(colDiv); }
         return container;
       }
       function switchLayout(layout) {
@@ -735,16 +812,12 @@
         if (show) { let skeletonHtml = ''; for (let i = 0; i < 12; i++) { skeletonHtml += `<div class="industrial-card p-4 space-y-4"><div class="skeleton-item h-48 rounded"></div><div class="space-y-2"><div class="skeleton-item h-6 w-3/4 rounded"></div><div class="skeleton-item h-4 w-1/2 rounded"></div></div></div>`; } dom.skeletonLoader.innerHTML = `<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 skeleton-breathe">${skeletonHtml}</div>`; }
       }
       function initThemeAndLayout() {
-        // Theme
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) { dom.html.classList.add('dark'); } else { dom.html.classList.remove('dark'); }
-        // Accent Color
         const savedAccent = localStorage.getItem('accentColor');
         if (savedAccent) { applyTheme(JSON.parse(savedAccent)); }
         populateThemeSwatches();
-        // Layout
         switchLayout(localStorage.getItem('layout') || 'grid');
-        // Sidebar
         if (localStorage.getItem('sidebarCollapsed') === 'true') { dom.body.classList.add('sidebar-collapsed'); }
         updateValueVisibility();
       }
@@ -786,6 +859,7 @@
         document.querySelectorAll('.sidebar-nav-link').forEach(l => l.classList.remove('active'));
         dom.dashboardView.classList.add('hidden');
         dom.reportsView.classList.add('hidden');
+        dom.auditView.classList.add('hidden');
         dom.layoutSwitcher.classList.add('hidden');
         if (view === 'dashboard' || view === 'manage') {
             dom.navDashboard.classList.add('active');
@@ -795,7 +869,12 @@
         } else if (view === 'reports') {
             dom.navReports.classList.add('active');
             dom.reportsView.classList.remove('hidden');
-            dom.pageTitle.textContent = "Reports";
+            dom.pageTitle.textContent = "Sales Reports";
+        } else if (view === 'audit') {
+            dom.navAudit.classList.add('active');
+            dom.auditView.classList.remove('hidden');
+            dom.pageTitle.textContent = "Audit Log";
+            renderAuditLog();
         }
       }
       function toggleMobileSidebar() { const isOpen = dom.sidebar.classList.toggle('open'); dom.mobileBackdrop.classList.toggle('hidden', !isOpen); }
@@ -807,11 +886,60 @@
       function renderReportCharts() { const textColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text-secondary'); const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--color-border-primary'); const monthlyRevenue = allSales.reduce((acc, sale) => { const month = new Date(sale.date).toLocaleString('default', { month: 'short', year: 'numeric' }); const revenue = sale.quantitySold * sale.salePrice; acc[month] = (acc[month] || 0) + revenue; return acc; }, {}); const bestSellers = allSales.reduce((acc, sale) => { const item = allItems.find(i => i.id === sale.itemId); if (item) { const itemName = [item.model, item.itemName].filter(Boolean).join(' '); acc[itemName] = (acc[itemName] || 0) + sale.quantitySold; } return acc; }, {}); const sortedBestSellers = Object.entries(bestSellers).sort((a, b) => b[1] - a[1]).slice(0, 5); const chartOptions = { plugins: { legend: { labels: { color: textColor } } }, scales: { x: { ticks: { color: textColor }, grid: { color: gridColor } }, y: { ticks: { color: textColor }, grid: { color: gridColor } } } }; if (revenueChart) revenueChart.destroy(); revenueChart = new Chart(document.getElementById('revenue-chart'), { type: 'bar', data: { labels: Object.keys(monthlyRevenue), datasets: [{ label: 'Monthly Revenue', data: Object.values(monthlyRevenue), backgroundColor: 'rgba(255, 193, 7, 0.5)', borderColor: 'rgb(255, 193, 7)', borderWidth: 1 }] }, options: chartOptions }); if (bestsellersChart) bestsellersChart.destroy(); bestsellersChart = new Chart(document.getElementById('bestsellers-chart'), { type: 'doughnut', data: { labels: sortedBestSellers.map(item => item[0]), datasets: [{ label: 'Quantity Sold', data: sortedBestSellers.map(item => item[1]), backgroundColor: ['#FFC107', '#FFCA28', '#FFD54F', '#FFE082', '#FFECB3'], borderColor: getComputedStyle(document.documentElement).getPropertyValue('--color-bg-secondary').trim() || '#FFFFFF' }] }, options: { plugins: { legend: { position: 'right', labels: { color: textColor } } } } }); }
 
       // ================================================================================
-      // 8. COMPARISON
+      // 8. COMPARISON & ADVANCED FILTERS
       // ================================================================================
       function updateCompareButton() { const count = comparisonList.size; if (count >= 2) { dom.compareBtn.classList.remove('hidden'); dom.compareBtn.textContent = `Compare (${count})`; } else { dom.compareBtn.classList.add('hidden'); } }
-      function openComparisonModal() { const itemsToCompare = allItems.filter(item => comparisonList.has(item.id)); if (itemsToCompare.length < 2) return; const allKeys = new Set(['itemName', 'model', 'device', 'size', 'price', 'quantity']); itemsToCompare.forEach(item => { Object.keys(item).forEach(key => { if (key.startsWith('spec_') && item[key]) allKeys.add(key); }); }); let tableHTML = '<table class="w-full text-left border-collapse"><thead><tr><th class="p-3 font-semibold border-b-2 border-[var(--color-border-primary)]">Feature</th>'; itemsToCompare.forEach(item => { tableHTML += `<th class="p-3 font-semibold border-b-2 border-[var(--color-border-primary)] capitalize">${[item.model, item.itemName].filter(Boolean).join(' ').toLowerCase()}</th>`; }); tableHTML += '</tr></thead><tbody>'; allKeys.forEach(key => { const label = key.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()); tableHTML += `<tr class="border-b border-[var(--color-border-primary)] last:border-0"><td class="p-3 font-medium text-[var(--color-text-secondary)]">${label}</td>`; itemsToCompare.forEach(item => { tableHTML += `<td class="p-3">${item[key] || 'N/A'}</td>`; }); tableHTML += '</tr>'; }); tableHTML += '</tbody></table>'; dom.comparisonContent.innerHTML = tableHTML; dom.comparisonModal.classList.remove('hidden'); dom.comparisonModal.classList.add('flex'); }
+      function openComparisonModal() {
+        const itemsToCompare = allItems.filter(item => comparisonList.has(item.id));
+        if (itemsToCompare.length < 2) return;
+        const allKeys = new Set(['itemName', 'model', 'device', 'size', 'price', 'quantity']);
+        itemsToCompare.forEach(item => { Object.keys(item).forEach(key => { if (key.startsWith('spec_') && item[key]) allKeys.add(key); }); });
+        let tableHTML = '<table class="w-full text-left border-collapse"><thead><tr><th class="p-3 font-semibold border-b-2 border-[var(--color-border-primary)]">Feature</th>';
+        itemsToCompare.forEach(item => { tableHTML += `<th class="p-3 font-semibold border-b-2 border-[var(--color-border-primary)] capitalize">${[item.model, item.itemName].filter(Boolean).join(' ').toLowerCase()}</th>`; });
+        tableHTML += '</tr></thead><tbody>';
+        allKeys.forEach(key => {
+            const label = key.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+            const values = itemsToCompare.map(item => item[key] || 'N/A');
+            const allSame = values.every(v => v === values[0]);
+            tableHTML += `<tr class="border-b border-[var(--color-border-primary)] last:border-0"><td class="p-3 font-medium text-[var(--color-text-secondary)]">${label}</td>`;
+            values.forEach(value => { tableHTML += `<td class="p-3 ${!allSame ? 'comparison-diff' : ''}">${value}</td>`; });
+            tableHTML += '</tr>';
+        });
+        tableHTML += '</tbody></table>';
+        dom.comparisonContent.innerHTML = tableHTML;
+        dom.comparisonModal.classList.remove('hidden');
+        dom.comparisonModal.classList.add('flex');
+      }
       function closeComparisonModal() { dom.comparisonModal.classList.add('hidden'); dom.comparisonModal.classList.remove('flex'); }
+      function saveCurrentFilter() {
+        Swal.fire({ title: 'Save Filter As', input: 'text', inputLabel: 'Filter Name', showCancelButton: true, confirmButtonText: 'Save',
+            inputValidator: (value) => { if (!value) { return 'You need to write something!' } }
+        }).then(result => {
+            if (result.isConfirmed && result.value) {
+                const filters = { name: result.value, search: dom.search.value, device: Array.from(dom.filterDevice.selectedOptions).map(o => o.value), size: Array.from(dom.filterSize.selectedOptions).map(o => o.value), sort: dom.sortBy.value };
+                const saved = JSON.parse(localStorage.getItem('savedFilters') || '[]');
+                saved.push(filters);
+                localStorage.setItem('savedFilters', JSON.stringify(saved));
+                loadSavedFilters();
+                Swal.fire('Saved!', 'Your filter has been saved.', 'success');
+            }
+        });
+      }
+      function loadSavedFilters() {
+        const saved = JSON.parse(localStorage.getItem('savedFilters') || '[]');
+        dom.savedFilters.innerHTML = '<option value="">Select saved filter...</option>';
+        saved.forEach((filter, index) => { dom.savedFilters.innerHTML += `<option value="${index}">${filter.name}</option>`; });
+      }
+      function applySavedFilter(index) {
+        const saved = JSON.parse(localStorage.getItem('savedFilters') || '[]');
+        const filter = saved[index];
+        if (!filter) return;
+        dom.search.value = filter.search;
+        Array.from(dom.filterDevice.options).forEach(o => o.selected = filter.device.includes(o.value));
+        Array.from(dom.filterSize.options).forEach(o => o.selected = filter.size.includes(o.value));
+        dom.sortBy.value = filter.sort;
+        processAndRenderItems();
+      }
 
       // ================================================================================
       // 9. NEW FEATURES - PALETTE, NOTIFICATIONS, ETC.
@@ -894,11 +1022,18 @@
       // 10. EVENTS & INIT
       // ================================================================================
       function handlePaginationClick(e) { const button = e.target.closest('button'); if (button && !button.disabled) { currentPage = parseInt(button.dataset.page); renderItems(); window.scrollTo(0, 0); } }
-      function handleCardClick(e) { const viewBtn = e.target.closest('.view-details-btn'); if (viewBtn) { const itemId = viewBtn.dataset.id; const item = allItems.find(i => i.id === itemId); if (item) openDetailPanel(item); return; } const checkbox = e.target.closest('.compare-checkbox'); if (checkbox) { const itemId = checkbox.dataset.id; if (checkbox.checked) comparisonList.add(itemId); else comparisonList.delete(itemId); updateCompareButton(); } }
+      function handleCardClick(e) {
+        const viewBtn = e.target.closest('.view-details-btn');
+        if (viewBtn) { const itemId = viewBtn.dataset.id; const item = allItems.find(i => i.id === itemId); if (item) openDetailPanel(item); return; }
+        const compareCheckbox = e.target.closest('.compare-checkbox');
+        if (compareCheckbox) { const itemId = compareCheckbox.dataset.id; if (compareCheckbox.checked) comparisonList.add(itemId); else comparisonList.delete(itemId); updateCompareButton(); }
+        const bulkCheckbox = e.target.closest('.bulk-checkbox');
+        if (bulkCheckbox) { const itemId = bulkCheckbox.dataset.id; if (bulkCheckbox.checked) bulkSelectedItems.add(itemId); else bulkSelectedItems.delete(itemId); updateBulkActionsBar(); }
+      }
       function handleDetailPanelClick(e) {
         const editBtn = e.target.closest('.edit-btn'); const deleteBtn = e.target.closest('.delete-btn'); const arrowBtn = e.target.closest('.detail-gallery-arrow');
         if (editBtn) { const itemId = editBtn.dataset.id; const item = allItems.find(i => i.id === itemId); if (item) { closeDetailPanel(); openEditModal(item); } }
-        if (deleteBtn) { const itemId = deleteBtn.dataset.id; Swal.fire({ title: 'Are you absolutely sure?', text: "This action cannot be undone!", icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, delete it!', confirmButtonColor: '#d33', cancelButtonText: 'Cancel' }).then((result) => { if (result.isConfirmed) deleteComponent(itemId); }); }
+        if (deleteBtn) { const itemId = deleteBtn.dataset.id; Swal.fire({ title: 'Are you absolutely sure?', text: "This action cannot be undone!", icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, delete it!', confirmButtonColor: '#d33', cancelButtonText: 'Cancel' }).then(async (result) => { if (result.isConfirmed) { if(await deleteComponent(itemId)) { Swal.fire('Deleted!', 'The component has been deleted.', 'success'); closeDetailPanel(); localStorage.removeItem('inventoryData'); await loadAllData(); } } }); }
         if (arrowBtn) { const gallery = arrowBtn.closest('.image-gallery'); const images = (gallery.dataset.images || '').split(',').map(link => link.trim()).filter(Boolean); if (images.length <= 1) return; let currentIndex = parseInt(gallery.dataset.currentIndex || '0'); const direction = parseInt(arrowBtn.dataset.direction); currentIndex = (currentIndex + direction + images.length) % images.length; gallery.querySelector('.gallery-image').src = getDriveThumbnail(images[currentIndex]); gallery.dataset.currentIndex = currentIndex; }
       }
       
@@ -926,9 +1061,10 @@
       dom.detailCloseBtn.addEventListener('click', closeDetailPanel);
       dom.detailBackdrop.addEventListener('click', closeDetailPanel);
       dom.searchResults.addEventListener('click', handleCardClick);
+      dom.searchResults.addEventListener('dblclick', handleInlineEdit);
       dom.detailContent.addEventListener('click', handleDetailPanelClick);
       dom.paginationControls.addEventListener('click', handlePaginationClick);
-      [dom.navDashboard, dom.navReports, dom.navManage].forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const view = e.currentTarget.id.replace('nav-', ''); switchView(view); if (window.innerWidth < 1024) toggleMobileSidebar(); }); });
+      [dom.navDashboard, dom.navReports, dom.navManage, dom.navAudit].forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const view = e.currentTarget.id.replace('nav-', ''); switchView(view); if (window.innerWidth < 1024) toggleMobileSidebar(); }); });
       dom.valueToggleBtn.addEventListener('click', toggleValueVisibility);
       dom.compareBtn.addEventListener('click', openComparisonModal);
       dom.closeComparisonModalBtn.addEventListener('click', closeComparisonModal);
@@ -944,6 +1080,13 @@
       dom.sidebarCollapseBtn.addEventListener('click', toggleSidebarCollapse);
       dom.mainFab.addEventListener('click', () => dom.quickActionsFabContainer.classList.toggle('open'));
       dom.themeSwatches.addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') { applyTheme(e.target.dataset); } });
+      dom.saveFilterBtn.addEventListener('click', saveCurrentFilter);
+      dom.savedFilters.addEventListener('change', (e) => applySavedFilter(e.target.value));
+      dom.searchResults.addEventListener('change', (e) => { if(e.target.id === 'select-all-checkbox') { toggleSelectAll(e.target.checked); } });
+      dom.bulkDeleteBtn.addEventListener('click', handleBulkDelete);
+      dom.bulkExportBtn.addEventListener('click', handleBulkExport);
+      dom.auditUserFilter.addEventListener('change', () => renderAuditLog());
+      dom.auditDateFilter.addEventListener('change', () => renderAuditLog());
       
       // Global Listeners
       document.addEventListener('click', (e) => {
@@ -960,7 +1103,6 @@
         if (e.ctrlKey && e.key === 'k') { e.preventDefault(); openCommandPalette(); }
         if (e.ctrlKey && e.key === 's' && !dom.formModal.classList.contains('hidden')) { e.preventDefault(); dom.saveBtn.click(); }
         
-        // Command Palette Keyboard Navigation
         if (!dom.commandPalette.classList.contains('hidden')) {
           const results = dom.commandPaletteResults.querySelectorAll('.result-item');
           if (results.length === 0) return;
@@ -970,6 +1112,119 @@
           results.forEach((r, i) => r.classList.toggle('selected', i === commandPaletteSelectedIndex));
         }
       });
+
+      // ================================================================================
+      // 11. ADVANCED FEATURES - INLINE EDIT, BULK ACTIONS, AUDIT LOG
+      // ================================================================================
+      function handleInlineEdit(e) {
+        const cell = e.target.closest('.editable');
+        if (!cell || cell.querySelector('input')) return;
+        
+        const originalValue = cell.textContent.replace('₹', '').trim();
+        const field = cell.dataset.field;
+        const id = cell.dataset.id;
+        
+        cell.innerHTML = `<input type="text" value="${originalValue}" class="w-full bg-transparent border-b-2 border-[var(--color-accent-main)] outline-none">`;
+        const input = cell.querySelector('input');
+        input.focus();
+        input.select();
+
+        const saveEdit = async () => {
+            const newValue = input.value;
+            cell.innerHTML = field === 'price' ? `₹${newValue}` : newValue;
+            if (newValue !== originalValue) {
+                try {
+                    await updateComponent(id, { [field]: newValue }, true);
+                } catch(err) {
+                    Swal.fire('Update Failed', 'Could not save the change.', 'error');
+                    cell.innerHTML = originalValue;
+                }
+            }
+        };
+        
+        input.addEventListener('blur', saveEdit);
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') input.blur();
+            if (e.key === 'Escape') {
+                cell.innerHTML = field === 'price' ? `₹${originalValue}` : originalValue;
+            }
+        });
+      }
+      function updateBulkActionsBar() {
+        const count = bulkSelectedItems.size;
+        dom.bulkActionsCount.textContent = count;
+        dom.bulkActionsBar.classList.toggle('visible', count > 0);
+      }
+      function toggleSelectAll(checked) {
+        const checkboxes = dom.searchResults.querySelectorAll('.bulk-checkbox');
+        checkboxes.forEach(cb => {
+            cb.checked = checked;
+            const id = cb.dataset.id;
+            if (checked) bulkSelectedItems.add(id); else bulkSelectedItems.delete(id);
+        });
+        updateBulkActionsBar();
+      }
+      async function handleBulkDelete() {
+        const count = bulkSelectedItems.size;
+        if (count === 0) return;
+        const result = await Swal.fire({ title: `Delete ${count} items?`, text: "This action cannot be undone.", icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, delete them!', confirmButtonColor: '#d33' });
+        if (result.isConfirmed) {
+            Swal.fire({ title: 'Deleting...', html: 'Please wait while the items are being deleted.', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+            const deletePromises = Array.from(bulkSelectedItems).map(id => deleteComponent(id));
+            await Promise.all(deletePromises);
+            bulkSelectedItems.clear();
+            updateBulkActionsBar();
+            localStorage.removeItem('inventoryData');
+            await loadAllData();
+            Swal.close();
+            Swal.fire('Deleted!', `${count} items have been deleted.`, 'success');
+        }
+      }
+      function handleBulkExport() {
+        const itemsToExport = allItems.filter(item => bulkSelectedItems.has(item.id));
+        if (itemsToExport.length === 0) return;
+        const headers = Object.keys(itemsToExport[0]).join(',');
+        const csvRows = itemsToExport.map(item => Object.values(item).map(val => `"${String(val || '').replace(/"/g, '""')}"`).join(','));
+        const csvContent = `data:text/csv;charset=utf-8,${headers}\n${csvRows.join('\n')}`;
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', `component_export_${new Date().toISOString()}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      function renderAuditLog() {
+          const userFilter = dom.auditUserFilter.value;
+          const dateFilter = dom.auditDateFilter.value;
+          
+          const filteredLogs = allNotifications.filter(log => {
+              const userMatch = !userFilter || log.user === userFilter;
+              const dateMatch = !dateFilter || new Date(log.timestamp).toDateString() === new Date(dateFilter).toDateString();
+              return userMatch && dateMatch;
+          });
+
+          const users = [...new Set(allNotifications.map(n => n.user))];
+          dom.auditUserFilter.innerHTML = '<option value="">All Users</option>' + users.map(u => `<option value="${u}">${u}</option>`).join('');
+          dom.auditUserFilter.value = userFilter;
+
+          let tableHTML = `<table class="w-full text-left border-collapse industrial-table"><thead><tr class="border-b border-[var(--color-border-primary)]"><th class="p-4">Date</th><th class="p-4">User</th><th class="p-4">Action</th><th class="p-4">Item</th><th class="p-4">Details</th></tr></thead><tbody>`;
+          filteredLogs.forEach(log => {
+              const item = allItems.find(i => i.id === log.itemId);
+              const itemName = item ? [item.model, item.itemName].filter(Boolean).join(' ') : `ID: ${log.itemId}`;
+              let detailsHtml = '';
+              if (log.action === 'UPDATE') {
+                  try {
+                      const changes = JSON.parse(log.details);
+                      detailsHtml = Object.entries(changes).map(([key, val]) => `<div class="text-xs"><span class="font-semibold">${key}:</span> ${val.from || '""'} &rarr; ${val.to || '""'}</div>`).join('');
+                  } catch { detailsHtml = '...'; }
+              }
+              tableHTML += `<tr class="border-b border-[var(--color-border-primary)] last:border-b-0"><td class="p-4 text-sm">${new Date(log.timestamp).toLocaleString()}</td><td class="p-4">${log.user}</td><td class="p-4"><span class="font-semibold px-2 py-1 text-xs rounded ${log.action === 'CREATE' ? 'bg-green-500/20' : log.action === 'DELETE' ? 'bg-red-500/20' : 'bg-yellow-500/20'}">${log.action}</span></td><td class="p-4">${itemName}</td><td class="p-4">${detailsHtml}</td></tr>`;
+          });
+          tableHTML += `</tbody></table>`;
+          dom.auditLogContent.innerHTML = tableHTML;
+      }
+
     });
   </script>
 </body>
