@@ -109,14 +109,6 @@
     .sidebar-nav-link.active { background-color: var(--color-accent-main); color: var(--color-text-on-accent); font-weight: var(--font-weight-bold); }
     .sidebar-nav-link.active::before { transform: translateY(-50%) scaleY(1); }
     
-    .nav-section summary { list-style: none; cursor: pointer; }
-    .nav-section summary::-webkit-details-marker { display: none; }
-    .nav-section .chevron { transition: transform var(--transition-speed-fast) var(--transition-curve-smooth); }
-    .nav-section[open] > summary .chevron { transform: rotate(90deg); }
-    body.sidebar-collapsed .nav-section summary .chevron { display: none; }
-    body.sidebar-collapsed .nav-section-content { padding-left: 0; }
-    body.sidebar-collapsed .nav-section[open] .sidebar-nav-link { background-color: var(--color-bg-tertiary); }
-
     .industrial-card { background-color: var(--color-bg-secondary); border: var(--border-width) solid var(--color-border-primary); border-radius: var(--radius-md); box-shadow: var(--shadow-elevation-low); transition: transform var(--transition-speed-fast) var(--transition-curve-bounce), box-shadow var(--transition-speed-fast) var(--transition-curve-bounce), border-color var(--transition-speed-fast) var(--transition-curve-smooth); }
     .industrial-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-elevation-medium); border-color: var(--color-accent-main); }
     .industrial-card th { position: -webkit-sticky; position: sticky; top: 0; background-color: var(--color-bg-secondary); z-index: 10; }
@@ -222,20 +214,6 @@
         <a href="#" id="nav-dashboard" class="sidebar-nav-link active flex items-center gap-4 px-4 py-3 rounded-lg">
           <i data-lucide="layout-grid" class="w-5 h-5"></i><span class="truncate">Dashboard</span>
         </a>
-        <details class="nav-section">
-          <summary class="sidebar-nav-link flex items-center justify-between gap-4 px-4 py-3 text-[var(--color-text-secondary)] rounded-lg font-medium">
-            <div class="flex items-center gap-4"><i data-lucide="archive" class="w-5 h-5"></i><span class="truncate">Inventory</span></div>
-            <i data-lucide="chevron-right" class="chevron w-4 h-4"></i>
-          </summary>
-          <div class="nav-section-content pl-4 pt-1 space-y-1">
-            <a href="#" id="nav-manage" class="sidebar-nav-link flex items-center gap-4 px-4 py-3 text-[var(--color-text-secondary)] rounded-lg font-medium">
-              <i data-lucide="list" class="w-5 h-5"></i><span class="truncate">Manage</span>
-            </a>
-            <a href="#" id="nav-add-new" class="sidebar-nav-link flex items-center gap-4 px-4 py-3 text-[var(--color-text-secondary)] rounded-lg font-medium">
-              <i data-lucide="plus-circle" class="w-5 h-5"></i><span class="truncate">Add New</span>
-            </a>
-          </div>
-        </details>
         <a href="#" id="nav-activity" class="sidebar-nav-link flex items-center gap-4 px-4 py-3 text-[var(--color-text-secondary)] rounded-lg font-medium">
           <i data-lucide="history" class="w-5 h-5"></i><span class="truncate">Activity Log</span>
         </a>
@@ -243,11 +221,6 @@
 
       <!-- Sidebar Footer -->
       <div class="p-4 border-t border-[var(--color-border-primary)] flex-shrink-0 space-y-2">
-        <div class="grid grid-cols-3 gap-2">
-            <a href="https://drive.google.com" target="_blank" class="btn btn--secondary !p-2" title="Google Drive"><i data-lucide="folder-symlink"></i></a>
-            <a href="#" class="btn btn--secondary !p-2" title="SAP CPI"><i data-lucide="database"></i></a>
-            <a href="mailto:" class="btn btn--secondary !p-2" title="Email"><i data-lucide="mail"></i></a>
-        </div>
         <div id="user-profile-area" class="relative">
           <div id="auth-signed-out-view" class="p-2 rounded-lg cursor-pointer group hover:bg-[var(--color-bg-tertiary)] transition-colors">
             <div class="flex items-center gap-3">
@@ -307,10 +280,10 @@
             <div class="mb-8">
                 <h2 class="text-2xl font-black mb-4">Analytics Overview</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Total Components</p><p id="total-components" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p></div>
-                    <div class="industrial-card p-6 flex flex-col justify-between"><div class="flex justify-between items-start"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Inventory Value</p><button id="value-toggle-btn" aria-label="Toggle inventory value visibility" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"><i data-lucide="eye-off" class="w-5 h-5"></i></button></div><p id="total-value" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">₹0</p></div>
-                    <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Low Stock Items</p><p id="low-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2">0</p></div>
-                    <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Out of Stock</p><p id="out-of-stock" class="text-3xl sm:text-4xl xl:text-5xl font-black mt-2 text-[var(--color-status-danger)]">0</p></div>
+                    <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Total Components</p><p id="total-components" class="text-3xl sm:text-4xl font-black mt-2">0</p></div>
+                    <div class="industrial-card p-6 flex flex-col justify-between"><div class="flex justify-between items-start"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Inventory Value</p><button id="value-toggle-btn" aria-label="Toggle inventory value visibility" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"><i data-lucide="eye-off" class="w-5 h-5"></i></button></div><p id="total-value" class="text-3xl sm:text-4xl font-black mt-2">₹0</p></div>
+                    <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Low Stock Items</p><p id="low-stock" class="text-3xl sm:text-4xl font-black mt-2">0</p></div>
+                    <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Out of Stock</p><p id="out-of-stock" class="text-3xl sm:text-4xl font-black mt-2 text-[var(--color-status-danger)]">0</p></div>
                 </div>
             </div>
             <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg p-4 mb-8">
@@ -443,7 +416,6 @@
         body: document.body,
         appWrapper: document.getElementById('app-wrapper'),
         loginView: document.getElementById('login-view'),
-        addPartBtn: document.getElementById('nav-add-new'),
         searchResults: document.getElementById('searchResults'),
         noResults: document.getElementById('no-results'),
         authSignedInView: document.getElementById('auth-signed-in-view'),
@@ -480,7 +452,6 @@
         sortBy: document.getElementById('sort-by'),
         paginationControls: document.getElementById('pagination-controls'),
         navDashboard: document.getElementById('nav-dashboard'),
-        navManage: document.getElementById('nav-manage'),
         dashboardView: document.getElementById('dashboard-view'),
         layoutSwitcher: document.getElementById('layout-switcher'),
         pageTitle: document.getElementById('page-title'),
@@ -783,7 +754,7 @@
         dom.dashboardView.classList.add('hidden');
         dom.activityView.classList.add('hidden');
         dom.layoutSwitcher.classList.add('hidden');
-        if (view === 'dashboard' || view === 'manage') {
+        if (view === 'dashboard') {
             dom.navDashboard.classList.add('active');
             dom.dashboardView.classList.remove('hidden');
             dom.layoutSwitcher.classList.remove('hidden');
@@ -987,7 +958,6 @@
       dom.partForm.addEventListener('submit', handleFormSubmit);
       dom.search.addEventListener('input', () => { clearTimeout(searchDebounceTimer); searchDebounceTimer = setTimeout(() => { currentPage = 1; processAndRenderItems(); }, 300); });
       [dom.filterDevice, dom.filterSize, dom.sortBy].forEach(el => el.addEventListener('change', () => { currentPage = 1; processAndRenderItems(); }));
-      dom.addPartBtn.addEventListener('click', openAddModal);
       dom.closeFormModalBtn.addEventListener('click', closeFormModal);
       dom.cancelBtn.addEventListener('click', closeFormModal);
       dom.menuBtn.addEventListener('click', toggleMobileSidebar);
@@ -1003,7 +973,7 @@
       dom.searchResults.addEventListener('click', handleCardClick);
       dom.detailContent.addEventListener('click', handleDetailPanelClick);
       dom.paginationControls.addEventListener('click', handlePaginationClick);
-      [dom.navDashboard, dom.navManage, dom.navActivity].forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const view = e.currentTarget.id.replace('nav-', ''); switchView(view); if (window.innerWidth < 1024) toggleMobileSidebar(); }); });
+      [dom.navDashboard, dom.navActivity].forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const view = e.currentTarget.id.replace('nav-', ''); switchView(view); if (window.innerWidth < 1024) toggleMobileSidebar(); }); });
       dom.valueToggleBtn.addEventListener('click', toggleValueVisibility);
       dom.compareBtn.addEventListener('click', openComparisonModal);
       dom.closeComparisonModalBtn.addEventListener('click', closeComparisonModal);
