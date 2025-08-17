@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vinayaka  | Component Database</title>
+  <title>Vinayaka Industries | Component Database</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -12,11 +12,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+  
   <style>
     /* ==========================================================================
-       VINAYAKA INDUSTRIES :: COMPONENT DATABASE STYLESHEET V2
+       VINAYAKA INDUSTRIES :: COMPONENT DATABASE STYLESHEET V3
        ========================================================================== */
     :root {
       --sidebar-width: 260px;
@@ -86,13 +85,11 @@
     }
     h1,h2,h3,h4,h5,h6 { font-weight: var(--font-weight-black); line-height: 1.2; }
 
-    /* NEW: Animated Transitions */
     .fade-in { animation: fadeIn var(--transition-speed-normal) var(--transition-curve-smooth); }
     .scale-in { animation: scaleIn var(--transition-speed-normal) var(--transition-curve-bounce); }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
-    /* UPDATED: Sidebar & Main Content for Collapse Feature */
     .main-content { padding-left: var(--sidebar-width); transition: padding-left var(--transition-speed-normal) var(--transition-curve-bounce); }
     .sidebar { background-color: var(--color-bg-secondary); border-right: var(--border-width) solid var(--color-border-primary); transition: width var(--transition-speed-normal) var(--transition-curve-bounce), transform var(--transition-speed-normal) var(--transition-curve-bounce); height: 100vh; }
     body.sidebar-collapsed .main-content { padding-left: var(--sidebar-width-collapsed); }
@@ -105,7 +102,6 @@
     body.sidebar-collapsed .sidebar-header { justify-content: center; }
     body.sidebar-collapsed .sidebar-nav-link { justify-content: center; }
     
-    /* UPDATED: Sidebar Navigation Links */
     .sidebar-nav-link { position: relative; transition: background-color var(--transition-speed-fast) var(--transition-curve-smooth), color var(--transition-speed-fast) var(--transition-curve-smooth); }
     .sidebar-nav-link::before { content: ''; position: absolute; left: 0; top: 50%; width: 4px; height: 60%; background-color: var(--color-accent-main); border-radius: 0 4px 4px 0; transform: translateY(-50%) scaleY(0); transition: transform var(--transition-speed-fast) var(--transition-curve-bounce); }
     .sidebar-nav-link:hover:not(.active) { background-color: var(--color-bg-tertiary); }
@@ -113,7 +109,6 @@
     .sidebar-nav-link.active { background-color: var(--color-accent-main); color: var(--color-text-on-accent); font-weight: var(--font-weight-bold); }
     .sidebar-nav-link.active::before { transform: translateY(-50%) scaleY(1); }
     
-    /* NEW: Collapsible Nav Sections */
     .nav-section summary { list-style: none; cursor: pointer; }
     .nav-section summary::-webkit-details-marker { display: none; }
     .nav-section .chevron { transition: transform var(--transition-speed-fast) var(--transition-curve-smooth); }
@@ -122,15 +117,12 @@
     body.sidebar-collapsed .nav-section-content { padding-left: 0; }
     body.sidebar-collapsed .nav-section[open] .sidebar-nav-link { background-color: var(--color-bg-tertiary); }
 
-
-    /* Industrial Card & Table */
     .industrial-card { background-color: var(--color-bg-secondary); border: var(--border-width) solid var(--color-border-primary); border-radius: var(--radius-md); box-shadow: var(--shadow-elevation-low); transition: transform var(--transition-speed-fast) var(--transition-curve-bounce), box-shadow var(--transition-speed-fast) var(--transition-curve-bounce), border-color var(--transition-speed-fast) var(--transition-curve-smooth); }
     .industrial-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-elevation-medium); border-color: var(--color-accent-main); }
     .industrial-card th { position: -webkit-sticky; position: sticky; top: 0; background-color: var(--color-bg-secondary); z-index: 10; }
     .industrial-table tbody tr:nth-child(even) { background-color: var(--color-bg-tertiary); }
     .industrial-table tbody tr:hover { background-color: color-mix(in srgb, var(--color-accent-main) 15%, transparent); }
 
-    /* Buttons & Inputs */
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); padding: var(--space-3) var(--space-5); border-radius: var(--radius-sm); font-weight: var(--font-weight-bold); text-align: center; border: var(--border-width) solid transparent; cursor: pointer; transition: transform var(--transition-speed-fast) var(--transition-curve-bounce), box-shadow var(--transition-speed-fast) var(--transition-curve-bounce), background-color var(--transition-speed-fast) var(--transition-curve-smooth), border-color var(--transition-speed-fast) var(--transition-curve-smooth); user-select: none; }
     .btn:focus-visible { outline: 2px solid var(--color-accent-main); outline-offset: 2px; }
     .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; box-shadow: none !important; border-bottom-width: 3px !important; }
@@ -141,47 +133,45 @@
     .btn--secondary:hover:not(:disabled) { background-color: var(--color-bg-tertiary); border-color: var(--color-text-primary); }
     .btn--danger { background-color: transparent; color: var(--color-status-danger); border-color: var(--color-status-danger); }
     .btn--danger:hover:not(:disabled) { background-color: var(--color-status-danger); color: var(--color-text-on-danger); }
+    
     .filter-control-group { background-color: var(--color-bg-tertiary); border: var(--border-width) solid var(--color-border-primary); border-radius: var(--radius-md); padding: var(--space-1) var(--space-3); transition: border-color var(--transition-speed-fast) var(--transition-curve-smooth), box-shadow var(--transition-speed-fast) var(--transition-curve-smooth); }
     .filter-control-group:focus-within { border-color: var(--color-border-focus); box-shadow: 0 0 0 3px var(--color-accent-focus-ring); }
     .filter-control-group label { font-size: 0.7rem; font-weight: var(--font-weight-semibold); color: var(--color-text-secondary); display: block; }
     .filter-control-input { background-color: transparent; border: none; outline: none; width: 100%; padding: 0.1rem 0; color: var(--color-text-primary); font-weight: var(--font-weight-medium); font-family: inherit; }
     .filter-control-input::placeholder { color: var(--color-text-secondary); opacity: 0.8; }
+    
     .industrial-input { background-color: transparent; border: none; border-bottom: 2px solid var(--color-border-primary); border-radius: 0; padding: var(--space-3) var(--space-1); width: 100%; font-family: inherit; font-size: 1rem; transition: border-color var(--transition-speed-fast) var(--transition-curve-smooth); }
     .industrial-input:focus { outline: none; border-bottom-color: var(--color-border-focus); --tw-ring-color: transparent; }
     
-    /* Misc & Modals */
     .blurred-value { filter: blur(8px); user-select: none; cursor: pointer; transition: filter var(--transition-speed-normal) var(--transition-curve-smooth); }
     .swal2-popup { font-family: var(--font-family-base); background-color: var(--color-bg-secondary) !important; color: var(--color-text-primary) !important; border: var(--border-width) solid var(--color-border-primary) !important; border-radius: var(--radius-lg) !important; }
     .swal2-title { color: var(--color-text-primary) !important; }
     .swal2-confirm { background-color: var(--color-accent-main) !important; color: var(--color-text-on-accent) !important; }
     .swal2-deny { background-color: var(--color-status-danger) !important; }
     .swal2-cancel { background-color: var(--color-bg-tertiary) !important; }
+    
     @keyframes breathing { 0%,100%{ background-color: var(--color-bg-tertiary);} 50%{ background-color: color-mix(in srgb, var(--color-bg-tertiary) 80%, var(--color-bg-secondary)); } }
     .skeleton-breathe .skeleton-item { animation: breathing 2s var(--transition-curve-bounce) infinite; }
     .skeleton-breathe .skeleton-item:nth-child(2n){ animation-delay: 100ms; }
     .skeleton-breathe .skeleton-item:nth-child(3n){ animation-delay: 200ms; }
+    
     .edit-mode-banner { background-color: color-mix(in srgb, var(--color-accent-main) 20%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--color-accent-main) 40%, transparent); padding: 0.75rem 1.5rem; font-size: 0.9rem; font-weight: var(--font-weight-semibold); display: flex; align-items: center; gap: 0.5rem; color: var(--color-text-primary); }
 
-    /* NEW: Command Palette */
     #command-palette { transition: opacity var(--transition-speed-fast) var(--transition-curve-smooth), transform var(--transition-speed-fast) var(--transition-curve-smooth); }
     #command-palette-results .result-item.selected { background-color: var(--color-accent-main); color: var(--color-text-on-accent); }
     #command-palette-results .result-item.selected .result-item-desc { color: var(--color-text-on-accent); opacity: 0.8; }
     
-    /* NEW: Notification Center */
     #notification-center { transition: transform var(--transition-speed-normal) var(--transition-curve-bounce); transform: translateX(100%); }
     #notification-center.open { transform: translateX(0); }
     #notification-bell-btn::after { content: ''; position: absolute; top: 0.6rem; right: 0.6rem; width: 8px; height: 8px; border-radius: 99px; background-color: var(--color-status-danger); display: none; }
     #notification-bell-btn.has-unread::after { display: block; }
     
-    /* NEW: Profile Dropdown */
     #profile-dropdown { transition: opacity var(--transition-speed-fast) var(--transition-curve-smooth), transform var(--transition-speed-fast) var(--transition-curve-smooth); }
     
-    /* NEW: Quick Actions FAB */
     #quick-actions-fab-container button { transition: all var(--transition-speed-normal) var(--transition-curve-bounce); }
     #quick-actions-fab-container.open .main-fab { transform: rotate(45deg); }
     #quick-actions-fab-container.open .action-fab-1 { transform: translateY(-60px) scale(1); opacity: 1; }
     
-    /* RESPONSIVE STYLES */
     @media (max-width: 1024px) {
       .main-content { padding-left: 0; }
       .sidebar { transform: translateX(-100%); box-shadow: 5px 0 15px rgba(0,0,0,0.2); z-index: 50; width: var(--sidebar-width) !important; }
@@ -424,19 +414,17 @@
       // 1. CONFIGURATION & STATE
       // ================================================================================
       const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw'; // WARNING: Exposing API keys on the client-side is a security risk.
-      const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com';
+      const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.google.com';
       const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4", "https://www.googleapis.com/discovery/v1/apis/oauth2/v2/rest"];
       const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile";
       const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ';
       const SHEET_NAME = 'Sheet1';
-      const SALES_SHEET_NAME = 'SalesLog';
       const AUDIT_SHEET_NAME = 'AuditLog';
       let SHEET_ID = null;
       const INVENTORY_RANGE = `${SHEET_NAME}!A:ZZ`;
-      const SALES_RANGE = `${SALES_SHEET_NAME}!A:D`;
       const AUDIT_RANGE = `${AUDIT_SHEET_NAME}!A:E`;
 
-      let allItems = [], allSales = [], allActivity = [];
+      let allItems = [], allActivity = [];
       let filteredItems = [];
       let gapiInited = false, gisInited = false;
       let tokenClient;
@@ -559,33 +547,17 @@
           dom.appWrapper.classList.add('hidden');
           dom.authSignedInView.classList.add('hidden');
           dom.authSignedOutView.classList.remove('hidden');
-          allItems = []; allSales = []; sheetHeaders = []; currentUser = {}; allActivity = [];
+          allItems = []; sheetHeaders = []; currentUser = {}; allActivity = [];
           localStorage.removeItem('inventoryData');
           processAndRenderItems();
         }
       }
       async function loadAllData() {
-        const cached = JSON.parse(localStorage.getItem('inventoryData'));
-        if (cached && (Date.now() - cached.timestamp < 3600000)) { // 1 hour cache
-          allItems = cached.items || []; 
-          allSales = cached.sales || []; 
-          sheetHeaders = cached.headers || []; 
-          allActivity = cached.activity || [];
-          populateFilters(); 
-          processAndRenderItems(); 
-          renderNotifications(); 
-          renderActivityLog();
-          return;
-        }
-
         showSkeletonLoader(true);
         try {
-          const [invRes, salesRes, auditRes] = await Promise.all([
-            gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: INVENTORY_RANGE }),
-            gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: SALES_RANGE }).catch(err => { console.error("Could not load SalesLog:", err); return null; }),
-            gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: AUDIT_RANGE }).catch(err => { console.error("Could not load AuditLog:", err); return null; })
-          ]);
-
+          // ** FIX: Sequential and robust data fetching **
+          // 1. Fetch critical inventory data first.
+          const invRes = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: INVENTORY_RANGE });
           const inventoryValues = invRes.result.values;
           if (!inventoryValues || inventoryValues.length === 0) { 
             Swal.fire('Sheet Error', 'The main inventory sheet (Sheet1) is empty or could not be read.', 'error'); 
@@ -600,13 +572,17 @@
             return item; 
           }).filter(item => item.id && item.id.trim() !== '');
 
-          const salesValues = salesRes ? salesRes.result.values : null;
-          allSales = (salesValues && salesValues.length > 1) ? salesValues.slice(1).map(row => ({ itemId: row[0], quantitySold: parseInt(row[1], 10), salePrice: parseFloat(row[2]), date: row[3] })) : [];
+          // 2. Then, fetch non-critical audit log data.
+          try {
+            const auditRes = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: AUDIT_RANGE });
+            const auditValues = auditRes.result.values;
+            allActivity = (auditValues && auditValues.length > 1) ? auditValues.slice(1).map(row => ({ timestamp: row[0], user: row[1], action: row[2], itemId: row[3], details: row[4] })).reverse() : [];
+          } catch (err) {
+            console.error("Could not load AuditLog, but continuing...", err);
+            allActivity = []; // Ensure it's an empty array on failure
+          }
           
-          const auditValues = auditRes ? auditRes.result.values : null;
-          allActivity = (auditValues && auditValues.length > 1) ? auditValues.slice(1).map(row => ({ timestamp: row[0], user: row[1], action: row[2], itemId: row[3], details: row[4] })).reverse() : [];
-
-          localStorage.setItem('inventoryData', JSON.stringify({ items: allItems, sales: allSales, headers: sheetHeaders, activity: allActivity, timestamp: Date.now() }));
+          localStorage.setItem('inventoryData', JSON.stringify({ items: allItems, headers: sheetHeaders, activity: allActivity, timestamp: Date.now() }));
         
         } catch (err) { 
           handleApiError(err, 'Critical Data Loading Error'); 
@@ -619,7 +595,6 @@
           renderActivityLog(); 
         }
       }
-
 
       // ================================================================================
       // 3. ADD / UPDATE / DELETE & AUDIT LOG
@@ -1043,7 +1018,7 @@
       dom.profileBtn.addEventListener('click', toggleProfileDropdown);
       dom.sidebarCollapseBtn.addEventListener('click', toggleSidebarCollapse);
       dom.mainFab.addEventListener('click', () => dom.quickActionsFabContainer.classList.toggle('open'));
-      dom.addComponentFab.addEventListener('click', openAddModal); // <-- FIX: Added event listener for FAB action
+      dom.addComponentFab.addEventListener('click', openAddModal);
       dom.themeSwatches.addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') { applyTheme(e.target.dataset); } });
       
       // Global Listeners
