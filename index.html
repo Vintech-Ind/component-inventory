@@ -250,6 +250,10 @@
         <a href="#" id="nav-reports" class="sidebar-nav-link flex items-center gap-4 px-4 py-3 text-[var(--color-text-secondary)] rounded-lg font-medium">
           <i data-lucide="bar-chart-2" class="w-5 h-5"></i><span class="truncate">Reports</span>
         </a>
+        <!-- PHASE 1: ADDED ACTIVITY LOG LINK -->
+        <a href="#" id="nav-activity" class="sidebar-nav-link flex items-center gap-4 px-4 py-3 text-[var(--color-text-secondary)] rounded-lg font-medium">
+          <i data-lucide="history" class="w-5 h-5"></i><span class="truncate">Activity Log</span>
+        </a>
       </nav>
 
       <!-- Sidebar Footer -->
@@ -350,6 +354,14 @@
             <div class="industrial-card p-6"><h3 class="font-semibold mb-4">Best Selling Items (by Quantity)</h3><canvas id="bestsellers-chart"></canvas></div>
           </div>
         </div>
+        <!-- PHASE 1: ADDED ACTIVITY LOG VIEW -->
+        <div id="activity-view" class="hidden">
+            <div class="industrial-card overflow-hidden">
+                <div id="activity-log-container" class="max-h-[75vh] overflow-y-auto">
+                    <!-- Activity log content will be injected here by JS -->
+                </div>
+            </div>
+        </div>
       </div>
     </main>
   </div>
@@ -427,7 +439,7 @@
       // ================================================================================
       // 1. CONFIGURATION & STATE
       // ================================================================================
-      const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
+      const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw'; // WARNING: Exposing API keys on the client-side is a security risk.
       const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com';
       const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4", "https://www.googleapis.com/discovery/v1/apis/oauth2/v2/rest"];
       const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile";
@@ -440,7 +452,7 @@
       const SALES_RANGE = `${SALES_SHEET_NAME}!A:D`;
       const AUDIT_RANGE = `${AUDIT_SHEET_NAME}!A:E`;
 
-      let allItems = [], allSales = [], allNotifications = [];
+      let allItems = [], allSales = [], allNotifications = [], allActivity = []; // PHASE 1: Added allActivity
       let filteredItems = [];
       let gapiInited = false, gisInited = false;
       let tokenClient;
@@ -460,7 +472,7 @@
         body: document.body,
         appWrapper: document.getElementById('app-wrapper'),
         loginView: document.getElementById('login-view'),
-        addPartBtn: document.getElementById('nav-add-new'), // Updated
+        addPartBtn: document.getElementById('nav-add-new'),
         searchResults: document.getElementById('searchResults'),
         noResults: document.getElementById('no-results'),
         authSignedInView: document.getElementById('auth-signed-in-view'),
@@ -512,7 +524,6 @@
         comparisonContent: document.getElementById('comparison-content'),
         editModeBanner: document.getElementById('edit-mode-banner'),
         saveBtn: document.getElementById('save-component-btn'),
-        // NEW DOM ELEMENTS
         commandPalette: document.getElementById('command-palette'),
         commandPaletteInput: document.getElementById('command-palette-input'),
         commandPaletteResults: document.getElementById('command-palette-results'),
@@ -527,6 +538,10 @@
         quickActionsFabContainer: document.getElementById('quick-actions-fab-container'),
         mainFab: document.getElementById('main-fab'),
         themeSwatches: document.getElementById('theme-swatches'),
+        // PHASE 1: ADDED DOM ELEMENTS FOR ACTIVITY LOG
+        navActivity: document.getElementById('nav-activity'),
+        activityView: document.getElementById('activity-view'),
+        activityLogContainer: document.getElementById('activity-log-container'),
       };
 
       const specDefinitions = { 'Planetary Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeeth'], 'Sun Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd'], 'Ring Gear': ['spec_teeth', 'spec_outerDiameter', 'spec_innerDiameter'], 'Spline/Pinion Shaft': ['spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_length', 'spec_splineOd'], 'Track Motor Shaft': ['spec_length', 'spec_outerDiameter', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'], 'Bearing': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_width'], 'Bushes': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length'], };
@@ -563,7 +578,7 @@
           dom.appWrapper.classList.add('hidden');
           dom.authSignedInView.classList.add('hidden');
           dom.authSignedOutView.classList.remove('hidden');
-          allItems = []; allSales = []; sheetHeaders = []; currentUser = {};
+          allItems = []; allSales = []; sheetHeaders = []; currentUser = {}; allActivity = [];
           localStorage.removeItem('inventoryData');
           processAndRenderItems();
         }
@@ -571,8 +586,8 @@
       async function loadAllData() {
         const cached = JSON.parse(localStorage.getItem('inventoryData'));
         if (cached && (Date.now() - cached.timestamp < 3600000)) { // 1 hour cache
-          allItems = cached.items; allSales = cached.sales; sheetHeaders = cached.headers; allNotifications = cached.notifications || [];
-          populateFilters(); processAndRenderItems(); renderReportCharts(); renderNotifications();
+          allItems = cached.items; allSales = cached.sales; sheetHeaders = cached.headers; allNotifications = cached.notifications || []; allActivity = cached.activity || [];
+          populateFilters(); processAndRenderItems(); renderReportCharts(); renderNotifications(); renderActivityLog();
           return;
         }
         showSkeletonLoader(true);
@@ -589,11 +604,15 @@
           const salesValues = salesRes.result.values;
           const freshSales = (salesValues && salesValues.length > 1) ? salesValues.slice(1).map(row => ({ itemId: row[0], quantitySold: parseInt(row[1], 10), salePrice: parseFloat(row[2]), date: row[3] })) : [];
           const auditValues = auditRes.result.values;
-          const freshNotifications = (auditValues && auditValues.length > 1) ? auditValues.slice(1).map(row => ({ timestamp: row[0], user: row[1], action: row[2], itemId: row[3], details: row[4] })).reverse() : [];
-          allItems = freshItems; allSales = freshSales; allNotifications = freshNotifications;
-          localStorage.setItem('inventoryData', JSON.stringify({ items: allItems, sales: allSales, headers: sheetHeaders, notifications: allNotifications, timestamp: Date.now() }));
+          // PHASE 1: Parse audit log data
+          const freshActivity = (auditValues && auditValues.length > 1) ? auditValues.slice(1).map(row => ({ timestamp: row[0], user: row[1], action: row[2], itemId: row[3], details: row[4] })).reverse() : [];
+          
+          allItems = freshItems; allSales = freshSales; allActivity = freshActivity;
+          allNotifications = allActivity; // Temporarily use activity log for notifications
+          
+          localStorage.setItem('inventoryData', JSON.stringify({ items: allItems, sales: allSales, headers: sheetHeaders, notifications: allNotifications, activity: allActivity, timestamp: Date.now() }));
         } catch (err) { handleApiError(err, 'Data Loading Error'); updateAuthStatus(false);
-        } finally { showSkeletonLoader(false); populateFilters(); processAndRenderItems(); renderReportCharts(); renderNotifications(); }
+        } finally { showSkeletonLoader(false); populateFilters(); processAndRenderItems(); renderReportCharts(); renderNotifications(); renderActivityLog(); }
       }
 
       // ================================================================================
@@ -735,16 +754,12 @@
         if (show) { let skeletonHtml = ''; for (let i = 0; i < 12; i++) { skeletonHtml += `<div class="industrial-card p-4 space-y-4"><div class="skeleton-item h-48 rounded"></div><div class="space-y-2"><div class="skeleton-item h-6 w-3/4 rounded"></div><div class="skeleton-item h-4 w-1/2 rounded"></div></div></div>`; } dom.skeletonLoader.innerHTML = `<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 skeleton-breathe">${skeletonHtml}</div>`; }
       }
       function initThemeAndLayout() {
-        // Theme
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) { dom.html.classList.add('dark'); } else { dom.html.classList.remove('dark'); }
-        // Accent Color
         const savedAccent = localStorage.getItem('accentColor');
         if (savedAccent) { applyTheme(JSON.parse(savedAccent)); }
         populateThemeSwatches();
-        // Layout
         switchLayout(localStorage.getItem('layout') || 'grid');
-        // Sidebar
         if (localStorage.getItem('sidebarCollapsed') === 'true') { dom.body.classList.add('sidebar-collapsed'); }
         updateValueVisibility();
       }
@@ -786,6 +801,7 @@
         document.querySelectorAll('.sidebar-nav-link').forEach(l => l.classList.remove('active'));
         dom.dashboardView.classList.add('hidden');
         dom.reportsView.classList.add('hidden');
+        dom.activityView.classList.add('hidden'); // PHASE 1: Hide activity view by default
         dom.layoutSwitcher.classList.add('hidden');
         if (view === 'dashboard' || view === 'manage') {
             dom.navDashboard.classList.add('active');
@@ -796,6 +812,10 @@
             dom.navReports.classList.add('active');
             dom.reportsView.classList.remove('hidden');
             dom.pageTitle.textContent = "Reports";
+        } else if (view === 'activity') { // PHASE 1: Handle activity view
+            dom.navActivity.classList.add('active');
+            dom.activityView.classList.remove('hidden');
+            dom.pageTitle.textContent = "Activity Log";
         }
       }
       function toggleMobileSidebar() { const isOpen = dom.sidebar.classList.toggle('open'); dom.mobileBackdrop.classList.toggle('hidden', !isOpen); }
@@ -865,6 +885,41 @@
         dom.notificationBellBtn.classList.toggle('has-unread', hasUnread);
         lucide.createIcons();
       }
+      // PHASE 1: NEW FUNCTION TO RENDER THE ACTIVITY LOG
+      function renderActivityLog() {
+          let activityHtml = '<table class="w-full text-left border-collapse">';
+          activityHtml += '<thead><tr class="border-b-2 border-[var(--color-border-primary)]"><th class="p-4 font-semibold">Timestamp</th><th class="p-4 font-semibold">User</th><th class="p-4 font-semibold">Action</th><th class="p-4 font-semibold">Component</th><th class="p-4 font-semibold">Details</th></tr></thead>';
+          activityHtml += '<tbody>';
+
+          if (allActivity.length === 0) {
+              activityHtml += '<tr><td colspan="5" class="text-center p-8 text-[var(--color-text-secondary)]">No activity has been recorded yet.</td></tr>';
+          } else {
+              allActivity.forEach(log => {
+                  const item = allItems.find(i => i.id === log.itemId);
+                  const itemName = item ? [item.model, item.itemName].filter(Boolean).join(' ') : `ID: ${log.itemId}`;
+                  let detailsText = 'N/A';
+                  if (log.action === 'UPDATE') {
+                      try {
+                          const changes = JSON.parse(log.details);
+                          detailsText = Object.entries(changes).map(([key, val]) => `<li><strong>${key}:</strong> "${val.from}" &rarr; "${val.to}"</li>`).join('');
+                          detailsText = `<ul class="list-disc pl-5 text-xs">${detailsText}</ul>`;
+                      } catch { detailsText = 'Changes were made.'; }
+                  } else if (log.action === 'CREATE' || log.action === 'DELETE') {
+                      detailsText = 'Component data recorded.';
+                  }
+
+                  activityHtml += `<tr class="border-b border-[var(--color-border-primary)] last:border-b-0 text-sm hover:bg-[var(--color-bg-tertiary)]">
+                      <td class="p-4 whitespace-nowrap text-[var(--color-text-secondary)]">${new Date(log.timestamp).toLocaleString()}</td>
+                      <td class="p-4 font-medium">${log.user}</td>
+                      <td class="p-4"><span class="font-semibold px-2 py-1 rounded text-xs ${log.action === 'CREATE' ? 'bg-green-500/20 text-green-700 dark:text-green-300' : log.action === 'DELETE' ? 'bg-red-500/20 text-red-700 dark:text-red-300' : 'bg-blue-500/20 text-blue-700 dark:text-blue-300'}">${log.action}</span></td>
+                      <td class="p-4 capitalize">${itemName}</td>
+                      <td class="p-4">${detailsText}</td>
+                  </tr>`;
+              });
+          }
+          activityHtml += '</tbody></table>';
+          dom.activityLogContainer.innerHTML = activityHtml;
+      }
       function toggleNotificationCenter() {
         const isOpen = dom.notificationCenter.classList.toggle('open');
         if (isOpen) { localStorage.setItem('hasUnreadNotifications', 'false'); dom.notificationBellBtn.classList.remove('has-unread'); }
@@ -928,7 +983,8 @@
       dom.searchResults.addEventListener('click', handleCardClick);
       dom.detailContent.addEventListener('click', handleDetailPanelClick);
       dom.paginationControls.addEventListener('click', handlePaginationClick);
-      [dom.navDashboard, dom.navReports, dom.navManage].forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const view = e.currentTarget.id.replace('nav-', ''); switchView(view); if (window.innerWidth < 1024) toggleMobileSidebar(); }); });
+      // PHASE 1: Updated navigation links
+      [dom.navDashboard, dom.navReports, dom.navManage, dom.navActivity].forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const view = e.currentTarget.id.replace('nav-', ''); switchView(view); if (window.innerWidth < 1024) toggleMobileSidebar(); }); });
       dom.valueToggleBtn.addEventListener('click', toggleValueVisibility);
       dom.compareBtn.addEventListener('click', openComparisonModal);
       dom.closeComparisonModalBtn.addEventListener('click', closeComparisonModal);
