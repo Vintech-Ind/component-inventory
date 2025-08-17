@@ -114,7 +114,6 @@
     .industrial-card { background-color: var(--color-bg-secondary); border: var(--border-width) solid var(--color-border-primary); border-radius: var(--radius-md); box-shadow: var(--shadow-elevation-low); transition: transform var(--transition-speed-fast) var(--transition-curve-bounce), box-shadow var(--transition-speed-fast) var(--transition-curve-bounce), border-color var(--transition-speed-fast) var(--transition-curve-smooth); }
     .industrial-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-elevation-medium); border-color: var(--color-accent-main); }
     
-    /* NEW: Sticky header for table view */
     .industrial-card th {
       position: -webkit-sticky; /* Safari */
       position: sticky;
@@ -154,6 +153,25 @@
     .skeleton-breathe .skeleton-item:nth-child(2n){ animation-delay: 100ms; }
     .skeleton-breathe .skeleton-item:nth-child(3n){ animation-delay: 200ms; }
 
+    /* NEW: Table readability and Edit mode banner styles */
+    .industrial-table tbody tr:nth-child(even) {
+      background-color: var(--color-bg-tertiary);
+    }
+    .industrial-table tbody tr:hover {
+      background-color: color-mix(in srgb, var(--color-accent-main) 15%, transparent);
+    }
+    .edit-mode-banner {
+      background-color: color-mix(in srgb, var(--color-accent-main) 20%, transparent);
+      border-bottom: 1px solid color-mix(in srgb, var(--color-accent-main) 40%, transparent);
+      padding: 0.75rem 1.5rem;
+      font-size: 0.9rem;
+      font-weight: var(--font-weight-semibold);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--color-text-primary);
+    }
+
     @media (max-width: 1024px) {
       .main-content { padding-left: 0; }
       .sidebar { transform: translateX(-100%); box-shadow: 5px 0 15px rgba(0,0,0,0.2); z-index: 50; }
@@ -182,9 +200,12 @@
 
     <!-- Sidebar -->
     <aside class="sidebar fixed top-0 left-0 w-[var(--sidebar-width)] flex flex-col">
-      <div class="flex items-center gap-4 p-5 h-[var(--header-height)] border-b border-[var(--color-border-primary)] flex-shrink-0">
-        <div class="bg-[var(--color-text-primary)] p-2.5 rounded-lg"><i data-lucide="gem" class="w-6 h-6 text-[var(--color-bg-primary)]"></i></div>
-        <h1 class="text-xl font-black">Vinayaka Industries</h1>
+      <!-- UPDATED: Logo and branding -->
+      <div class="flex items-center gap-3 p-5 h-[var(--header-height)] border-b border-[var(--color-border-primary)] flex-shrink-0">
+        <div class="bg-[var(--color-accent-main)] p-2.5 rounded-lg flex items-center justify-center">
+          <i data-lucide="gem" class="w-6 h-6 text-[var(--color-text-on-accent)]"></i>
+        </div>
+        <h1 class="text-xl font-black">Vinayaka DB</h1>
       </div>
 
       <nav class="flex-1 px-4 py-6 space-y-2">
@@ -344,6 +365,12 @@
         <button type="button" id="closeFormModalBtn" aria-label="Close form" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
       </div>
 
+      <!-- NEW: Edit mode banner -->
+      <div id="edit-mode-banner" class="edit-mode-banner hidden">
+        <i data-lucide="pencil" class="w-4 h-4"></i>
+        You are currently editing an existing component.
+      </div>
+
       <form id="partForm" class="p-6 space-y-6 overflow-y-auto">
         <input type="hidden" id="edit-id">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -378,7 +405,6 @@
               <option value="Bushes">Bushes</option>
             </select>
           </div>
-          <!-- UPDATED: Added min="0" to price input -->
           <div><label for="price">Price</label><input type="number" id="price" placeholder="e.g., 4500" min="0" class="mt-1 industrial-input"></div>
           <div><label for="quantity">Quantity*</label><input type="number" id="quantity" required value="1" min="0" class="mt-1 industrial-input"></div>
         </div>
@@ -396,7 +422,6 @@
 
       <div class="p-6 border-t border-[var(--color-border-primary)] bg-[var(--color-bg-primary)] flex justify-end gap-3">
         <button type="button" id="cancelBtn" class="btn btn--secondary">Cancel</button>
-        <!-- IMPORTANT: external submit button with an id so we can control it -->
         <button id="save-component-btn" type="submit" form="partForm" class="btn btn--primary">Save Component</button>
       </div>
     </div>
@@ -431,20 +456,18 @@
       // ================================================================================
       // 1. CONFIGURATION & STATE
       // ================================================================================
-      // IMPORTANT: For security, this key should be restricted in Google Cloud Console
-      // to only be usable by your website's domain.
       const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
       const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com';
       const DISCOVERY_DOCS = [
         "https://sheets.googleapis.com/$discovery/rest?version=v4",
-        "https://www.googleapis.com/discovery/v1/apis/oauth2/v2/rest" // needed for userinfo
+        "https://www.googleapis.com/discovery/v1/apis/oauth2/v2/rest"
       ];
       const SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile";
 
       const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ';
       const SHEET_NAME = 'Sheet1';
       const SALES_SHEET_NAME = 'SalesLog';
-      let SHEET_ID = null; // resolved at runtime
+      let SHEET_ID = null;
 
       const INVENTORY_RANGE = `${SHEET_NAME}!A:ZZ`;
       const SALES_RANGE = `${SALES_SHEET_NAME}!A:D`;
@@ -517,7 +540,8 @@
         comparisonModal: document.getElementById('comparison-modal'),
         closeComparisonModalBtn: document.getElementById('closeComparisonModalBtn'),
         comparisonContent: document.getElementById('comparison-content'),
-        saveBtn: document.getElementById('save-component-btn') // external submit button
+        editModeBanner: document.getElementById('edit-mode-banner'), // New DOM element
+        saveBtn: document.getElementById('save-component-btn')
       };
 
       const specDefinitions = {
@@ -549,7 +573,6 @@
       }
       function maybeEnableButtons() {
         if (gapiInited && gisInited) {
-          // single handler for both sign-in area and the big button
           document.getElementById('auth-signed-out-view').onclick = handleAuthClick;
           dom.signInButtonMain.onclick = handleAuthClick;
           dom.signOutBtn.onclick = handleAuthClick;
@@ -608,7 +631,6 @@
             dom.userName.textContent = "User";
             dom.userDp.src = `https://ui-avatars.com/api/?name=U&background=E9ECEF&color=212529`;
           }
-          // resolve actual sheetId for safe deletes
           try { SHEET_ID = await getSheetIdByName(SHEET_NAME); } catch {}
           loadAllData();
         } else {
@@ -627,7 +649,7 @@
 
       async function loadAllData() {
         const cached = JSON.parse(localStorage.getItem('inventoryData'));
-        if (cached && (Date.now() - cached.timestamp < 3600000)) { // 1 hour cache
+        if (cached && (Date.now() - cached.timestamp < 3600000)) {
           allItems = cached.items;
           allSales = cached.sales;
           sheetHeaders = cached.headers;
@@ -659,7 +681,7 @@
                 obj[header] = row[i];
                 return obj;
               }, {});
-              item.rowIndex = index + 2; // 1-based index, +1 for header
+              item.rowIndex = index + 2;
               return item;
             })
             .filter(item => item.id && item.id.trim() !== '');
@@ -712,7 +734,6 @@
       async function handleFormSubmit(e) {
         e.preventDefault();
 
-        // NEW: Enhanced validation for negative numbers
         const price = parseFloat(dom.partForm.querySelector('#price').value);
         const quantity = parseInt(dom.partForm.querySelector('#quantity').value, 10);
 
@@ -747,12 +768,12 @@
 
       async function addComponent() {
         const newItem = collectFormData();
-        newItem.id = String(Date.now()); // simple id
+        newItem.id = String(Date.now());
         const newRow = sheetHeaders.map(header => newItem[header] || "");
         try {
           await gapi.client.sheets.spreadsheets.values.append({
             spreadsheetId: SPREADSHEET_ID,
-            range: SHEET_NAME, // let Sheets append to the correct next row
+            range: SHEET_NAME,
             valueInputOption: 'USER_ENTERED',
             resource: { values: [newRow] }
           });
@@ -795,7 +816,7 @@
       async function deleteComponent(id) {
         const itemToDelete = allItems.find(item => item.id === id);
         if (!itemToDelete) { Swal.fire('Error', 'Could not find the component to delete.', 'error'); return; }
-        if (SHEET_ID == null) { // fallback, try to resolve now
+        if (SHEET_ID == null) {
           try { SHEET_ID = await getSheetIdByName(SHEET_NAME); } catch {}
         }
         if (SHEET_ID == null) {
@@ -946,7 +967,8 @@
 
       function createTableView(items) {
         const table = document.createElement('table');
-        table.className = 'w-full text-left border-collapse';
+        // UPDATED: Added class for zebra striping
+        table.className = 'w-full text-left border-collapse industrial-table';
         let head = `<thead><tr class="border-b border-[var(--color-border-primary)]">
           <th class="p-4"></th>
           <th class="p-4 font-semibold">Component</th>
@@ -960,7 +982,8 @@
           const quantity = parseInt(item.quantity) || 0;
           const statusColor = quantity === 0 ? 'text-[var(--color-status-danger)]' : quantity < 5 ? 'text-[var(--color-status-warning)]' : 'text-[var(--color-status-success)]';
           const isChecked = comparisonList.has(item.id);
-          body += `<tr class="border-b border-[var(--color-border-primary)] last:border-b-0 hover:bg-[var(--color-bg-tertiary)]">
+          // UPDATED: Removed hover class from tr, now handled by CSS
+          body += `<tr class="border-b border-[var(--color-border-primary)] last:border-b-0">
             <td class="p-4"><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5" ${isChecked ? 'checked' : ''}></td>
             <td class="p-4 capitalize font-medium">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</td>
             <td class="p-4 text-[var(--color-text-secondary)]">₹${item.price || 'N/A'}</td>
@@ -1092,6 +1115,7 @@
         dom.partForm.reset();
         dom.specFieldsContainer.classList.add('hidden');
         dom.specFields.innerHTML = '';
+        dom.editModeBanner.classList.add('hidden'); // Hide banner for add mode
         dom.formModal.classList.remove('hidden');
         dom.formModal.classList.add('flex');
         trapFocus(dom.formModal);
@@ -1115,6 +1139,7 @@
             if (input) input.value = item[key];
           }
         });
+        dom.editModeBanner.classList.remove('hidden'); // Show banner for edit mode
         dom.formModal.classList.remove('hidden');
         dom.formModal.classList.add('flex');
         trapFocus(dom.formModal);
@@ -1228,13 +1253,10 @@
       // ================================================================================
       // 6. ANALYTICS & HELPERS
       // ================================================================================
-      
-      // NEW: Centralized API error handler for user-friendly messages
       function handleApiError(err, contextTitle) {
           let userMessage = 'An unexpected error occurred. Please check your connection and try again.';
           const error = err.result?.error;
           
-          // Log the full error for debugging purposes
           console.error(`API Error in ${contextTitle}:`, err);
 
           if (error) {
@@ -1542,7 +1564,6 @@
       gisScript.onload = initializeGis;
       document.body.appendChild(gisScript);
 
-      // Form submit (works even with external submit button via `form` attribute)
       dom.partForm.addEventListener('submit', handleFormSubmit);
 
       dom.search.addEventListener('input', () => {
