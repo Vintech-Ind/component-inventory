@@ -113,6 +113,15 @@
 
     .industrial-card { background-color: var(--color-bg-secondary); border: var(--border-width) solid var(--color-border-primary); border-radius: var(--radius-md); box-shadow: var(--shadow-elevation-low); transition: transform var(--transition-speed-fast) var(--transition-curve-bounce), box-shadow var(--transition-speed-fast) var(--transition-curve-bounce), border-color var(--transition-speed-fast) var(--transition-curve-smooth); }
     .industrial-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-elevation-medium); border-color: var(--color-accent-main); }
+    
+    /* NEW: Sticky header for table view */
+    .industrial-card th {
+      position: -webkit-sticky; /* Safari */
+      position: sticky;
+      top: 0;
+      background-color: var(--color-bg-secondary);
+      z-index: 10;
+    }
 
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); padding: var(--space-3) var(--space-5); border-radius: var(--radius-sm); font-weight: var(--font-weight-bold); text-align: center; border: var(--border-width) solid transparent; cursor: pointer; transition: transform var(--transition-speed-fast) var(--transition-curve-bounce), box-shadow var(--transition-speed-fast) var(--transition-curve-bounce), background-color var(--transition-speed-fast) var(--transition-curve-smooth), border-color var(--transition-speed-fast) var(--transition-curve-smooth); user-select: none; }
     .btn:focus-visible { outline: 2px solid var(--color-accent-main); outline-offset: 2px; }
@@ -369,7 +378,8 @@
               <option value="Bushes">Bushes</option>
             </select>
           </div>
-          <div><label for="price">Price</label><input type="number" id="price" placeholder="e.g., 4500" class="mt-1 industrial-input"></div>
+          <!-- UPDATED: Added min="0" to price input -->
+          <div><label for="price">Price</label><input type="number" id="price" placeholder="e.g., 4500" min="0" class="mt-1 industrial-input"></div>
           <div><label for="quantity">Quantity*</label><input type="number" id="quantity" required value="1" min="0" class="mt-1 industrial-input"></div>
         </div>
 
@@ -421,6 +431,8 @@
       // ================================================================================
       // 1. CONFIGURATION & STATE
       // ================================================================================
+      // IMPORTANT: For security, this key should be restricted in Google Cloud Console
+      // to only be usable by your website's domain.
       const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
       const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com';
       const DISCOVERY_DOCS = [
@@ -615,7 +627,7 @@
 
       async function loadAllData() {
         const cached = JSON.parse(localStorage.getItem('inventoryData'));
-        if (cached && (Date.now() - cached.timestamp < 3600000)) {
+        if (cached && (Date.now() - cached.timestamp < 3600000)) { // 1 hour cache
           allItems = cached.items;
           allSales = cached.sales;
           sheetHeaders = cached.headers;
@@ -647,7 +659,7 @@
                 obj[header] = row[i];
                 return obj;
               }, {});
-              item.rowIndex = index + 2;
+              item.rowIndex = index + 2; // 1-based index, +1 for header
               return item;
             })
             .filter(item => item.id && item.id.trim() !== '');
@@ -661,7 +673,7 @@
                 date: row[3]
               }))
             : [];
-
+          
           allItems = freshItems;
           allSales = freshSales;
 
@@ -672,7 +684,7 @@
             timestamp: Date.now()
           }));
         } catch (err) {
-          Swal.fire({ title: 'Data Loading Error', text: `Could not load data. Check Sheet ID and permissions. Error: ${err.result?.error?.message || 'Unknown error'}`, icon: 'error' });
+          handleApiError(err, 'Data Loading Error');
           updateAuthStatus(false);
         } finally {
           showSkeletonLoader(false);
@@ -699,6 +711,19 @@
 
       async function handleFormSubmit(e) {
         e.preventDefault();
+
+        // NEW: Enhanced validation for negative numbers
+        const price = parseFloat(dom.partForm.querySelector('#price').value);
+        const quantity = parseInt(dom.partForm.querySelector('#quantity').value, 10);
+
+        if (price < 0 || quantity < 0) {
+            Swal.fire({
+                title: 'Invalid Input',
+                text: 'Price and Quantity cannot be negative.',
+                icon: 'warning'
+            });
+            return;
+        }
 
         if (isDuplicate()) {
           Swal.fire({
@@ -736,7 +761,7 @@
           localStorage.removeItem('inventoryData');
           await loadAllData();
         } catch (err) {
-          Swal.fire({ title: 'Save Error', text: `Could not save the component. Error: ${err.result?.error?.message || 'Unknown error'}`, icon: 'error' });
+          handleApiError(err, 'Save Error');
         }
       }
 
@@ -763,7 +788,7 @@
           localStorage.removeItem('inventoryData');
           await loadAllData();
         } catch (err) {
-          Swal.fire('Update Error', `Could not update the component. Error: ${err.result?.error?.message || 'Unknown error'}`, 'error');
+          handleApiError(err, 'Update Error');
         }
       }
 
@@ -798,7 +823,7 @@
           localStorage.removeItem('inventoryData');
           await loadAllData();
         } catch (err) {
-          Swal.fire('Delete Error', `Could not delete the component. Error: ${err.result?.error?.message || 'Unknown error'}`, 'error');
+          handleApiError(err, 'Delete Error');
         }
       }
 
@@ -855,7 +880,7 @@
             paginatedItems.forEach(item => fragment.appendChild(createListCard(item)));
             break;
           case 'table':
-            dom.searchResults.className = 'w-full overflow-x-auto';
+            dom.searchResults.className = 'w-full overflow-x-auto industrial-card';
             fragment.appendChild(createTableView(paginatedItems));
             break;
           case 'kanban':
@@ -921,7 +946,7 @@
 
       function createTableView(items) {
         const table = document.createElement('table');
-        table.className = 'w-full text-left border-collapse industrial-card';
+        table.className = 'w-full text-left border-collapse';
         let head = `<thead><tr class="border-b border-[var(--color-border-primary)]">
           <th class="p-4"></th>
           <th class="p-4 font-semibold">Component</th>
@@ -1203,6 +1228,27 @@
       // ================================================================================
       // 6. ANALYTICS & HELPERS
       // ================================================================================
+      
+      // NEW: Centralized API error handler for user-friendly messages
+      function handleApiError(err, contextTitle) {
+          let userMessage = 'An unexpected error occurred. Please check your connection and try again.';
+          const error = err.result?.error;
+          
+          // Log the full error for debugging purposes
+          console.error(`API Error in ${contextTitle}:`, err);
+
+          if (error) {
+              if (error.code === 403 || error.status === 'PERMISSION_DENIED') {
+                  userMessage = 'You do not have permission to perform this action. Please check your Google Sheet permissions.';
+              } else if (error.code === 400) {
+                  userMessage = 'The data sent was invalid. Please check the form fields and try again.';
+              } else if (error.code === 404) {
+                  userMessage = 'Could not find the requested data. The spreadsheet or sheet may have been moved or deleted.';
+              }
+          }
+          Swal.fire({ title: contextTitle, text: userMessage, icon: 'error' });
+      }
+
       function columnToLetter(column) {
         let temp, letter = '';
         while (column > 0) {
@@ -1307,7 +1353,7 @@
       }
 
       function trapFocus(element) {
-        const focusableEls = element.querySelectorAll('a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])');
+        const focusableEls = element.querySelectorAll('a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="number"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])');
         const firstFocusableEl = focusableEls[0];
         const lastFocusableEl = focusableEls[focusableEls.length - 1];
         const KEYCODE_TAB = 9;
