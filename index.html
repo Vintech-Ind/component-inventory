@@ -171,6 +171,48 @@
       color: var(--color-text-primary);
     }
 
+    /* ==========================================================================
+       NEW: RESPONSIVE TABLE STYLES
+       ========================================================================== */
+    @media (max-width: 768px) {
+      .industrial-table thead {
+        display: none; /* Hide table headers on mobile */
+      }
+      .industrial-table tr {
+        display: block; /* Make each row a block element */
+        border: none;
+        border-bottom: 2px solid var(--color-border-primary);
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+      }
+      .industrial-table tr:last-child {
+        margin-bottom: 0;
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      .industrial-table tbody tr:nth-child(even) {
+        background-color: transparent; /* Disable alternating row color */
+      }
+      .industrial-table td {
+        display: flex; /* Use flexbox for alignment */
+        justify-content: space-between; /* Align label and value */
+        align-items: center;
+        text-align: right; /* Align cell content to the right */
+        padding: 0.75rem 0.25rem;
+        border-bottom: 1px solid var(--color-bg-tertiary);
+      }
+       .industrial-table td:last-child {
+        border-bottom: none;
+      }
+      .industrial-table td::before {
+        content: attr(data-label); /* Use data-label for the header text */
+        font-weight: var(--font-weight-bold);
+        text-align: left;
+        margin-right: 1rem;
+        color: var(--color-text-secondary);
+      }
+    }
+
     @media (max-width: 1024px) {
       .main-content { padding-left: 0; }
       .sidebar { transform: translateX(-100%); box-shadow: 5px 0 15px rgba(0,0,0,0.2); z-index: 50; }
@@ -229,7 +271,7 @@
           <div id="auth-signed-in-view" class="hidden">
             <div class="flex items-center justify-between p-2">
               <div class="flex items-center gap-3">
-                <img id="user-dp" class="w-11 h-11 rounded-full" src="" alt="User profile picture">
+                <img id="user-dp" class="w-11 h-11 rounded-full" src="" alt="User profile picture" onerror="this.onerror=null; this.src='https://placehold.co/44x44/E9ECEF/212529?text=U'">
                 <div>
                   <p id="user-name" class="font-semibold"></p>
                   <p class="text-xs text-[var(--color-status-success)] font-medium">Online</p>
@@ -453,7 +495,7 @@
       // ================================================================================
       // 1. CONFIGURATION & STATE
       // ================================================================================
-      const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw';
+      const API_KEY = 'AIzaSyD3zRTlBC7t0-VJV49tdRF8SA3hrWN7pKw'; // WARNING: Exposing API keys client-side is a security risk.
       const CLIENT_ID = '1088294326380-399bo10d4vfiql44nu0mdd04hsanpdn2.apps.googleusercontent.com';
       const DISCOVERY_DOCS = [
         "https://sheets.googleapis.com/$discovery/rest?version=v4",
@@ -464,7 +506,7 @@
       const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ';
       const SHEET_NAME = 'Sheet1';
       const SALES_SHEET_NAME = 'SalesLog';
-      const AUDIT_SHEET_NAME = 'AuditLog'; // NEW: Audit log sheet name
+      const AUDIT_SHEET_NAME = 'AuditLog';
       let SHEET_ID = null;
 
       const INVENTORY_RANGE = `${SHEET_NAME}!A:ZZ`;
@@ -477,7 +519,7 @@
       let gisInited = false;
       let tokenClient;
       let sheetHeaders = [];
-      let currentUser = {}; // NEW: Store current user info
+      let currentUser = {};
       let currentLayout = 'grid';
       let currentPage = 1;
       const ITEMS_PER_PAGE = 12;
@@ -626,7 +668,6 @@
             const userInfo = await gapi.client.oauth2.userinfo.get();
             dom.userName.textContent = userInfo.result.name || "User";
             dom.userDp.src = userInfo.result.picture || `https://ui-avatars.com/api/?name=U&background=E9ECEF&color=212529`;
-            // NEW: Store user info for logging
             currentUser = { name: userInfo.result.name, email: userInfo.result.email };
           } catch (e) {
             dom.userName.textContent = "User";
@@ -652,7 +693,7 @@
 
       async function loadAllData() {
         const cached = JSON.parse(localStorage.getItem('inventoryData'));
-        if (cached && (Date.now() - cached.timestamp < 3600000)) {
+        if (cached && (Date.now() - cached.timestamp < 3600000)) { // 1 hour cache
           allItems = cached.items;
           allSales = cached.sales;
           sheetHeaders = cached.headers;
@@ -723,7 +764,6 @@
       // 3. ADD / UPDATE / DELETE & AUDIT LOG
       // ================================================================================
       
-      // NEW: Function to log actions to the AuditLog sheet
       async function logAction(action, itemId, details) {
           if (!gapi.client.getToken()) return;
 
@@ -805,7 +845,7 @@
             resource: { values: [newRow] }
           });
           Swal.fire({ title: 'Success!', text: 'Component added successfully.', icon: 'success', timer: 1800, showConfirmButton: false });
-          await logAction('CREATE', newItem.id, newItem); // Log action
+          await logAction('CREATE', newItem.id, newItem);
           closeFormModal();
           localStorage.removeItem('inventoryData');
           await loadAllData();
@@ -834,7 +874,6 @@
           });
           Swal.fire({ title: 'Success!', text: 'Component updated successfully.', icon: 'success', timer: 1800, showConfirmButton: false });
           
-          // Log detailed changes
           const changes = {};
           Object.keys(updatedItem).forEach(key => {
             if (itemToUpdate[key] !== updatedItem[key]) {
@@ -878,7 +917,7 @@
             }
           });
           Swal.fire('Deleted!', 'The component has been deleted.', 'success');
-          await logAction('DELETE', id, itemToDelete); // Log action
+          await logAction('DELETE', id, itemToDelete);
           closeDetailPanel();
           localStorage.removeItem('inventoryData');
           await loadAllData();
@@ -959,7 +998,7 @@
         const card = document.createElement('div');
         card.className = 'industrial-card overflow-hidden flex flex-col group';
         const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
-        const firstImage = getDriveThumbnail(images[0]) || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.itemName || 'N/A')}&background=E9ECEF&color=212529&size=512&bold=true`;
+        const firstImage = getDriveThumbnail(images[0]) || `https://placehold.co/512x512/E9ECEF/212529?text=${encodeURIComponent(item.itemName || 'N/A')}`;
         const quantity = parseInt(item.quantity) || 0;
         const statusColor = quantity === 0 ? 'bg-[var(--color-status-danger)]' : quantity < 5 ? 'bg-[var(--color-status-warning)]' : 'bg-[var(--color-status-success)]';
         const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
@@ -967,7 +1006,7 @@
 
         card.innerHTML = `
           <div class="relative image-gallery bg-[var(--color-bg-tertiary)]" data-images="${images.join(',')}">
-            <img loading="lazy" src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-52 object-contain" onerror="this.src='https://ui-avatars.com/api/?name=Error&background=F8D7DA&color=721C24&size=512&bold=true';">
+            <img loading="lazy" src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-52 object-contain" onerror="this.src='https://placehold.co/512x512/F8D7DA/721C24?text=Error';">
             ${images.length > 1 ? `
               <button aria-label="Previous image" class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="-1"><i data-lucide="chevron-left"></i></button>
               <button aria-label="Next image" class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
@@ -987,14 +1026,14 @@
       function createListCard(item) {
         const card = document.createElement('div');
         card.className = 'industrial-card p-4 flex items-center gap-4';
-        const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.itemName || 'N/A')}&background=E9ECEF&color=212529&size=128&bold=true`;
+        const image = getDriveThumbnail((item.imageLinks || '').split(',')[0]) || `https://placehold.co/128x128/E9ECEF/212529?text=${encodeURIComponent(item.itemName || 'N/A')}`;
         const quantity = parseInt(item.quantity) || 0;
         const statusColor = quantity === 0 ? 'text-[var(--color-status-danger)]' : quantity < 5 ? 'text-[var(--color-status-warning)]' : 'text-[var(--color-status-success)]';
         const isChecked = comparisonList.has(item.id);
 
         card.innerHTML = `
           <input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5 flex-shrink-0" ${isChecked ? 'checked' : ''}>
-          <img loading="lazy" src="${image}" class="w-16 h-16 rounded-md object-contain flex-shrink-0 bg-[var(--color-bg-tertiary)]" onerror="this.src='https://ui-avatars.com/api/?name=Error&background=F8D7DA&color=721C24&size=128&bold=true';">
+          <img loading="lazy" src="${image}" class="w-16 h-16 rounded-md object-contain flex-shrink-0 bg-[var(--color-bg-tertiary)]" onerror="this.src='https://placehold.co/128x128/F8D7DA/721C24?text=Error';">
           <div class="flex-1 grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
             <h3 class="md:col-span-2 font-semibold capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3>
             <p class="text-[var(--color-text-secondary)]">₹${item.price || 'N/A'}</p>
@@ -1007,25 +1046,33 @@
       function createTableView(items) {
         const table = document.createElement('table');
         table.className = 'w-full text-left border-collapse industrial-table';
-        let head = `<thead><tr class="border-b border-[var(--color-border-primary)]">
-          <th class="p-4"></th>
-          <th class="p-4 font-semibold">Component</th>
-          <th class="p-4 font-semibold">Price</th>
-          <th class="p-4 font-semibold">Quantity</th>
-          <th class="p-4 font-semibold">Actions</th>
-        </tr></thead>`;
+        // NEW: Define headers here to be used for data-labels
+        const headers = [
+            { key: 'compare', label: ''},
+            { key: 'component', label: 'Component'},
+            { key: 'price', label: 'Price'},
+            { key: 'quantity', label: 'Quantity'},
+            { key: 'actions', label: 'Actions'}
+        ];
+
+        let head = `<thead><tr class="border-b border-[var(--color-border-primary)]">`;
+        headers.forEach(h => {
+            head += `<th class="p-4 font-semibold">${h.label}</th>`;
+        });
+        head += `</tr></thead>`;
 
         let body = '<tbody>';
         items.forEach(item => {
           const quantity = parseInt(item.quantity) || 0;
           const statusColor = quantity === 0 ? 'text-[var(--color-status-danger)]' : quantity < 5 ? 'text-[var(--color-status-warning)]' : 'text-[var(--color-status-success)]';
           const isChecked = comparisonList.has(item.id);
+          // NEW: Added data-label attributes to each <td> for mobile view
           body += `<tr class="border-b border-[var(--color-border-primary)] last:border-b-0">
-            <td class="p-4"><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5" ${isChecked ? 'checked' : ''}></td>
-            <td class="p-4 capitalize font-medium">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</td>
-            <td class="p-4 text-[var(--color-text-secondary)]">₹${item.price || 'N/A'}</td>
-            <td class="p-4 font-medium ${statusColor}">${quantity}</td>
-            <td class="p-4"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button></td>
+            <td data-label="${headers[0].label}" class="p-4"><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5" ${isChecked ? 'checked' : ''}></td>
+            <td data-label="${headers[1].label}" class="p-4 capitalize font-medium">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</td>
+            <td data-label="${headers[2].label}" class="p-4 text-[var(--color-text-secondary)]">₹${item.price || 'N/A'}</td>
+            <td data-label="${headers[3].label}" class="p-4 font-medium ${statusColor}">${quantity}</td>
+            <td data-label="${headers[4].label}" class="p-4"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button></td>
           </tr>`;
         });
         body += '</tbody>';
@@ -1256,7 +1303,7 @@
           <div class="lg:col-span-2 p-6 flex items-center justify-center bg-[var(--color-bg-primary)] image-gallery" data-images="${images.join(',')}" data-current-index="0">
             ${images.length > 0 ? `
               <div class="relative w-full h-full">
-                <img loading="lazy" src="${getDriveThumbnail(images[0])}" class="gallery-image w-full max-h-[75vh] h-full object-contain rounded-lg" onerror="this.src='https://ui-avatars.com/api/?name=No+Image&background=E9ECEF&color=212529&size=512&bold=true';">
+                <img loading="lazy" src="${getDriveThumbnail(images[0])}" class="gallery-image w-full max-h-[75vh] h-full object-contain rounded-lg" onerror="this.src='https://placehold.co/512x512/E9ECEF/212529?text=No+Image';">
                 ${images.length > 1 ? `<button aria-label="Previous image" class="detail-gallery-arrow absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/75 transition-colors" data-direction="-1"><i data-lucide="chevron-left" class="pointer-events-none"></i></button><button aria-label="Next image" class="detail-gallery-arrow absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/75 transition-colors" data-direction="1"><i data-lucide="chevron-right" class="pointer-events-none"></i></button>` : ''}
               </div>
             ` : `<div class="h-full flex items-center justify-center text-[var(--color-text-secondary)]">No Images</div>`}
