@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title> Industries | Component Database</title>
+  <title>Vinayaka Industries | Component Database</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -584,36 +584,73 @@
         }
       }
       async function loadAllData() {
+        // Check for cached data first
         const cached = JSON.parse(localStorage.getItem('inventoryData'));
         if (cached && (Date.now() - cached.timestamp < 3600000)) { // 1 hour cache
-          allItems = cached.items; allSales = cached.sales; sheetHeaders = cached.headers; allNotifications = cached.notifications || []; allActivity = cached.activity || [];
-          populateFilters(); processAndRenderItems(); renderReportCharts(); renderNotifications(); renderActivityLog();
+          allItems = cached.items || []; 
+          allSales = cached.sales || []; 
+          sheetHeaders = cached.headers || []; 
+          allActivity = cached.activity || [];
+          allNotifications = allActivity; // Use activity for notifications for now
+          populateFilters(); 
+          processAndRenderItems(); 
+          renderReportCharts(); 
+          renderNotifications(); 
+          renderActivityLog();
           return;
         }
+
         showSkeletonLoader(true);
         try {
+          // *** FIX: Made secondary data fetches resilient. They won't break the app if they fail. ***
           const [invRes, salesRes, auditRes] = await Promise.all([
+            // Inventory is critical, so we let it fail loudly.
             gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: INVENTORY_RANGE }),
-            gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: SALES_RANGE }),
-            gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: AUDIT_RANGE })
+            // Sales and Audit logs are not critical. We catch errors and return null instead of failing.
+            gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: SALES_RANGE }).catch(err => { console.error("Could not load SalesLog:", err); return null; }),
+            gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: AUDIT_RANGE }).catch(err => { console.error("Could not load AuditLog:", err); return null; })
           ]);
+
+          // Process Inventory (critical)
           const inventoryValues = invRes.result.values;
-          if (!inventoryValues || inventoryValues.length === 0) { Swal.fire('Sheet Error', 'The inventory sheet is empty or could not be read.', 'error'); showSkeletonLoader(false); dom.noResults.classList.remove('hidden'); return; }
+          if (!inventoryValues || inventoryValues.length === 0) { 
+            Swal.fire('Sheet Error', 'The main inventory sheet (Sheet1) is empty or could not be read.', 'error'); 
+            showSkeletonLoader(false); 
+            dom.noResults.classList.remove('hidden'); 
+            return; 
+          }
           sheetHeaders = inventoryValues[0];
-          const freshItems = inventoryValues.slice(1).map((row, index) => { const item = sheetHeaders.reduce((obj, header, i) => { obj[header] = row[i]; return obj; }, {}); item.rowIndex = index + 2; return item; }).filter(item => item.id && item.id.trim() !== '');
-          const salesValues = salesRes.result.values;
-          const freshSales = (salesValues && salesValues.length > 1) ? salesValues.slice(1).map(row => ({ itemId: row[0], quantitySold: parseInt(row[1], 10), salePrice: parseFloat(row[2]), date: row[3] })) : [];
-          const auditValues = auditRes.result.values;
-          // PHASE 1: Parse audit log data
-          const freshActivity = (auditValues && auditValues.length > 1) ? auditValues.slice(1).map(row => ({ timestamp: row[0], user: row[1], action: row[2], itemId: row[3], details: row[4] })).reverse() : [];
+          allItems = inventoryValues.slice(1).map((row, index) => { 
+            const item = sheetHeaders.reduce((obj, header, i) => { obj[header] = row[i]; return obj; }, {}); 
+            item.rowIndex = index + 2; 
+            return item; 
+          }).filter(item => item.id && item.id.trim() !== '');
+
+          // Process Sales (non-critical)
+          const salesValues = salesRes ? salesRes.result.values : null;
+          allSales = (salesValues && salesValues.length > 1) ? salesValues.slice(1).map(row => ({ itemId: row[0], quantitySold: parseInt(row[1], 10), salePrice: parseFloat(row[2]), date: row[3] })) : [];
           
-          allItems = freshItems; allSales = freshSales; allActivity = freshActivity;
-          allNotifications = allActivity; // Temporarily use activity log for notifications
-          
-          localStorage.setItem('inventoryData', JSON.stringify({ items: allItems, sales: allSales, headers: sheetHeaders, notifications: allNotifications, activity: allActivity, timestamp: Date.now() }));
-        } catch (err) { handleApiError(err, 'Data Loading Error'); updateAuthStatus(false);
-        } finally { showSkeletonLoader(false); populateFilters(); processAndRenderItems(); renderReportCharts(); renderNotifications(); renderActivityLog(); }
+          // Process Audit Log (non-critical)
+          const auditValues = auditRes ? auditRes.result.values : null;
+          allActivity = (auditValues && auditValues.length > 1) ? auditValues.slice(1).map(row => ({ timestamp: row[0], user: row[1], action: row[2], itemId: row[3], details: row[4] })).reverse() : [];
+          allNotifications = allActivity;
+
+          // Cache all data
+          localStorage.setItem('inventoryData', JSON.stringify({ items: allItems, sales: allSales, headers: sheetHeaders, activity: allActivity, timestamp: Date.now() }));
+        
+        } catch (err) { 
+          handleApiError(err, 'Critical Data Loading Error'); 
+          updateAuthStatus(false);
+        } finally { 
+          showSkeletonLoader(false); 
+          populateFilters(); 
+          processAndRenderItems(); 
+          renderReportCharts(); 
+          renderNotifications(); 
+          renderActivityLog(); 
+        }
       }
+
 
       // ================================================================================
       // 3. ADD / UPDATE / DELETE & AUDIT LOG
