@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title> Industries | Component Database</title>
+  <title>Industries | Component Database</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -124,13 +124,14 @@
 
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); padding: var(--space-3) var(--space-5); border-radius: var(--radius-sm); font-weight: var(--font-weight-bold); text-align: center; border: var(--border-width) solid transparent; cursor: pointer; transition: transform var(--transition-speed-fast) var(--transition-curve-bounce), box-shadow var(--transition-speed-fast) var(--transition-curve-bounce), background-color var(--transition-speed-fast) var(--transition-curve-smooth), border-color var(--transition-speed-fast) var(--transition-curve-smooth); user-select: none; }
     .btn:focus-visible { outline: 2px solid var(--color-accent-main); outline-offset: 2px; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; box-shadow: none !important; border-bottom-width: 3px !important; }
     .btn--primary { background-color: var(--color-accent-main); color: var(--color-text-on-accent); border-bottom: 3px solid color-mix(in srgb, var(--color-text-primary) 25%, transparent); }
-    .btn--primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-elevation-low); }
-    .btn--primary:active { transform: translateY(1px); border-bottom-width: 1px; }
+    .btn--primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-elevation-low); }
+    .btn--primary:active:not(:disabled) { transform: translateY(1px); border-bottom-width: 1px; }
     .btn--secondary { background-color: transparent; color: var(--color-text-primary); border-color: var(--color-border-primary); }
-    .btn--secondary:hover { background-color: var(--color-bg-tertiary); border-color: var(--color-text-primary); }
+    .btn--secondary:hover:not(:disabled) { background-color: var(--color-bg-tertiary); border-color: var(--color-text-primary); }
     .btn--danger { background-color: transparent; color: var(--color-status-danger); border-color: var(--color-status-danger); }
-    .btn--danger:hover { background-color: var(--color-status-danger); color: var(--color-text-on-danger); }
+    .btn--danger:hover:not(:disabled) { background-color: var(--color-status-danger); color: var(--color-text-on-danger); }
 
     .filter-control-group { background-color: var(--color-bg-tertiary); border: var(--border-width) solid var(--color-border-primary); border-radius: var(--radius-md); padding: var(--space-1) var(--space-3); transition: border-color var(--transition-speed-fast) var(--transition-curve-smooth), box-shadow var(--transition-speed-fast) var(--transition-curve-smooth); }
     .filter-control-group:focus-within { border-color: var(--color-border-focus); box-shadow: 0 0 0 3px var(--color-accent-focus-ring); }
@@ -308,7 +309,7 @@
             <button id="kanban-view-btn" aria-label="Switch to kanban view" class="p-2 rounded-md"><i data-lucide="trello"></i></button>
           </div>
           <button id="compare-btn" class="btn btn--secondary hidden">Compare (0)</button>
-          <button id="addPartBtn" class="btn btn--primary disabled:bg-gray-400 disabled:text-gray-600 disabled:cursor-not-allowed disabled:border-b-0" disabled>
+          <button id="addPartBtn" class="btn btn--primary" disabled>
             <i data-lucide="plus" class="w-5 h-5"></i><span class="hidden sm:inline">Add Component</span>
           </button>
         </div>
@@ -444,8 +445,8 @@
               <option value="Bushes">Bushes</option>
             </select>
           </div>
-          <div><label for="price">Price</label><input type="number" id="price" placeholder="e.g., 4500" min="0" class="mt-1 industrial-input"></div>
-          <div><label for="quantity">Quantity*</label><input type="number" id="quantity" required value="1" min="0" class="mt-1 industrial-input"></div>
+          <div><label for="price">Price</label><input type="number" id="price" placeholder="e.g., 4500" min="0" step="0.01" class="mt-1 industrial-input"></div>
+          <div><label for="quantity">Quantity*</label><input type="number" id="quantity" required value="1" min="0" step="1" class="mt-1 industrial-input"></div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -786,108 +787,101 @@
           }
       }
 
-      function buttonBusy(btn, busy) {
-        if (!btn) return;
-        if (busy) {
-          btn.dataset.originalHtml = btn.innerHTML;
-          btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-black inline-block align-middle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...`;
-        } else {
-          btn.innerHTML = btn.dataset.originalHtml || 'Save Component';
-          delete btn.dataset.originalHtml;
-        }
-        btn.disabled = !!busy;
-      }
-
+      /**
+       * UPDATED: Handles form submission with improved validation and feedback.
+       */
       async function handleFormSubmit(e) {
         e.preventDefault();
+        
+        // 1. Submit Button Handling
+        const submitButton = dom.saveBtn;
+        const originalButtonHTML = submitButton.innerHTML;
+        submitButton.innerHTML = `<svg class="animate-spin h-5 w-5 text-black inline-block align-middle" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...`;
+        submitButton.disabled = true;
 
-        const price = parseFloat(dom.partForm.querySelector('#price').value);
-        const quantity = parseInt(dom.partForm.querySelector('#quantity').value, 10);
-
-        if (price < 0 || quantity < 0) {
-            Swal.fire({
-                title: 'Invalid Input',
-                text: 'Price and Quantity cannot be negative.',
-                icon: 'warning'
-            });
-            return;
-        }
-
-        if (isDuplicate()) {
-          Swal.fire({
-            title: 'Duplicate Component',
-            text: 'An item with the same model, device, size, and name already exists. Please modify the details.',
-            icon: 'warning'
-          });
-          return;
-        }
-
-        const editId = dom.editId.value;
-        const action = editId ? updateComponent : addComponent;
-
-        buttonBusy(dom.saveBtn, true);
         try {
-          await action(editId);
-        } finally {
-          buttonBusy(dom.saveBtn, false);
-        }
-      }
+            const formData = collectFormData();
 
-      async function addComponent() {
-        const newItem = collectFormData();
-        newItem.id = String(Date.now());
-        const newRow = sheetHeaders.map(header => newItem[header] || "");
-        try {
-          await gapi.client.sheets.spreadsheets.values.append({
-            spreadsheetId: SPREADSHEET_ID,
-            range: SHEET_NAME,
-            valueInputOption: 'USER_ENTERED',
-            resource: { values: [newRow] }
-          });
-          Swal.fire({ title: 'Success!', text: 'Component added successfully.', icon: 'success', timer: 1800, showConfirmButton: false });
-          await logAction('CREATE', newItem.id, newItem);
-          closeFormModal();
-          localStorage.removeItem('inventoryData');
-          await loadAllData();
+            // 2. Validation
+            if (!formData.model || !formData.itemName || !formData.quantity) {
+                Swal.fire('Validation Error', 'Please fill out all required fields (*).', 'warning');
+                return; // Stop execution
+            }
+            if (parseFloat(formData.price) < 0 || parseInt(formData.quantity, 10) < 0) {
+                Swal.fire('Invalid Input', 'Price and Quantity cannot be negative.', 'warning');
+                return; // Stop execution
+            }
+            if (isDuplicate()) {
+                Swal.fire('Duplicate Component', 'An item with the same model, device, size, and name already exists.', 'warning');
+                return; // Stop execution
+            }
+
+            const editId = dom.editId.value;
+            if (editId) {
+                await updateComponent(editId, formData);
+            } else {
+                await addComponent(formData);
+            }
         } catch (err) {
-          handleApiError(err, 'Save Error');
+            // 3. Feedback: Centralized error handling for API calls
+            handleApiError(err, editId ? 'Update Error' : 'Save Error');
+        } finally {
+            // 7. Code Cleanliness: Always reset button state
+            submitButton.innerHTML = originalButtonHTML;
+            submitButton.disabled = false;
         }
       }
 
-      async function updateComponent(id) {
+      async function addComponent(newItemData) {
+        newItemData.id = String(Date.now());
+        const newRow = sheetHeaders.map(header => newItemData[header] || "");
+        
+        await gapi.client.sheets.spreadsheets.values.append({
+          spreadsheetId: SPREADSHEET_ID,
+          range: SHEET_NAME,
+          valueInputOption: 'USER_ENTERED',
+          resource: { values: [newRow] }
+        });
+
+        Swal.fire({ title: 'Success!', text: 'Component added successfully.', icon: 'success', timer: 1800, showConfirmButton: false });
+        await logAction('CREATE', newItemData.id, newItemData);
+        
+        // 4. Auto-Close Modal
+        closeFormModal();
+        localStorage.removeItem('inventoryData');
+        await loadAllData();
+      }
+
+      async function updateComponent(id, updatedItemData) {
         const itemToUpdate = allItems.find(item => item.id === id);
-        if (!itemToUpdate) { Swal.fire('Error', 'Could not find the component to update.', 'error'); return; }
+        if (!itemToUpdate) { throw new Error('Could not find the component to update.'); }
 
-        const updatedItem = collectFormData();
-        updatedItem.id = id;
-
-        const updatedRow = sheetHeaders.map(header => updatedItem[header] || "");
+        updatedItemData.id = id;
+        const updatedRow = sheetHeaders.map(header => updatedItemData[header] || "");
         const endColumn = columnToLetter(sheetHeaders.length);
         const updateRange = `${SHEET_NAME}!A${itemToUpdate.rowIndex}:${endColumn}${itemToUpdate.rowIndex}`;
 
-        try {
-          await gapi.client.sheets.spreadsheets.values.update({
-            spreadsheetId: SPREADSHEET_ID,
-            range: updateRange,
-            valueInputOption: 'USER_ENTERED',
-            resource: { values: [updatedRow] }
-          });
-          Swal.fire({ title: 'Success!', text: 'Component updated successfully.', icon: 'success', timer: 1800, showConfirmButton: false });
-          
-          const changes = {};
-          Object.keys(updatedItem).forEach(key => {
-            if (itemToUpdate[key] !== updatedItem[key]) {
-              changes[key] = { from: itemToUpdate[key] || '', to: updatedItem[key] };
-            }
-          });
-          await logAction('UPDATE', id, changes);
+        await gapi.client.sheets.spreadsheets.values.update({
+          spreadsheetId: SPREADSHEET_ID,
+          range: updateRange,
+          valueInputOption: 'USER_ENTERED',
+          resource: { values: [updatedRow] }
+        });
+        
+        Swal.fire({ title: 'Success!', text: 'Component updated successfully.', icon: 'success', timer: 1800, showConfirmButton: false });
+        
+        const changes = {};
+        Object.keys(updatedItemData).forEach(key => {
+          if (itemToUpdate[key] !== updatedItemData[key]) {
+            changes[key] = { from: itemToUpdate[key] || '', to: updatedItemData[key] };
+          }
+        });
+        await logAction('UPDATE', id, changes);
 
-          closeFormModal();
-          localStorage.removeItem('inventoryData');
-          await loadAllData();
-        } catch (err) {
-          handleApiError(err, 'Update Error');
-        }
+        // 4. Auto-Close Modal
+        closeFormModal();
+        localStorage.removeItem('inventoryData');
+        await loadAllData();
       }
 
       async function deleteComponent(id) {
@@ -1043,10 +1037,12 @@
         return card;
       }
 
+      /**
+       * UPDATED: Creates a table view with data-labels for responsiveness.
+       */
       function createTableView(items) {
         const table = document.createElement('table');
         table.className = 'w-full text-left border-collapse industrial-table';
-        // NEW: Define headers here to be used for data-labels
         const headers = [
             { key: 'compare', label: ''},
             { key: 'component', label: 'Component'},
@@ -1066,7 +1062,6 @@
           const quantity = parseInt(item.quantity) || 0;
           const statusColor = quantity === 0 ? 'text-[var(--color-status-danger)]' : quantity < 5 ? 'text-[var(--color-status-warning)]' : 'text-[var(--color-status-success)]';
           const isChecked = comparisonList.has(item.id);
-          // NEW: Added data-label attributes to each <td> for mobile view
           body += `<tr class="border-b border-[var(--color-border-primary)] last:border-b-0">
             <td data-label="${headers[0].label}" class="p-4"><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5" ${isChecked ? 'checked' : ''}></td>
             <td data-label="${headers[1].label}" class="p-4 capitalize font-medium">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</td>
@@ -1239,16 +1234,16 @@
 
       function collectFormData() {
         const formData = {
-          model: dom.partForm.querySelector('#model').value,
+          model: dom.partForm.querySelector('#model').value.trim(),
           device: dom.partForm.querySelector('#device').value,
           size: dom.partForm.querySelector('#size').value,
           itemName: dom.itemNameSelect.value,
           price: dom.partForm.querySelector('#price').value,
           quantity: dom.partForm.querySelector('#quantity').value,
-          imageLinks: dom.imageLinksInput.value,
-          note: dom.partForm.querySelector('#note').value,
+          imageLinks: dom.imageLinksInput.value.trim(),
+          note: dom.partForm.querySelector('#note').value.trim(),
         };
-        dom.partForm.querySelectorAll('#spec-fields input').forEach(input => { formData[input.name] = input.value; });
+        dom.partForm.querySelectorAll('#spec-fields input').forEach(input => { formData[input.name] = input.value.trim(); });
         return formData;
       }
 
