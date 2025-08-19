@@ -15,7 +15,7 @@
   
   <style>
     /* ==========================================================================
-       VINAYAKA INDUSTRIES :: COMPONENT DATABASE STYLESHEET V4
+       VINAYAKA INDUSTRIES :: COMPONENT DATABASE STYLESHEET V5
        ========================================================================== */
     :root {
       --sidebar-width: 260px;
@@ -158,8 +158,12 @@
     #notification-bell-btn::after { content: ''; position: absolute; top: 0.6rem; right: 0.6rem; width: 8px; height: 8px; border-radius: 99px; background-color: var(--color-status-danger); display: none; }
     #notification-bell-btn.has-unread::after { display: block; }
     
-    #profile-dropdown { transition: opacity var(--transition-speed-fast) var(--transition-curve-smooth), transform var(--transition-speed-fast) var(--transition-curve-smooth); }
+    #profile-dropdown, #settings-dropdown { transition: opacity var(--transition-speed-fast) var(--transition-curve-smooth), transform var(--transition-speed-fast) var(--transition-curve-smooth); }
     
+    .image-gallery .gallery-image {
+        transition: opacity var(--transition-speed-normal) var(--transition-curve-smooth);
+    }
+
     @media (max-width: 1024px) {
       .main-content { padding-left: 0; }
       .sidebar { transform: translateX(-100%); box-shadow: 5px 0 15px rgba(0,0,0,0.2); z-index: 50; width: var(--sidebar-width) !important; }
@@ -238,14 +242,17 @@
                 </div>
                 <div id="theme-swatches" class="grid grid-cols-5 gap-2 p-2"></div>
                 <a href="#" class="flex items-center gap-3 px-3 py-2 text-sm rounded hover:bg-[var(--color-bg-tertiary)]">Help / Docs</a>
-                <button id="sign-out-btn" class="w-full flex items-center gap-3 px-3 py-2 text-sm rounded hover:bg-[var(--color-bg-tertiary)] text-[var(--color-status-danger)]"><i data-lucide="log-out" class="w-5 h-5"></i>Sign Out</button>
             </div>
           </div>
         </div>
+        <button id="sign-out-btn" class="w-full btn btn--secondary !justify-start !text-[var(--color-status-danger)] !border-transparent hover:!bg-red-500/10">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+            <span class="truncate">Sign Out</span>
+        </button>
       </div>
     </aside>
 
-    <!-- NEW Sidebar Collapse Button -->
+    <!-- Sidebar Collapse Button -->
     <button id="sidebar-collapse-btn" class="absolute top-1/2 -translate-y-1/2 right-0 z-20 w-8 h-8 flex items-center justify-center bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-full shadow-md transition-all duration-300 ease-in-out" style="right: -16px;">
         <i data-lucide="chevron-left" class="transition-transform duration-300"></i>
     </button>
@@ -265,6 +272,13 @@
           </div>
           <button id="add-item-header-btn" class="btn btn--primary"><i data-lucide="plus"></i><span class="hidden sm:inline">Add Item</span></button>
           <button id="compare-btn" class="btn btn--secondary hidden">Compare (0)</button>
+          <button id="refresh-btn" class="p-2 rounded-full hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] transition-colors" title="Refresh Data"><i data-lucide="refresh-cw" class="w-5 h-5"></i></button>
+          <div class="relative">
+              <button id="settings-btn" class="p-2 rounded-full hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] transition-colors" title="Settings"><i data-lucide="settings"></i></button>
+              <div id="settings-dropdown" class="absolute top-full mt-2 right-0 w-48 bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg shadow-lg p-2 origin-top-right scale-95 opacity-0 hidden">
+                  <button id="manage-item-types-btn" class="w-full flex items-center gap-3 px-3 py-2 text-sm rounded hover:bg-[var(--color-bg-tertiary)]"><i data-lucide="list-plus" class="w-5 h-5"></i>Manage Item Types</button>
+              </div>
+          </div>
           <button id="notification-bell-btn" class="relative p-2 rounded-full hover:bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] transition-colors"><i data-lucide="bell"></i></button>
         </div>
       </header>
@@ -365,6 +379,38 @@
           <button id="notification-close-btn" class="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] rounded-full hover:bg-[var(--color-bg-tertiary)]"><i data-lucide="x"></i></button>
       </div>
       <div id="notification-list" class="flex-1 p-4 overflow-y-auto space-y-3"></div>
+  </div>
+  
+  <!-- Item Types Management Modal -->
+  <div id="item-types-modal" role="dialog" aria-modal="true" aria-labelledby="item-types-title" class="fixed inset-0 z-50 justify-center items-start p-4 overflow-y-auto bg-black/70 hidden">
+    <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg shadow-2xl w-full max-w-2xl my-8 flex flex-col scale-in">
+      <div class="flex justify-between items-center p-6 border-b border-[var(--color-border-primary)]">
+        <h2 id="item-types-title" class="text-2xl font-black">Manage Item Types</h2>
+        <button type="button" id="close-item-types-modal-btn" aria-label="Close" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div id="item-types-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
+        <button id="add-new-item-type-btn" class="btn btn--secondary w-full"><i data-lucide="plus"></i>Add New Item Type</button>
+      </div>
+      <div id="item-type-form-container" class="p-6 border-t border-[var(--color-border-primary)] bg-[var(--color-bg-primary)] hidden">
+        <form id="item-type-form" class="space-y-4">
+          <input type="hidden" id="item-type-edit-name">
+          <div>
+            <label for="item-type-name" class="font-semibold">Item Name*</label>
+            <input type="text" id="item-type-name" required class="mt-1 industrial-input">
+          </div>
+          <div>
+            <label for="item-type-specs" class="font-semibold">Specifications</label>
+            <textarea id="item-type-specs" class="mt-1 industrial-input" rows="3" placeholder="e.g., spec_height,spec_width,spec_material"></textarea>
+            <p class="text-xs text-[var(--color-text-secondary)] mt-1">Enter a comma-separated list of specification names.</p>
+          </div>
+          <div class="flex justify-end gap-3 pt-2">
+            <button type="button" id="cancel-item-type-btn" class="btn btn--secondary">Cancel</button>
+            <button type="submit" class="btn btn--primary">Save Item Type</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 
   <script src="https://apis.google.com/js/api.js"></script>
@@ -468,6 +514,17 @@
         activityView: document.getElementById('activity-view'),
         activityLogContainer: document.getElementById('activity-log-container'),
         addItemHeaderBtn: document.getElementById('add-item-header-btn'),
+        refreshBtn: document.getElementById('refresh-btn'),
+        settingsBtn: document.getElementById('settings-btn'),
+        settingsDropdown: document.getElementById('settings-dropdown'),
+        manageItemTypesBtn: document.getElementById('manage-item-types-btn'),
+        itemTypesModal: document.getElementById('item-types-modal'),
+        closeItemTypesModalBtn: document.getElementById('close-item-types-modal-btn'),
+        itemTypesList: document.getElementById('item-types-list'),
+        addNewItemTypeBtn: document.getElementById('add-new-item-type-btn'),
+        itemTypeFormContainer: document.getElementById('item-type-form-container'),
+        itemTypeForm: document.getElementById('item-type-form'),
+        cancelItemTypeBtn: document.getElementById('cancel-item-type-btn'),
       };
       
       // ================================================================================
@@ -735,7 +792,42 @@
       }
       function toggleTheme() { dom.html.classList.toggle('dark'); localStorage.setItem('theme', dom.html.classList.contains('dark') ? 'dark' : 'light'); }
       function getDriveThumbnail(url) { if (!url) return null; const match = url.match(/file\/d\/([a-zA-Z0-9_-]+)/); return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w512-h512` : url; }
-      function initGalleries() { document.querySelectorAll('.image-gallery').forEach(gallery => { const images = (gallery.dataset.images || '').split(',').map(link => link.trim()).filter(Boolean); if (images.length <= 1) return; let currentIndex = 0; const imgElement = gallery.querySelector('.gallery-image'); gallery.querySelectorAll('.gallery-arrow').forEach(arrow => { arrow.addEventListener('click', (e) => { e.stopPropagation(); const direction = parseInt(e.currentTarget.dataset.direction); currentIndex = (currentIndex + direction + images.length) % images.length; imgElement.src = getDriveThumbnail(images[currentIndex]); }); }); }); }
+      function initGalleries() {
+        document.querySelectorAll('.image-gallery').forEach(gallery => {
+            const images = (gallery.dataset.images || '').split(',').map(link => link.trim()).filter(Boolean);
+            if (images.length <= 1) return;
+
+            let currentIndex = 0;
+            const imgElement = gallery.querySelector('.gallery-image');
+            
+            // Preload the next image
+            const preloadNext = () => {
+                if (images.length > 1) {
+                    const nextIndex = (currentIndex + 1) % images.length;
+                    const img = new Image();
+                    img.src = getDriveThumbnail(images[nextIndex]);
+                }
+            };
+
+            imgElement.onload = preloadNext; // Preload next image once the current one is loaded
+            preloadNext(); // Initial preload
+
+            gallery.querySelectorAll('.gallery-arrow').forEach(arrow => {
+                arrow.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const direction = parseInt(e.currentTarget.dataset.direction);
+                    currentIndex = (currentIndex + direction + images.length) % images.length;
+                    
+                    imgElement.style.opacity = 0;
+                    setTimeout(() => {
+                        imgElement.src = getDriveThumbnail(images[currentIndex]);
+                        imgElement.style.opacity = 1;
+                    }, 300); // Match transition speed
+                });
+            });
+        });
+      }
+
 
       // ================================================================================
       // 5. MODALS & FORMS
