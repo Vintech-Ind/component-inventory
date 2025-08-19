@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vinayaka  | Component Database</title>
+  <title>Vinayaka Industries | Component Database</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -322,7 +322,7 @@
           <div><label for="model">Model*</label><input type="text" id="model" required class="mt-1 industrial-input"></div>
           <div><label for="device">Device</label><select id="device" class="mt-1 industrial-input"><option value="">(None)</option><option value="SWING DEVICE">Swing Device</option><option value="TRAVEL DEVICE">Travel Device</option></select></div>
           <div><label for="size">Size</label><select id="size" class="mt-1 industrial-input"><option value="">(None)</option><option value="SMALL">Small</option><option value="MIDDLE">Middle</option><option value="BIG">Big</option></select></div>
-          <div><label for="item-name-main">Item Name*</label><select id="item-name-main" required class="mt-1 industrial-input"><option value="">Select item type...</option><option value="Planetary Gear">Planetary Gear</option><option value="Sun Gear">Sun Gear</option><option value="Ring Gear">Ring Gear</option><option value="Spline/Pinion Shaft">Spline/Pinion Shaft</option><option value="Track Motor Shaft">Track Motor Shaft</option><option value="Bearing">Bearing</option><option value="Bushes">Bushes</option></select></div>
+          <div><label for="item-name-main">Item Name*</label><select id="item-name-main" required class="mt-1 industrial-input"><option value="">Select item type...</option></select></div>
           <div><label for="price">Price</label><input type="number" id="price" placeholder="e.g., 4500" min="0" step="0.01" class="mt-1 industrial-input"></div>
           <div><label for="quantity">Quantity*</label><input type="number" id="quantity" required value="1" min="0" step="1" class="mt-1 industrial-input"></div>
         </div>
@@ -380,11 +380,14 @@
       const SPREADSHEET_ID = '1ezj8H6Wg_nQv6AKPE0VOU1YqSm-yIpgxKACAqhIwglQ';
       const SHEET_NAME = 'Sheet1';
       const AUDIT_SHEET_NAME = 'AuditLog';
+      const ITEM_TYPES_SHEET_NAME = 'ItemTypes';
       let SHEET_ID = null;
       const INVENTORY_RANGE = `${SHEET_NAME}!A:ZZ`;
       const AUDIT_RANGE = `${AUDIT_SHEET_NAME}!A:E`;
+      const ITEM_TYPES_RANGE = `${ITEM_TYPES_SHEET_NAME}!A:B`;
 
       let allItems = [], allActivity = [];
+      let itemTypeDefinitions = new Map();
       let filteredItems = [];
       let gapiInited = false, gisInited = false;
       let tokenClient;
@@ -397,7 +400,7 @@
       let searchDebounceTimer;
       let comparisonList = new Set();
       let commandPaletteSelectedIndex = -1;
-
+      
       const dom = {
         html: document.documentElement,
         body: document.body,
@@ -466,18 +469,50 @@
         activityLogContainer: document.getElementById('activity-log-container'),
         addItemHeaderBtn: document.getElementById('add-item-header-btn'),
       };
-
-      const specDefinitions = { 'Planetary Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeeth'], 'Sun Gear': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_stepOd'], 'Ring Gear': ['spec_teeth', 'spec_outerDiameter', 'spec_innerDiameter'], 'Spline/Pinion Shaft': ['spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_length', 'spec_splineOd'], 'Track Motor Shaft': ['spec_length', 'spec_outerDiameter', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth', 'spec_insideOd'], 'Bearing': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_width'], 'Bushes': ['spec_innerDiameter', 'spec_outerDiameter', 'spec_length'], };
       
       // ================================================================================
       // 2. AUTHENTICATION & API
       // ================================================================================
       async function initializeGapiClient() { await gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS }); gapiInited = true; maybeEnableButtons(); }
-      function initializeGis() { tokenClient = google.accounts.oauth2.initTokenClient({ client_id: CLIENT_ID, scope: SCOPES, callback: handleAuthResponse }); gisInited = true; maybeEnableButtons(); }
-      function maybeEnableButtons() { if (gapiInited && gisInited) { document.getElementById('auth-signed-out-view').onclick = handleAuthClick; dom.signInButtonMain.onclick = handleAuthClick; dom.signOutBtn.onclick = handleAuthClick; lucide.createIcons(); } }
-      function handleAuthResponse(resp) { if (resp.error !== undefined) { Swal.fire({ title: 'Authentication Error', text: 'Could not sign in. Please try again.', icon: 'error' }); updateAuthStatus(false); return; } gapi.client.setToken(resp); updateAuthStatus(true); }
-      function handleAuthClick() { if (!gapiInited || !gisInited) { Swal.fire('Loading...', 'Authentication libraries are still loading. Please try again in a moment.', 'info'); return; } if (gapi.client.getToken() === null) { tokenClient?.requestAccessToken({ prompt: 'consent' }); } else { Swal.fire({ title: 'Sign Out', text: 'Are you sure you want to sign out?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, sign out'}).then((result) => { if (result.isConfirmed) { gapi.client.setToken(null); updateAuthStatus(false); } }); } }
+      
+      function initializeGis() { 
+        tokenClient = google.accounts.oauth2.initTokenClient({ 
+            client_id: CLIENT_ID, 
+            scope: SCOPES, 
+            callback: (resp) => {
+                if (resp.error) {
+                    console.error("Authentication failed:", resp.error);
+                    if (document.body.dataset.manualSignIn === 'true') {
+                        Swal.fire({ title: 'Authentication Error', text: 'Could not sign in. Please try again.', icon: 'error' });
+                        document.body.removeAttribute('data-manual-sign-in');
+                    }
+                    return;
+                }
+                gapi.client.setToken(resp); 
+                updateAuthStatus(true); 
+            }
+        }); 
+        gisInited = true; 
+        maybeEnableButtons(); 
+      }
+      
+      function maybeEnableButtons() { if (gapiInited && gisInited) { dom.signInButtonMain.onclick = handleAuthClick; dom.signOutBtn.onclick = handleAuthClick; lucide.createIcons(); } }
+      
+      function handleAuthClick() {
+        if (!gapiInited || !gisInited) {
+            Swal.fire('Loading...', 'Authentication libraries are still loading. Please try again in a moment.', 'info');
+            return;
+        }
+        if (gapi.client.getToken() === null) {
+            document.body.dataset.manualSignIn = 'true';
+            tokenClient.requestAccessToken({ prompt: 'consent' });
+        } else {
+            Swal.fire({ title: 'Sign Out', text: 'Are you sure you want to sign out?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, sign out'}).then((result) => { if (result.isConfirmed) { gapi.client.setToken(null); updateAuthStatus(false); } });
+        }
+      }
+
       async function getSheetIdByName(title) { const meta = await gapi.client.sheets.spreadsheets.get({ spreadsheetId: SPREADSHEET_ID, fields: "sheets.properties(sheetId,title)" }); const sheet = meta.result.sheets.find(s => s.properties.title === title); return sheet ? sheet.properties.sheetId : null; }
+      
       async function updateAuthStatus(isSignedIn) {
         if (isSignedIn) {
           dom.loginView.classList.add('hidden');
@@ -531,6 +566,24 @@
           } catch (err) {
             console.error("Could not load AuditLog, but continuing...", err);
             allActivity = [];
+          }
+
+          try {
+            const itemTypesRes = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: ITEM_TYPES_RANGE });
+            const itemTypesValues = itemTypesRes.result.values;
+            if (itemTypesValues && itemTypesValues.length > 1) {
+              itemTypeDefinitions.clear();
+              itemTypesValues.slice(1).forEach(row => {
+                const itemName = row[0];
+                const specs = row[1] ? row[1].split(',').map(s => s.trim()) : [];
+                if (itemName) {
+                  itemTypeDefinitions.set(itemName, specs);
+                }
+              });
+            }
+          } catch(err) {
+            console.error("Could not load ItemTypes sheet, but continuing...", err);
+            Swal.fire('Configuration Warning', 'Could not load the "ItemTypes" sheet. The "Add Item" form may not work correctly.', 'warning');
           }
           
           localStorage.setItem('inventoryData', JSON.stringify({ items: allItems, headers: sheetHeaders, activity: allActivity, timestamp: Date.now() }));
@@ -687,11 +740,63 @@
       // ================================================================================
       // 5. MODALS & FORMS
       // ================================================================================
-      function openAddModal() { dom.formTitle.textContent = 'Add New Component'; dom.editId.value = ''; dom.partForm.reset(); dom.specFieldsContainer.classList.add('hidden'); dom.specFields.innerHTML = ''; dom.editModeBanner.classList.add('hidden'); dom.formModal.classList.remove('hidden'); dom.formModal.classList.add('flex'); trapFocus(dom.formModal); }
-      function openEditModal(item) { dom.formTitle.textContent = 'Edit Component'; dom.editId.value = item.id; dom.partForm.querySelector('#model').value = item.model || ''; dom.partForm.querySelector('#device').value = item.device || ''; dom.partForm.querySelector('#size').value = item.size || ''; dom.itemNameSelect.value = item.itemName || ''; dom.partForm.querySelector('#price').value = item.price || ''; dom.partForm.querySelector('#quantity').value = item.quantity || '0'; dom.imageLinksInput.value = item.imageLinks || ''; dom.partForm.querySelector('#note').value = item.note || ''; updateSpecFields(); Object.keys(item).forEach(key => { if (key.startsWith('spec_')) { const input = dom.partForm.querySelector(`[name="${key}"]`); if (input) input.value = item[key]; } }); dom.editModeBanner.classList.remove('hidden'); dom.formModal.classList.remove('hidden'); dom.formModal.classList.add('flex'); trapFocus(dom.formModal); }
+      function openAddModal() { 
+        dom.formTitle.textContent = 'Add New Component'; 
+        dom.editId.value = ''; 
+        dom.partForm.reset(); 
+        populateItemNameDropdown();
+        dom.specFieldsContainer.classList.add('hidden'); 
+        dom.specFields.innerHTML = ''; 
+        dom.editModeBanner.classList.add('hidden'); 
+        dom.formModal.classList.remove('hidden'); 
+        dom.formModal.classList.add('flex'); 
+        trapFocus(dom.formModal); 
+      }
+      function openEditModal(item) { 
+        dom.formTitle.textContent = 'Edit Component'; 
+        dom.editId.value = item.id; 
+        dom.partForm.querySelector('#model').value = item.model || ''; 
+        dom.partForm.querySelector('#device').value = item.device || ''; 
+        dom.partForm.querySelector('#size').value = item.size || ''; 
+        populateItemNameDropdown();
+        dom.itemNameSelect.value = item.itemName || ''; 
+        dom.partForm.querySelector('#price').value = item.price || ''; 
+        dom.partForm.querySelector('#quantity').value = item.quantity || '0'; 
+        dom.imageLinksInput.value = item.imageLinks || ''; 
+        dom.partForm.querySelector('#note').value = item.note || ''; 
+        updateSpecFields(); 
+        Object.keys(item).forEach(key => { if (key.startsWith('spec_')) { const input = dom.partForm.querySelector(`[name="${key}"]`); if (input) input.value = item[key]; } }); 
+        dom.editModeBanner.classList.remove('hidden'); 
+        dom.formModal.classList.remove('hidden'); 
+        dom.formModal.classList.add('flex'); 
+        trapFocus(dom.formModal); 
+      }
       function closeFormModal() { dom.formModal.classList.add('hidden'); dom.formModal.classList.remove('flex'); dom.partForm.reset(); dom.specFieldsContainer.classList.add('hidden'); dom.specFields.innerHTML = ''; }
       function collectFormData() { const formData = { model: dom.partForm.querySelector('#model').value.trim(), device: dom.partForm.querySelector('#device').value, size: dom.partForm.querySelector('#size').value, itemName: dom.itemNameSelect.value, price: dom.partForm.querySelector('#price').value, quantity: dom.partForm.querySelector('#quantity').value, imageLinks: dom.imageLinksInput.value.trim(), note: dom.partForm.querySelector('#note').value.trim(), }; dom.partForm.querySelectorAll('#spec-fields input').forEach(input => { formData[input.name] = input.value.trim(); }); return formData; }
-      function updateSpecFields() { const selectedType = dom.itemNameSelect.value; dom.specFields.innerHTML = ''; if (selectedType && specDefinitions[selectedType]) { dom.specFieldsContainer.classList.remove('hidden'); specDefinitions[selectedType].forEach(specName => { dom.specFields.appendChild(createSpecInput(specName)); }); } else { dom.specFieldsContainer.classList.add('hidden'); } }
+      
+      function populateItemNameDropdown() {
+        dom.itemNameSelect.innerHTML = '<option value="">Select item type...</option>';
+        for (const itemName of itemTypeDefinitions.keys()) {
+          const option = document.createElement('option');
+          option.value = itemName;
+          option.textContent = itemName;
+          dom.itemNameSelect.appendChild(option);
+        }
+      }
+
+      function updateSpecFields() { 
+        const selectedType = dom.itemNameSelect.value;
+        const specs = itemTypeDefinitions.get(selectedType);
+        dom.specFields.innerHTML = ''; 
+        if (specs && specs.length > 0) { 
+          dom.specFieldsContainer.classList.remove('hidden'); 
+          specs.forEach(specName => { 
+            dom.specFields.appendChild(createSpecInput(specName)); 
+          }); 
+        } else { 
+          dom.specFieldsContainer.classList.add('hidden'); 
+        } 
+      }
       function createSpecInput(specName) { const id = specName.replace(/_/g, '-'); const wrapper = document.createElement('div'); const labelText = specName.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()); wrapper.innerHTML = `<label for="${id}">${labelText}</label><input type="text" id="${id}" name="${specName}" class="mt-1 industrial-input">`; return wrapper; }
       function openDetailPanel(item) { populateDetailPanel(item); dom.detailModal.classList.remove('hidden'); requestAnimationFrame(() => { dom.detailModal.classList.remove('opacity-0', 'scale-95'); trapFocus(dom.detailModal); }); }
       function closeDetailPanel() { dom.detailModal.classList.add('opacity-0', 'scale-95'); setTimeout(() => { dom.detailModal.classList.add('hidden'); }, 300); }
