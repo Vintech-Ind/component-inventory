@@ -598,8 +598,9 @@
           processAndRenderItems();
         }
       }
-      async function loadAllData() {
+      async function loadAllData(isManualRefresh = false) {
         showSkeletonLoader(true);
+        let success = false;
         try {
           const invRes = await gapi.client.sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: INVENTORY_RANGE });
           const inventoryValues = invRes.result.values;
@@ -644,6 +645,7 @@
           }
           
           localStorage.setItem('inventoryData', JSON.stringify({ items: allItems, headers: sheetHeaders, activity: allActivity, timestamp: Date.now() }));
+          success = true;
         
         } catch (err) { 
           handleApiError(err, 'Critical Data Loading Error'); 
@@ -653,7 +655,17 @@
           populateFilters(); 
           processAndRenderItems(); 
           renderNotifications(); 
-          renderActivityLog(); 
+          renderActivityLog();
+          if (isManualRefresh && success) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Data refreshed!',
+                showConfirmButton: false,
+                timer: 1500
+            });
+          }
         }
       }
 
@@ -1146,10 +1158,32 @@
       dom.sidebarCollapseBtn.addEventListener('click', toggleSidebarCollapse);
       dom.addItemHeaderBtn.addEventListener('click', openAddModal);
       dom.themeSwatches.addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') { applyTheme(e.target.dataset); } });
+      dom.refreshBtn.addEventListener('click', () => loadAllData(true));
+      dom.settingsBtn.addEventListener('click', () => {
+          const isOpen = dom.settingsDropdown.classList.toggle('hidden');
+          if (isOpen) {
+              dom.settingsDropdown.classList.remove('opacity-0', 'scale-95');
+          } else {
+              dom.settingsDropdown.classList.add('opacity-0', 'scale-95');
+          }
+      });
+      dom.manageItemTypesBtn.addEventListener('click', () => {
+          dom.itemTypesModal.classList.remove('hidden');
+          dom.itemTypesModal.classList.add('flex');
+          renderItemTypesList();
+      });
+      dom.closeItemTypesModalBtn.addEventListener('click', () => {
+          dom.itemTypesModal.classList.add('hidden');
+          dom.itemTypesModal.classList.remove('flex');
+      });
       
       // Global Listeners
       document.addEventListener('click', (e) => {
         if (!dom.profileBtn.contains(e.target) && !dom.profileDropdown.contains(e.target) && !dom.profileDropdown.classList.contains('hidden')) { toggleProfileDropdown(); }
+        if (!dom.settingsBtn.contains(e.target) && !dom.settingsDropdown.contains(e.target) && !dom.settingsDropdown.classList.contains('hidden')) {
+            dom.settingsDropdown.classList.add('opacity-0', 'scale-95');
+            setTimeout(() => dom.settingsDropdown.classList.add('hidden'), 150);
+        }
       });
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
