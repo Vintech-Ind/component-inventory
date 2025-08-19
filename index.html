@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vinayaka  | Component Database</title>
+  <title>Vinayaka Industries | Component Database</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -812,7 +812,6 @@
             let currentIndex = 0;
             const imgElement = gallery.querySelector('.gallery-image');
             
-            // Preload the next image
             const preloadNext = () => {
                 if (images.length > 1) {
                     const nextIndex = (currentIndex + 1) % images.length;
@@ -821,8 +820,8 @@
                 }
             };
 
-            imgElement.onload = preloadNext; // Preload next image once the current one is loaded
-            preloadNext(); // Initial preload
+            imgElement.onload = preloadNext; 
+            preloadNext();
 
             gallery.querySelectorAll('.gallery-arrow').forEach(arrow => {
                 arrow.addEventListener('click', (e) => {
@@ -834,7 +833,7 @@
                     setTimeout(() => {
                         imgElement.src = getDriveThumbnail(images[currentIndex]);
                         imgElement.style.opacity = 1;
-                    }, 300); // Match transition speed
+                    }, 300);
                 });
             });
         });
@@ -1160,8 +1159,8 @@
       dom.themeSwatches.addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') { applyTheme(e.target.dataset); } });
       dom.refreshBtn.addEventListener('click', () => loadAllData(true));
       dom.settingsBtn.addEventListener('click', () => {
-          const isOpen = dom.settingsDropdown.classList.toggle('hidden');
-          if (isOpen) {
+          const isHidden = dom.settingsDropdown.classList.toggle('hidden');
+          if (!isHidden) {
               dom.settingsDropdown.classList.remove('opacity-0', 'scale-95');
           } else {
               dom.settingsDropdown.classList.add('opacity-0', 'scale-95');
@@ -1208,3 +1207,15 @@
   </script>
 </body>
 </html>
+" and am asking a query about/based on this code below.
+Instructions to follow:
+  * Don't output/edit the document if the query is Direct/Simple. For example, if the query asks for a simple explanation, output a direct answer.
+  * Make sure to **edit** the document if the query shows the intent of editing the document, in which case output the entire edited document, **not just that section or the edits**.
+    * Don't output the same document/empty document and say that you have edited it.
+    * Don't change unrelated code in the document.
+  * Don't output  and  in your final response.
+  * Any references like "this" or "selected code" refers to the code between  and  tags.
+  * Just acknowledge my request in the introduction.
+  * Make sure to refer to the document as "Canvas" in your response.
+
+hey i'm unable to add new item n
