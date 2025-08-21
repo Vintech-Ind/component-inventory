@@ -941,6 +941,166 @@
       function trapFocus(element) { const focusableEls = element.querySelectorAll('a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="number"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])'); const firstFocusableEl = focusableEls[0]; const lastFocusableEl = focusableEls[focusableEls.length - 1]; const KEYCODE_TAB = 9; element.addEventListener('keydown', function(e) { if (e.key !== 'Tab' && e.keyCode !== KEYCODE_TAB) return; if (e.shiftKey) { if (document.activeElement === firstFocusableEl) { lastFocusableEl.focus(); e.preventDefault(); } } else { if (document.activeElement === lastFocusableEl) { firstFocusableEl.focus(); e.preventDefault(); } } }); if (firstFocusableEl) firstFocusableEl.focus(); }
 
       // ================================================================================
+      // 7. ITEM TYPE MANAGEMENT (FIXED/ADDED CODE)
+      // ================================================================================
+      
+      /**
+       * Renders the list of existing item types in the management modal.
+       */
+      function renderItemTypesList() {
+          dom.itemTypesList.innerHTML = '';
+          if (itemTypeDefinitions.size === 0) {
+              dom.itemTypesList.innerHTML = '<p class="text-center text-[var(--color-text-secondary)] p-4">No custom item types found.</p>';
+              return;
+          }
+
+          const sortedItemTypes = [...itemTypeDefinitions.keys()].sort();
+
+          sortedItemTypes.forEach(name => {
+              const specs = itemTypeDefinitions.get(name);
+              const itemEl = document.createElement('div');
+              itemEl.className = 'flex justify-between items-center p-3 rounded-lg bg-[var(--color-bg-tertiary)]';
+              itemEl.innerHTML = `
+                  <div>
+                      <p class="font-semibold">${name}</p>
+                      <p class="text-xs text-[var(--color-text-secondary)]">${specs.length > 0 ? specs.join(', ') : 'No specifications'}</p>
+                  </div>
+                  <div class="flex gap-2">
+                      <button class="edit-item-type-btn p-2 hover:bg-[var(--color-bg-secondary)] rounded" data-name="${name}" title="Edit"><i data-lucide="pencil" class="w-4 h-4 pointer-events-none"></i></button>
+                      <button class="delete-item-type-btn p-2 hover:bg-[var(--color-bg-secondary)] rounded text-red-500" data-name="${name}" title="Delete"><i data-lucide="trash-2" class="w-4 h-4 pointer-events-none"></i></button>
+                  </div>
+              `;
+              dom.itemTypesList.appendChild(itemEl);
+          });
+          lucide.createIcons();
+      }
+
+      /**
+       * Handles the submission of the "Add/Edit Item Type" form.
+       * @param {Event} e - The form submission event.
+       */
+      async function handleItemTypeFormSubmit(e) {
+          e.preventDefault();
+          const form = dom.itemTypeForm;
+          const nameInput = form.querySelector('#item-type-name');
+          const specsInput = form.querySelector('#item-type-specs');
+          const editName = form.querySelector('#item-type-edit-name').value;
+
+          const newName = nameInput.value.trim();
+          const specs = specsInput.value.trim();
+
+          if (!newName) {
+              Swal.fire('Validation Error', 'Item Name is required.', 'warning');
+              return;
+          }
+
+          if (!editName && itemTypeDefinitions.has(newName)) {
+              Swal.fire('Duplicate Name', 'An item type with this name already exists.', 'warning');
+              return;
+          }
+          
+          const submitButton = form.querySelector('button[type="submit"]');
+          const originalButtonHTML = submitButton.innerHTML;
+          submitButton.innerHTML = 'Saving...';
+          submitButton.disabled = true;
+
+          try {
+              const allItemTypesRes = await gapi.client.sheets.spreadsheets.values.get({
+                  spreadsheetId: SPREADSHEET_ID,
+                  range: ITEM_TYPES_RANGE,
+              });
+              const itemTypesValues = allItemTypesRes.result.values || [];
+              const dataRows = itemTypesValues.slice(1);
+
+              if (editName) { // Update existing
+                  const rowIndex = dataRows.findIndex(row => row[0] === editName);
+                  if (rowIndex !== -1) {
+                      const updateRange = `${ITEM_TYPES_SHEET_NAME}!A${rowIndex + 2}:B${rowIndex + 2}`;
+                      await gapi.client.sheets.spreadsheets.values.update({
+                          spreadsheetId: SPREADSHEET_ID,
+                          range: updateRange,
+                          valueInputOption: 'USER_ENTERED',
+                          resource: { values: [[newName, specs]] }
+                      });
+                      await logAction('UPDATE_ITEM_TYPE', newName, { from: editName, to: newName, specs });
+                      Swal.fire('Success', 'Item type updated successfully.', 'success');
+                  } else {
+                       throw new Error('Could not find item type to update.');
+                  }
+              } else { // Add new
+                  await gapi.client.sheets.spreadsheets.values.append({
+                      spreadsheetId: SPREADSHEET_ID,
+                      range: ITEM_TYPES_SHEET_NAME,
+                      valueInputOption: 'USER_ENTERED',
+                      resource: { values: [[newName, specs]] }
+                  });
+                  await logAction('CREATE_ITEM_TYPE', newName, { specs });
+                  Swal.fire('Success', 'New item type added successfully.', 'success');
+              }
+
+              dom.itemTypeFormContainer.classList.add('hidden');
+              dom.itemTypeForm.reset();
+              await loadAllData(); 
+              renderItemTypesList();
+
+          } catch (err) {
+              handleApiError(err, 'Item Type Save Error');
+          } finally {
+              submitButton.innerHTML = originalButtonHTML;
+              submitButton.disabled = false;
+          }
+      }
+
+      /**
+       * Deletes an item type from the 'ItemTypes' sheet.
+       * @param {string} name - The name of the item type to delete.
+       */
+      async function deleteItemType(name) {
+          try {
+              const allItemTypesRes = await gapi.client.sheets.spreadsheets.values.get({
+                  spreadsheetId: SPREADSHEET_ID,
+                  range: ITEM_TYPES_RANGE,
+              });
+              const itemTypesValues = allItemTypesRes.result.values || [];
+              const dataRows = itemTypesValues.slice(1);
+              const rowIndex = dataRows.findIndex(row => row[0] === name);
+
+              if (rowIndex === -1) {
+                  throw new Error('Item type not found in the sheet.');
+              }
+
+              const itemTypesSheetId = await getSheetIdByName(ITEM_TYPES_SHEET_NAME);
+              if (itemTypesSheetId === null) {
+                  throw new Error('Could not find the ItemTypes sheet ID.');
+              }
+
+              await gapi.client.sheets.spreadsheets.batchUpdate({
+                  spreadsheetId: SPREADSHEET_ID,
+                  resource: {
+                      requests: [{
+                          deleteDimension: {
+                              range: {
+                                  sheetId: itemTypesSheetId,
+                                  dimension: 'ROWS',
+                                  startIndex: rowIndex + 1,
+                                  endIndex: rowIndex + 2
+                              }
+                          }
+                      }]
+                  }
+              });
+
+              await logAction('DELETE_ITEM_TYPE', name, { name });
+              Swal.fire('Deleted!', `Item type "${name}" has been deleted.`, 'success');
+              await loadAllData();
+              renderItemTypesList();
+
+          } catch (err) {
+              handleApiError(err, 'Delete Item Type Error');
+          }
+      }
+
+      // ================================================================================
       // 8. COMPARISON
       // ================================================================================
       function updateCompareButton() { 
@@ -1187,6 +1347,39 @@
       });
       dom.itemTypeForm.addEventListener('submit', handleItemTypeFormSubmit);
       
+      // NEW Event listener for the item type list (edit/delete buttons)
+      dom.itemTypesList.addEventListener('click', (e) => {
+          const editBtn = e.target.closest('.edit-item-type-btn');
+          const deleteBtn = e.target.closest('.delete-item-type-btn');
+
+          if (editBtn) {
+              const name = editBtn.dataset.name;
+              const specs = itemTypeDefinitions.get(name) || [];
+              dom.itemTypeFormContainer.classList.remove('hidden');
+              dom.itemTypeForm.querySelector('#item-type-edit-name').value = name;
+              const nameInput = dom.itemTypeForm.querySelector('#item-type-name');
+              nameInput.value = name;
+              nameInput.disabled = false;
+              dom.itemTypeForm.querySelector('#item-type-specs').value = specs.join(', ');
+          }
+
+          if (deleteBtn) {
+              const name = deleteBtn.dataset.name;
+              Swal.fire({
+                  title: 'Delete Item Type?',
+                  text: `Are you sure you want to delete "${name}"? This cannot be undone.`,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonText: 'Yes, delete it!',
+                  confirmButtonColor: '#d33',
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      deleteItemType(name);
+                  }
+              });
+          }
+      });
+      
       // Global Listeners
       document.addEventListener('click', (e) => {
         if (!dom.profileBtn.contains(e.target) && !dom.profileDropdown.contains(e.target) && !dom.profileDropdown.classList.contains('hidden')) { toggleProfileDropdown(); }
@@ -1210,7 +1403,7 @@
           if (results.length === 0) return;
           if (e.key === 'ArrowDown') { e.preventDefault(); commandPaletteSelectedIndex = (commandPaletteSelectedIndex + 1) % results.length; }
           else if (e.key === 'ArrowUp') { e.preventDefault(); commandPaletteSelectedIndex = (commandPaletteSelectedIndex - 1 + results.length) % results.length; }
-          else if (e.key === 'Enter') { e.preventDefault(); handleCommandPaletteSelection(commandPaletteSelectedIndex); }
+          else if (e.key === 'Enter') { e.preventDefault(); if (commandPaletteSelectedIndex > -1) { handleCommandPaletteSelection(commandPaletteSelectedIndex); } }
           results.forEach((r, i) => r.classList.toggle('selected', i === commandPaletteSelectedIndex));
         }
       });
