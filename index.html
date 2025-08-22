@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vinayaka  | Component Database</title>
+  <title>Vinayaka Industries | Component Database</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -313,11 +313,19 @@
         
         <!-- Activity Log View -->
         <div id="activity-view" class="hidden">
+            <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg p-4 mb-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="lg:col-span-1"><div class="filter-control-group flex items-center gap-2"><i data-lucide="search" class="w-5 h-5 text-[var(--color-text-secondary)] flex-shrink-0"></i><input type="text" id="activity-search" placeholder="Search by component..." class="filter-control-input"></div></div>
+                    <div><div class="filter-control-group"><label for="activity-filter-user">User</label><select id="activity-filter-user" class="filter-control-input"><option value="">All Users</option></select></div></div>
+                    <div><div class="filter-control-group"><label for="activity-filter-action">Action</label><select id="activity-filter-action" class="filter-control-input"><option value="">All Actions</option></select></div></div>
+                </div>
+            </div>
             <div class="industrial-card overflow-hidden">
                 <div id="activity-log-container" class="max-h-[75vh] overflow-y-auto">
                     <!-- Activity log content will be injected here by JS -->
                 </div>
             </div>
+             <div id="activity-pagination-controls" class="flex justify-center items-center gap-4 mt-8"></div>
         </div>
       </div>
     </main>
@@ -432,7 +440,7 @@
       const AUDIT_RANGE = `${AUDIT_SHEET_NAME}!A:E`;
       const ITEM_TYPES_RANGE = `${ITEM_TYPES_SHEET_NAME}!A:B`;
 
-      let allItems = [], allActivity = [];
+      let allItems = [], allActivity = [], filteredActivity = [];
       let itemTypeDefinitions = new Map();
       let filteredItems = [];
       let gapiInited = false, gisInited = false;
@@ -442,6 +450,8 @@
       let currentLayout = 'grid';
       let currentPage = 1;
       const ITEMS_PER_PAGE = 12;
+      let activityCurrentPage = 1;
+      const LOGS_PER_PAGE = 15;
       let isValueVisible = false;
       let searchDebounceTimer;
       let comparisonList = new Set();
@@ -525,6 +535,10 @@
         itemTypeFormContainer: document.getElementById('item-type-form-container'),
         itemTypeForm: document.getElementById('item-type-form'),
         cancelItemTypeBtn: document.getElementById('cancel-item-type-btn'),
+        activitySearch: document.getElementById('activity-search'),
+        activityFilterUser: document.getElementById('activity-filter-user'),
+        activityFilterAction: document.getElementById('activity-filter-action'),
+        activityPaginationControls: document.getElementById('activity-pagination-controls'),
       };
       
       // ================================================================================
@@ -655,6 +669,7 @@
           populateFilters(); 
           processAndRenderItems(); 
           renderNotifications(); 
+          populateActivityFilters();
           renderActivityLog();
           if (isManualRefresh && success) {
             Swal.fire({
@@ -944,6 +959,8 @@
             dom.navActivity.classList.add('active');
             dom.activityView.classList.remove('hidden');
             dom.pageTitle.textContent = "Activity Log";
+            populateActivityFilters();
+            renderActivityLog();
         }
       }
       function toggleMobileSidebar() { const isOpen = dom.sidebar.classList.toggle('open'); dom.mobileBackdrop.classList.toggle('hidden', !isOpen); }
@@ -1281,15 +1298,44 @@
         dom.notificationBellBtn.classList.toggle('has-unread', hasUnread);
         lucide.createIcons();
       }
+      
+      function populateActivityFilters() {
+        const users = [...new Set(allActivity.map(log => log.user).filter(Boolean))];
+        const actions = [...new Set(allActivity.map(log => log.action).filter(Boolean))];
+
+        dom.activityFilterUser.innerHTML = '<option value="">All Users</option>';
+        users.forEach(u => dom.activityFilterUser.innerHTML += `<option value="${u}">${u}</option>`);
+
+        dom.activityFilterAction.innerHTML = '<option value="">All Actions</option>';
+        actions.forEach(a => dom.activityFilterAction.innerHTML += `<option value="${a}">${a}</option>`);
+      }
+
       function renderActivityLog() {
+          const searchTerm = dom.activitySearch.value.toLowerCase();
+          const userFilter = dom.activityFilterUser.value;
+          const actionFilter = dom.activityFilterAction.value;
+
+          filteredActivity = allActivity.filter(log => {
+              const item = allItems.find(i => i.id === log.itemId);
+              const itemName = item ? [item.model, item.itemName].filter(Boolean).join(' ') : '';
+              
+              const searchMatch = !searchTerm || itemName.toLowerCase().includes(searchTerm) || (log.itemId || '').toLowerCase().includes(searchTerm);
+              const userMatch = !userFilter || log.user === userFilter;
+              const actionMatch = !actionFilter || log.action === actionFilter;
+
+              return searchMatch && userMatch && actionMatch;
+          });
+
+          const paginatedLogs = filteredActivity.slice((activityCurrentPage - 1) * LOGS_PER_PAGE, activityCurrentPage * LOGS_PER_PAGE);
+
           let activityHtml = '<table class="w-full text-left border-collapse">';
           activityHtml += '<thead><tr class="border-b-2 border-[var(--color-border-primary)]"><th class="p-4 font-semibold">Timestamp</th><th class="p-4 font-semibold">User</th><th class="p-4 font-semibold">Action</th><th class="p-4 font-semibold">Component</th><th class="p-4 font-semibold">Details</th><th class="p-4 font-semibold">Undo</th></tr></thead>';
           activityHtml += '<tbody>';
 
-          if (allActivity.length === 0) {
-              activityHtml += '<tr><td colspan="6" class="text-center p-8 text-[var(--color-text-secondary)]">No activity has been recorded in the "AuditLog" sheet yet.</td></tr>';
+          if (paginatedLogs.length === 0) {
+              activityHtml += `<tr><td colspan="6" class="text-center p-8 text-[var(--color-text-secondary)]">${allActivity.length > 0 ? 'No logs match your filters.' : 'No activity has been recorded yet.'}</td></tr>`;
           } else {
-              allActivity.forEach(log => {
+              paginatedLogs.forEach(log => {
                   const item = allItems.find(i => i.id === log.itemId);
                   const itemName = item ? [item.model, item.itemName].filter(Boolean).join(' ') : `ID: ${log.itemId}`;
                   let detailsText = 'N/A';
@@ -1302,7 +1348,11 @@
                   } else if (log.action === 'CREATE' || log.action === 'DELETE') {
                       detailsText = 'Component data recorded.';
                   } else if (log.action.startsWith('UNDO_')) {
-                      detailsText = `Reverted action from ${new Date(JSON.parse(log.details).originalLogTimestamp).toLocaleString()}`;
+                      try {
+                        detailsText = `Reverted action from ${new Date(JSON.parse(log.details).originalLogTimestamp).toLocaleString()}`;
+                      } catch {
+                        detailsText = 'Reverted an action.';
+                      }
                   }
 
                   const isReversible = ['CREATE', 'UPDATE', 'DELETE'].includes(log.action);
@@ -1320,8 +1370,20 @@
           }
           activityHtml += '</tbody></table>';
           dom.activityLogContainer.innerHTML = activityHtml;
+          renderActivityPaginationControls();
           lucide.createIcons();
       }
+
+      function renderActivityPaginationControls() {
+        const totalPages = Math.ceil(filteredActivity.length / LOGS_PER_PAGE);
+        dom.activityPaginationControls.innerHTML = '';
+        if (totalPages <= 1) return;
+        let html = `<button data-page="${activityCurrentPage - 1}" class="btn btn--secondary" ${activityCurrentPage === 1 ? 'disabled' : ''}>&larr; Prev</button>`;
+        html += `<span class="font-semibold text-[var(--color-text-secondary)]">Page ${activityCurrentPage} of ${totalPages}</span>`;
+        html += `<button data-page="${activityCurrentPage + 1}" class="btn btn--secondary" ${activityCurrentPage === totalPages ? 'disabled' : ''}>Next &rarr;</button>`;
+        dom.activityPaginationControls.innerHTML = html;
+      }
+
       function toggleNotificationCenter() {
         const isOpen = dom.notificationCenter.classList.toggle('open');
         if (isOpen) { localStorage.setItem('hasUnreadNotifications', 'false'); dom.notificationBellBtn.classList.remove('has-unread'); }
@@ -1457,13 +1519,34 @@
           }
       });
       
-      // NEW Event listener for the Undo button in the activity log
       dom.activityLogContainer.addEventListener('click', (e) => {
           const undoBtn = e.target.closest('.undo-btn');
           if (undoBtn) {
               handleUndoAction(undoBtn.dataset.log);
           }
       });
+
+      dom.activitySearch.addEventListener('input', () => {
+          clearTimeout(searchDebounceTimer);
+          searchDebounceTimer = setTimeout(() => {
+              activityCurrentPage = 1;
+              renderActivityLog();
+          }, 300);
+      });
+
+      [dom.activityFilterUser, dom.activityFilterAction].forEach(el => el.addEventListener('change', () => {
+          activityCurrentPage = 1;
+          renderActivityLog();
+      }));
+      
+      dom.activityPaginationControls.addEventListener('click', (e) => {
+          const button = e.target.closest('button');
+          if (button && !button.disabled) {
+              activityCurrentPage = parseInt(button.dataset.page);
+              renderActivityLog();
+          }
+      });
+
 
       // Global Listeners
       document.addEventListener('click', (e) => {
