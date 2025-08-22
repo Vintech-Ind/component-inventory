@@ -164,6 +164,21 @@
         transition: opacity var(--transition-speed-normal) var(--transition-curve-smooth);
     }
 
+    .spec-tag {
+        cursor: grab;
+        transition: background-color var(--transition-speed-fast) var(--transition-curve-smooth);
+    }
+    .spec-tag:active {
+        cursor: grabbing;
+        background-color: var(--color-accent-main);
+        color: var(--color-text-on-accent);
+    }
+    #item-type-specs.drag-over {
+        border-bottom-color: var(--color-accent-main);
+        box-shadow: 0 2px 0 var(--color-accent-main);
+    }
+
+
     @media (max-width: 1024px) {
       .main-content { padding-left: 0; }
       .sidebar { transform: translateX(-100%); box-shadow: 5px 0 15px rgba(0,0,0,0.2); z-index: 50; width: var(--sidebar-width) !important; }
@@ -391,7 +406,7 @@
   
   <!-- Item Types Management Modal -->
   <div id="item-types-modal" role="dialog" aria-modal="true" aria-labelledby="item-types-title" class="fixed inset-0 z-50 justify-center items-start p-4 overflow-y-auto bg-black/70 hidden">
-    <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg shadow-2xl w-full max-w-2xl my-8 flex flex-col scale-in">
+    <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg shadow-2xl w-full max-w-4xl my-8 flex flex-col scale-in">
       <div class="flex justify-between items-center p-6 border-b border-[var(--color-border-primary)]">
         <h2 id="item-types-title" class="text-2xl font-black">Manage Item Types</h2>
         <button type="button" id="close-item-types-modal-btn" aria-label="Close" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -401,22 +416,31 @@
         <button id="add-new-item-type-btn" class="btn btn--secondary w-full"><i data-lucide="plus"></i>Add New Item Type</button>
       </div>
       <div id="item-type-form-container" class="p-6 border-t border-[var(--color-border-primary)] bg-[var(--color-bg-primary)] hidden">
-        <form id="item-type-form" class="space-y-4">
-          <input type="hidden" id="item-type-edit-name">
-          <div>
-            <label for="item-type-name" class="font-semibold">Item Name*</label>
-            <input type="text" id="item-type-name" required class="mt-1 industrial-input">
-          </div>
-          <div>
-            <label for="item-type-specs" class="font-semibold">Specifications</label>
-            <textarea id="item-type-specs" class="mt-1 industrial-input" rows="3" placeholder="e.g., spec_height,spec_width,spec_material"></textarea>
-            <p class="text-xs text-[var(--color-text-secondary)] mt-1">Enter a comma-separated list of specification names.</p>
-          </div>
-          <div class="flex justify-end gap-3 pt-2">
-            <button type="button" id="cancel-item-type-btn" class="btn btn--secondary">Cancel</button>
-            <button type="submit" class="btn btn--primary">Save Item Type</button>
-          </div>
-        </form>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form id="item-type-form" class="space-y-4">
+              <input type="hidden" id="item-type-edit-name">
+              <div>
+                <label for="item-type-name" class="font-semibold">Item Name*</label>
+                <input type="text" id="item-type-name" required class="mt-1 industrial-input">
+              </div>
+              <div>
+                <label for="item-type-specs" class="font-semibold">Specifications</label>
+                <textarea id="item-type-specs" class="mt-1 industrial-input" rows="4" placeholder="Enter specs or drag from the right..."></textarea>
+                <p class="text-xs text-[var(--color-text-secondary)] mt-1">Enter a comma-separated list.</p>
+              </div>
+              <div class="flex justify-end gap-3 pt-2">
+                <button type="button" id="cancel-item-type-btn" class="btn btn--secondary">Cancel</button>
+                <button type="submit" class="btn btn--primary">Save Item Type</button>
+              </div>
+            </form>
+            <div>
+                <label class="font-semibold">Common Specs</label>
+                <p class="text-xs text-[var(--color-text-secondary)] mt-1 mb-2">Drag & drop specs into the text area.</p>
+                <div id="common-specs-list" class="flex flex-wrap gap-2 p-3 bg-[var(--color-bg-tertiary)] rounded-lg border border-[var(--color-border-primary)] max-h-48 overflow-y-auto">
+                    <!-- Draggable spec tags will be injected here by JS -->
+                </div>
+            </div>
+        </div>
       </div>
     </div>
   </div>
@@ -539,6 +563,8 @@
         activityFilterUser: document.getElementById('activity-filter-user'),
         activityFilterAction: document.getElementById('activity-filter-action'),
         activityPaginationControls: document.getElementById('activity-pagination-controls'),
+        itemTypeSpecsTextarea: document.getElementById('item-type-specs'),
+        commonSpecsList: document.getElementById('common-specs-list'),
       };
       
       // ================================================================================
