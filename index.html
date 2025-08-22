@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title> Industries | Component Database</title>
+  <title>Vinayaka Industries | Component Database</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -706,7 +706,7 @@
         await logAction('CREATE', newItemData.id, newItemData);
         closeFormModal(); localStorage.removeItem('inventoryData'); await loadAllData();
       }
-      async function updateComponent(id, updatedItemData) {
+      async function updateComponent(id, updatedItemData, isUndo = false) {
         const itemToUpdate = allItems.find(item => item.id === id);
         if (!itemToUpdate) { throw new Error('Could not find the component to update.'); }
         updatedItemData.id = id;
@@ -714,22 +714,31 @@
         const endColumn = columnToLetter(sheetHeaders.length);
         const updateRange = `${SHEET_NAME}!A${itemToUpdate.rowIndex}:${endColumn}${itemToUpdate.rowIndex}`;
         await gapi.client.sheets.spreadsheets.values.update({ spreadsheetId: SPREADSHEET_ID, range: updateRange, valueInputOption: 'USER_ENTERED', resource: { values: [updatedRow] } });
-        Swal.fire({ title: 'Success!', text: 'Component updated successfully.', icon: 'success', timer: 1800, showConfirmButton: false });
-        const changes = {};
-        Object.keys(updatedItemData).forEach(key => { if (itemToUpdate[key] !== updatedItemData[key]) { changes[key] = { from: itemToUpdate[key] || '', to: updatedItemData[key] }; } });
-        await logAction('UPDATE', id, changes);
-        closeFormModal(); localStorage.removeItem('inventoryData'); await loadAllData();
+        
+        if (!isUndo) {
+            Swal.fire({ title: 'Success!', text: 'Component updated successfully.', icon: 'success', timer: 1800, showConfirmButton: false });
+            const changes = {};
+            Object.keys(updatedItemData).forEach(key => { if (itemToUpdate[key] !== updatedItemData[key]) { changes[key] = { from: itemToUpdate[key] || '', to: updatedItemData[key] }; } });
+            await logAction('UPDATE', id, changes);
+            closeFormModal(); 
+        }
+        localStorage.removeItem('inventoryData'); 
+        if (!isUndo) await loadAllData();
       }
-      async function deleteComponent(id) {
+      async function deleteComponent(id, isUndo = false) {
         const itemToDelete = allItems.find(item => item.id === id);
         if (!itemToDelete) { Swal.fire('Error', 'Could not find the component to delete.', 'error'); return; }
         if (SHEET_ID == null) { try { SHEET_ID = await getSheetIdByName(SHEET_NAME); } catch {} }
         if (SHEET_ID == null) { Swal.fire('Delete Error', 'Could not resolve sheetId for deletion.', 'error'); return; }
         try {
           await gapi.client.sheets.spreadsheets.batchUpdate({ spreadsheetId: SPREADSHEET_ID, resource: { requests: [{ deleteDimension: { range: { sheetId: SHEET_ID, dimension: 'ROWS', startIndex: itemToDelete.rowIndex - 1, endIndex: itemToDelete.rowIndex } } }] } });
-          Swal.fire('Deleted!', 'The component has been deleted.', 'success');
-          await logAction('DELETE', id, itemToDelete);
-          closeDetailPanel(); localStorage.removeItem('inventoryData'); await loadAllData();
+          if (!isUndo) {
+            Swal.fire('Deleted!', 'The component has been deleted.', 'success');
+            await logAction('DELETE', id, itemToDelete);
+            closeDetailPanel(); 
+          }
+          localStorage.removeItem('inventoryData'); 
+          if (!isUndo) await loadAllData();
         } catch (err) { handleApiError(err, 'Delete Error'); }
       }
 
@@ -941,12 +950,9 @@
       function trapFocus(element) { const focusableEls = element.querySelectorAll('a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="number"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])'); const firstFocusableEl = focusableEls[0]; const lastFocusableEl = focusableEls[focusableEls.length - 1]; const KEYCODE_TAB = 9; element.addEventListener('keydown', function(e) { if (e.key !== 'Tab' && e.keyCode !== KEYCODE_TAB) return; if (e.shiftKey) { if (document.activeElement === firstFocusableEl) { lastFocusableEl.focus(); e.preventDefault(); } } else { if (document.activeElement === lastFocusableEl) { firstFocusableEl.focus(); e.preventDefault(); } } }); if (firstFocusableEl) firstFocusableEl.focus(); }
 
       // ================================================================================
-      // 7. ITEM TYPE MANAGEMENT (FIXED/ADDED CODE)
+      // 7. ITEM TYPE MANAGEMENT
       // ================================================================================
       
-      /**
-       * Renders the list of existing item types in the management modal.
-       */
       function renderItemTypesList() {
           dom.itemTypesList.innerHTML = '';
           if (itemTypeDefinitions.size === 0) {
@@ -975,10 +981,6 @@
           lucide.createIcons();
       }
 
-      /**
-       * Handles the submission of the "Add/Edit Item Type" form.
-       * @param {Event} e - The form submission event.
-       */
       async function handleItemTypeFormSubmit(e) {
           e.preventDefault();
           const form = dom.itemTypeForm;
@@ -1051,10 +1053,6 @@
           }
       }
 
-      /**
-       * Deletes an item type from the 'ItemTypes' sheet.
-       * @param {string} name - The name of the item type to delete.
-       */
       async function deleteItemType(name) {
           try {
               const allItemTypesRes = await gapi.client.sheets.spreadsheets.values.get({
@@ -1101,8 +1099,81 @@
       }
 
       // ================================================================================
-      // 8. COMPARISON
+      // 8. COMPARISON & UNDO LOGIC
       // ================================================================================
+      
+      /**
+       * Re-creates a component from a log entry. Used for undoing a deletion.
+       * @param {object} itemData - The full data object of the component to re-create.
+       */
+      async function recreateComponent(itemData) {
+        const newRow = sheetHeaders.map(header => itemData[header] || "");
+        await gapi.client.sheets.spreadsheets.values.append({
+            spreadsheetId: SPREADSHEET_ID,
+            range: SHEET_NAME,
+            valueInputOption: 'USER_ENTERED',
+            resource: { values: [newRow] }
+        });
+      }
+      
+      /**
+       * Handles the click of an "Undo" button in the activity log.
+       * @param {string} logString - The stringified log object from the button's data attribute.
+       */
+      async function handleUndoAction(logString) {
+        const log = JSON.parse(logString.replace(/&apos;/g, "'"));
+        
+        const { isConfirmed } = await Swal.fire({
+            title: `Undo "${log.action}"?`,
+            text: `This will revert the action performed by ${log.user}.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Undo it!',
+            confirmButtonColor: 'var(--color-accent-main)',
+            cancelButtonColor: 'var(--color-status-danger)'
+        });
+
+        if (!isConfirmed) return;
+
+        try {
+            switch (log.action) {
+                case 'CREATE':
+                    await deleteComponent(log.itemId, true); // Pass true to signify it's an undo action
+                    await logAction('UNDO_CREATE', log.itemId, { originalLogTimestamp: log.timestamp });
+                    break;
+
+                case 'DELETE':
+                    const itemToRecreate = JSON.parse(log.details);
+                    await recreateComponent(itemToRecreate);
+                    await logAction('UNDO_DELETE', log.itemId, { originalLogTimestamp: log.timestamp });
+                    break;
+
+                case 'UPDATE':
+                    const itemToUpdate = allItems.find(item => item.id === log.itemId);
+                    if (!itemToUpdate) throw new Error('Cannot undo update: Original item not found.');
+                    
+                    const changes = JSON.parse(log.details);
+                    const revertedData = { ...itemToUpdate };
+                    Object.keys(changes).forEach(key => {
+                        revertedData[key] = changes[key].from; // Revert to the "from" value
+                    });
+                    
+                    await updateComponent(itemToUpdate.id, revertedData, true); // Pass true to signify it's an undo action
+                    await logAction('UNDO_UPDATE', log.itemId, { originalLogTimestamp: log.timestamp });
+                    break;
+                
+                default:
+                  Swal.fire('Cannot Undo', 'This action type cannot be reversed.', 'info');
+                  return;
+            }
+            Swal.fire('Undo Successful!', 'The action has been reversed.', 'success');
+        } catch (err) {
+            handleApiError(err, 'Undo Action Error');
+        } finally {
+            await loadAllData(true); // Force a full refresh after the action
+        }
+      }
+
       function updateCompareButton() { 
           const count = comparisonList.size; 
           if (count >= 2) { 
@@ -1212,11 +1283,11 @@
       }
       function renderActivityLog() {
           let activityHtml = '<table class="w-full text-left border-collapse">';
-          activityHtml += '<thead><tr class="border-b-2 border-[var(--color-border-primary)]"><th class="p-4 font-semibold">Timestamp</th><th class="p-4 font-semibold">User</th><th class="p-4 font-semibold">Action</th><th class="p-4 font-semibold">Component</th><th class="p-4 font-semibold">Details</th></tr></thead>';
+          activityHtml += '<thead><tr class="border-b-2 border-[var(--color-border-primary)]"><th class="p-4 font-semibold">Timestamp</th><th class="p-4 font-semibold">User</th><th class="p-4 font-semibold">Action</th><th class="p-4 font-semibold">Component</th><th class="p-4 font-semibold">Details</th><th class="p-4 font-semibold">Undo</th></tr></thead>';
           activityHtml += '<tbody>';
 
           if (allActivity.length === 0) {
-              activityHtml += '<tr><td colspan="5" class="text-center p-8 text-[var(--color-text-secondary)]">No activity has been recorded in the "AuditLog" sheet yet.</td></tr>';
+              activityHtml += '<tr><td colspan="6" class="text-center p-8 text-[var(--color-text-secondary)]">No activity has been recorded in the "AuditLog" sheet yet.</td></tr>';
           } else {
               allActivity.forEach(log => {
                   const item = allItems.find(i => i.id === log.itemId);
@@ -1230,19 +1301,26 @@
                       } catch { detailsText = 'Changes were made.'; }
                   } else if (log.action === 'CREATE' || log.action === 'DELETE') {
                       detailsText = 'Component data recorded.';
+                  } else if (log.action.startsWith('UNDO_')) {
+                      detailsText = `Reverted action from ${new Date(JSON.parse(log.details).originalLogTimestamp).toLocaleString()}`;
                   }
+
+                  const isReversible = ['CREATE', 'UPDATE', 'DELETE'].includes(log.action);
+                  const undoButtonHtml = isReversible ? `<button class="undo-btn btn btn--secondary !p-2" data-log='${JSON.stringify(log).replace(/'/g, "&apos;")}' title="Undo Action"><i data-lucide="undo-2" class="w-4 h-4 pointer-events-none"></i></button>` : '';
 
                   activityHtml += `<tr class="border-b border-[var(--color-border-primary)] last:border-b-0 text-sm hover:bg-[var(--color-bg-tertiary)]">
                       <td class="p-4 whitespace-nowrap text-[var(--color-text-secondary)]">${new Date(log.timestamp).toLocaleString()}</td>
                       <td class="p-4 font-medium">${log.user}</td>
-                      <td class="p-4"><span class="font-semibold px-2 py-1 rounded text-xs ${log.action === 'CREATE' ? 'bg-green-500/20 text-green-700 dark:text-green-300' : log.action === 'DELETE' ? 'bg-red-500/20 text-red-700 dark:text-red-300' : 'bg-blue-500/20 text-blue-700 dark:text-blue-300'}">${log.action}</span></td>
+                      <td class="p-4"><span class="font-semibold px-2 py-1 rounded text-xs ${log.action === 'CREATE' ? 'bg-green-500/20 text-green-700 dark:text-green-300' : log.action === 'DELETE' ? 'bg-red-500/20 text-red-700 dark:text-red-300' : log.action.startsWith('UNDO') ? 'bg-gray-500/20 text-gray-700 dark:text-gray-300' : 'bg-blue-500/20 text-blue-700 dark:text-blue-300'}">${log.action}</span></td>
                       <td class="p-4 capitalize">${itemName}</td>
                       <td class="p-4">${detailsText}</td>
+                      <td class="p-4">${undoButtonHtml}</td>
                   </tr>`;
               });
           }
           activityHtml += '</tbody></table>';
           dom.activityLogContainer.innerHTML = activityHtml;
+          lucide.createIcons();
       }
       function toggleNotificationCenter() {
         const isOpen = dom.notificationCenter.classList.toggle('open');
@@ -1347,7 +1425,6 @@
       });
       dom.itemTypeForm.addEventListener('submit', handleItemTypeFormSubmit);
       
-      // NEW Event listener for the item type list (edit/delete buttons)
       dom.itemTypesList.addEventListener('click', (e) => {
           const editBtn = e.target.closest('.edit-item-type-btn');
           const deleteBtn = e.target.closest('.delete-item-type-btn');
@@ -1380,6 +1457,14 @@
           }
       });
       
+      // NEW Event listener for the Undo button in the activity log
+      dom.activityLogContainer.addEventListener('click', (e) => {
+          const undoBtn = e.target.closest('.undo-btn');
+          if (undoBtn) {
+              handleUndoAction(undoBtn.dataset.log);
+          }
+      });
+
       // Global Listeners
       document.addEventListener('click', (e) => {
         if (!dom.profileBtn.contains(e.target) && !dom.profileDropdown.contains(e.target) && !dom.profileDropdown.classList.contains('hidden')) { toggleProfileDropdown(); }
