@@ -316,7 +316,7 @@
                     <div class="industrial-card p-6 flex flex-col justify-between"><div class="flex justify-between items-start"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Inventory Value</p><button id="value-toggle-btn" aria-label="Toggle inventory value visibility" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"><i data-lucide="eye-off" class="w-5 h-5"></i></button></div><p id="total-value" class="text-3xl sm:text-4xl font-black mt-2 break-all">₹0</p></div>
                     <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Low Stock Items</p><p id="low-stock" class="text-3xl sm:text-4xl font-black mt-2">0</p></div>
                     <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Out of Stock</p><p id="out-of-stock" class="text-3xl sm:text-4xl font-black mt-2 text-[var(--color-status-danger)]">0</p></div>
-                    <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Incomplete Items</p><p id="incomplete-items" class="text-3xl sm:text-4xl font-black mt-2 text-[var(--color-status-warning)]">0</p></div>
+                    <div id="incomplete-items-card" class="industrial-card p-6 flex flex-col justify-between cursor-pointer"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Incomplete Items</p><p id="incomplete-items" class="text-3xl sm:text-4xl font-black mt-2 text-[var(--color-status-warning)]">0</p></div>
                 </div>
             </div>
             <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg p-4 mb-8">
@@ -365,7 +365,11 @@
       <form id="partForm" class="p-6 space-y-6 overflow-y-auto">
         <input type="hidden" id="edit-id">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div><label for="model">Model*</label><input type="text" id="model" required class="mt-1 industrial-input"></div>
+          <div>
+            <label for="model">Model*</label>
+            <input type="text" id="model" required class="mt-1 industrial-input" list="model-list">
+            <datalist id="model-list"></datalist>
+          </div>
           <div><label for="device">Device</label><select id="device" class="mt-1 industrial-input"><option value="">(None)</option><option value="SWING DEVICE">Swing Device</option><option value="TRAVEL DEVICE">Travel Device</option></select></div>
           <div><label for="size">Size</label><select id="size" class="mt-1 industrial-input"><option value="">(None)</option><option value="SMALL">Small</option><option value="MIDDLE">Middle</option><option value="BIG">Big</option></select></div>
           <div><label for="item-name-main">Item Name*</label><select id="item-name-main" required class="mt-1 industrial-input"><option value="">Select item type...</option></select></div>
@@ -489,6 +493,7 @@
       let searchDebounceTimer;
       let comparisonList = new Set();
       let commandPaletteSelectedIndex = -1;
+      let lastAddedData = {};
       
       const dom = {
         html: document.documentElement,
@@ -574,6 +579,7 @@
         activityPaginationControls: document.getElementById('activity-pagination-controls'),
         itemTypeSpecsTextarea: document.getElementById('item-type-specs'),
         commonSpecsList: document.getElementById('common-specs-list'),
+        incompleteItemsCard: document.getElementById('incomplete-items-card'),
       };
       
       // ================================================================================
@@ -754,6 +760,7 @@
         await gapi.client.sheets.spreadsheets.values.append({ spreadsheetId: SPREADSHEET_ID, range: SHEET_NAME, valueInputOption: 'USER_ENTERED', resource: { values: [newRow] } });
         Swal.fire({ title: 'Success!', text: 'Component added successfully.', icon: 'success', timer: 1800, showConfirmButton: false });
         await logAction('CREATE', newItemData.id, newItemData);
+        lastAddedData = { device: newItemData.device, size: newItemData.size };
         closeFormModal(); localStorage.removeItem('inventoryData'); await loadAllData();
       }
       async function updateComponent(id, updatedItemData, isUndo = false) {
@@ -848,6 +855,7 @@
         const hasPrice = item.price && item.price.trim() !== '';
         const hasImages = item.imageLinks && item.imageLinks.trim() !== '';
         card.className = `industrial-card overflow-hidden flex flex-col group ${!hasPrice || !hasImages ? 'missing-info-indicator' : ''}`;
+        card.dataset.id = item.id;
         
         const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
         const firstImage = getDriveThumbnail(images[0]) || `https://placehold.co/512x512/E9ECEF/212529?text=${encodeURIComponent(item.itemName || 'N/A')}`;
@@ -867,8 +875,12 @@
             <div class="p-4 flex-grow flex flex-col">
                 <h3 class="font-bold leading-tight capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3>
                 <p class="text-sm text-[var(--color-text-secondary)] mt-1">Price: <span class="font-semibold ${!hasPrice ? 'missing-info-text' : 'text-[var(--color-text-primary)]'}">${hasPrice ? '₹' + item.price : 'Not Set'}</span></p>
-                <div class="mt-auto pt-4 text-right">
-                    <button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">View Details &rarr;</button>
+                <div class="mt-4 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <button class="quantity-btn btn btn--secondary !p-2" data-id="${item.id}" data-change="-1"><i data-lucide="minus" class="w-4 h-4"></i></button>
+                        <button class="quantity-btn btn btn--secondary !p-2" data-id="${item.id}" data-change="1"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                    </div>
+                    <button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details &rarr;</button>
                 </div>
             </div>`;
         return card;
@@ -963,17 +975,40 @@
       // ================================================================================
       // 5. MODALS & FORMS
       // ================================================================================
-      function openAddModal() { 
-        dom.formTitle.textContent = 'Add New Component'; 
-        dom.editId.value = ''; 
-        dom.partForm.reset(); 
+      function openAddModal(itemToDuplicate = null) {
+        dom.formTitle.textContent = itemToDuplicate ? 'Duplicate Component' : 'Add New Component';
+        dom.editId.value = '';
+        dom.partForm.reset();
         populateItemNameDropdown();
-        dom.specFieldsContainer.classList.add('hidden'); 
-        dom.specFields.innerHTML = ''; 
-        dom.editModeBanner.classList.add('hidden'); 
-        dom.formModal.classList.remove('hidden'); 
-        dom.formModal.classList.add('flex'); 
-        trapFocus(dom.formModal); 
+        populateModelDatalist();
+
+        if (itemToDuplicate) {
+            Object.keys(itemToDuplicate).forEach(key => {
+                const input = dom.partForm.querySelector(`#${key.replace('_', '-')}`);
+                if (input && key !== 'id' && key !== 'rowIndex') {
+                    input.value = itemToDuplicate[key];
+                }
+            });
+             dom.partForm.querySelector('#model').value = itemToDuplicate.model ? `${itemToDuplicate.model} (Copy)` : '';
+        } else if (lastAddedData.device || lastAddedData.size) {
+            dom.partForm.querySelector('#device').value = lastAddedData.device || '';
+            dom.partForm.querySelector('#size').value = lastAddedData.size || '';
+        }
+
+        updateSpecFields();
+        if (itemToDuplicate) {
+            Object.keys(itemToDuplicate).forEach(key => {
+                if (key.startsWith('spec_')) {
+                    const specInput = dom.specFields.querySelector(`[name="${key}"]`);
+                    if (specInput) specInput.value = itemToDuplicate[key];
+                }
+            });
+        }
+
+        dom.editModeBanner.classList.add('hidden');
+        dom.formModal.classList.remove('hidden');
+        dom.formModal.classList.add('flex');
+        trapFocus(dom.formModal);
       }
       function openEditModal(item) { 
         dom.formTitle.textContent = 'Edit Component'; 
@@ -982,6 +1017,7 @@
         dom.partForm.querySelector('#device').value = item.device || ''; 
         dom.partForm.querySelector('#size').value = item.size || ''; 
         populateItemNameDropdown();
+        populateModelDatalist();
         dom.itemNameSelect.value = item.itemName || ''; 
         dom.partForm.querySelector('#price').value = item.price || ''; 
         dom.partForm.querySelector('#quantity').value = item.quantity || '0'; 
@@ -1005,6 +1041,18 @@
           option.textContent = itemName;
           dom.itemNameSelect.appendChild(option);
         }
+      }
+
+      function populateModelDatalist() {
+        const modelList = document.getElementById('model-list');
+        if (!modelList) return;
+        modelList.innerHTML = '';
+        const uniqueModels = [...new Set(allItems.map(item => item.model).filter(Boolean))];
+        uniqueModels.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model;
+            modelList.appendChild(option);
+        });
       }
 
       function updateSpecFields() { 
@@ -1064,6 +1112,7 @@
                     </dl>
                     <div class="flex items-center gap-3 mt-4">
                         <button data-id="${item.id}" class="edit-btn btn btn--secondary flex-1"><i data-lucide="edit"></i>Edit</button>
+                        <button data-id="${item.id}" class="duplicate-btn btn btn--secondary flex-1"><i data-lucide="copy"></i>Duplicate</button>
                         <button data-id="${item.id}" class="delete-btn btn btn--danger flex-1"><i data-lucide="trash-2"></i>Delete</button>
                     </div>
                 </div>
@@ -1596,11 +1645,60 @@
       // 10. EVENTS & INIT
       // ================================================================================
       function handlePaginationClick(e) { const button = e.target.closest('button'); if (button && !button.disabled) { currentPage = parseInt(button.dataset.page); renderItems(); window.scrollTo(0, 0); } }
-      function handleCardClick(e) { const viewBtn = e.target.closest('.view-details-btn'); if (viewBtn) { const itemId = viewBtn.dataset.id; const item = allItems.find(i => i.id === itemId); if (item) openDetailPanel(item); return; } const checkbox = e.target.closest('.compare-checkbox'); if (checkbox) { const itemId = checkbox.dataset.id; if (checkbox.checked) comparisonList.add(itemId); else comparisonList.delete(itemId); updateCompareButton(); } }
+      
+      async function handleCardClick(e) {
+        const viewBtn = e.target.closest('.view-details-btn');
+        const checkbox = e.target.closest('.compare-checkbox');
+        const quantityBtn = e.target.closest('.quantity-btn');
+        const card = e.target.closest('.industrial-card');
+
+        if (viewBtn) {
+            const itemId = viewBtn.dataset.id;
+            const item = allItems.find(i => i.id === itemId);
+            if (item) openDetailPanel(item);
+            return;
+        }
+
+        if (checkbox) {
+            const itemId = checkbox.dataset.id;
+            if (checkbox.checked) comparisonList.add(itemId);
+            else comparisonList.delete(itemId);
+            updateCompareButton();
+            return;
+        }
+        
+        if (quantityBtn) {
+            const itemId = quantityBtn.dataset.id;
+            const change = parseInt(quantityBtn.dataset.change);
+            const itemToUpdate = allItems.find(i => i.id === itemId);
+            if (itemToUpdate) {
+                const currentQuantity = parseInt(itemToUpdate.quantity) || 0;
+                const newQuantity = Math.max(0, currentQuantity + change);
+                if (currentQuantity !== newQuantity) {
+                    const updatedData = { ...itemToUpdate, quantity: newQuantity };
+                    await updateComponent(itemId, updatedData, true); // True to suppress success message
+                    await logAction('QUICK_EDIT_QUANTITY', itemId, { from: currentQuantity, to: newQuantity });
+                    await loadAllData();
+                }
+            }
+            return;
+        }
+
+        if (card && card.classList.contains('missing-info-indicator')) {
+             const itemId = card.dataset.id;
+             const item = allItems.find(i => i.id === itemId);
+             if(item) openEditModal(item);
+        }
+      }
+
       function handleDetailPanelClick(e) {
-        const editBtn = e.target.closest('.edit-btn'); const deleteBtn = e.target.closest('.delete-btn'); const arrowBtn = e.target.closest('.detail-gallery-arrow');
+        const editBtn = e.target.closest('.edit-btn'); 
+        const deleteBtn = e.target.closest('.delete-btn'); 
+        const duplicateBtn = e.target.closest('.duplicate-btn');
+        const arrowBtn = e.target.closest('.detail-gallery-arrow');
         if (editBtn) { const itemId = editBtn.dataset.id; const item = allItems.find(i => i.id === itemId); if (item) { closeDetailPanel(); openEditModal(item); } }
         if (deleteBtn) { const itemId = deleteBtn.dataset.id; Swal.fire({ title: 'Are you absolutely sure?', text: "This action cannot be undone!", icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, delete it!', confirmButtonColor: '#d33', cancelButtonText: 'Cancel' }).then((result) => { if (result.isConfirmed) deleteComponent(itemId); }); }
+        if (duplicateBtn) { const itemId = duplicateBtn.dataset.id; const item = allItems.find(i => i.id === itemId); if(item) { closeDetailPanel(); openAddModal(item); } }
         if (arrowBtn) { const gallery = arrowBtn.closest('.image-gallery'); const images = (gallery.dataset.images || '').split(',').map(link => link.trim()).filter(Boolean); if (images.length <= 1) return; let currentIndex = parseInt(gallery.dataset.currentIndex || '0'); const direction = parseInt(arrowBtn.dataset.direction); currentIndex = (currentIndex + direction + images.length) % images.length; gallery.querySelector('.gallery-image').src = getDriveThumbnail(images[currentIndex]); gallery.dataset.currentIndex = currentIndex; }
       }
       
@@ -1639,7 +1737,7 @@
       dom.notificationCloseBtn.addEventListener('click', toggleNotificationCenter);
       dom.profileBtn.addEventListener('click', toggleProfileDropdown);
       dom.sidebarCollapseBtn.addEventListener('click', toggleSidebarCollapse);
-      dom.addItemHeaderBtn.addEventListener('click', openAddModal);
+      dom.addItemHeaderBtn.addEventListener('click', () => openAddModal());
       dom.themeSwatches.addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') { applyTheme(e.target.dataset); } });
       dom.refreshBtn.addEventListener('click', () => loadAllData(true));
       dom.settingsBtn.addEventListener('click', () => {
@@ -1654,7 +1752,7 @@
           dom.itemTypesModal.classList.remove('hidden');
           dom.itemTypesModal.classList.add('flex');
           renderItemTypesList();
-          populateCommonSpecs(); // <-- FIXED: Called the function here
+          populateCommonSpecs();
       });
       dom.closeItemTypesModalBtn.addEventListener('click', () => {
           dom.itemTypesModal.classList.add('hidden');
@@ -1732,7 +1830,6 @@
           }
       });
 
-      // *** FIXED: Added Drag and Drop for Common Specs ***
       dom.commonSpecsList.addEventListener('dragstart', (e) => {
           if (e.target.classList.contains('spec-tag')) {
               e.dataTransfer.setData('text/plain', e.target.dataset.spec);
@@ -1741,7 +1838,7 @@
       });
 
       dom.itemTypeSpecsTextarea.addEventListener('dragover', (e) => {
-          e.preventDefault(); // Necessary to allow dropping
+          e.preventDefault();
           e.currentTarget.classList.add('drag-over');
           e.dataTransfer.dropEffect = 'copy';
       });
@@ -1761,6 +1858,11 @@
               textarea.value = currentValue + separator + specName;
               textarea.dispatchEvent(new Event('input'));
           }
+      });
+
+      dom.incompleteItemsCard.addEventListener('click', () => {
+        dom.sortBy.value = 'incomplete';
+        processAndRenderItems();
       });
 
 
