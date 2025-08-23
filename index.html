@@ -178,6 +178,14 @@
         box-shadow: 0 2px 0 var(--color-accent-main);
     }
 
+    .missing-info-indicator {
+        border: 2px dashed var(--color-status-warning) !important;
+    }
+    .missing-info-text {
+        color: var(--color-status-warning) !important;
+        font-style: italic;
+    }
+
 
     @media (max-width: 1024px) {
       .main-content { padding-left: 0; }
@@ -303,11 +311,12 @@
         <div id="dashboard-view">
             <div class="mb-8">
                 <h2 class="text-2xl font-black mb-4">Analytics Overview</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
                     <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Total Components</p><p id="total-components" class="text-3xl sm:text-4xl font-black mt-2">0</p></div>
                     <div class="industrial-card p-6 flex flex-col justify-between"><div class="flex justify-between items-start"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Inventory Value</p><button id="value-toggle-btn" aria-label="Toggle inventory value visibility" class="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"><i data-lucide="eye-off" class="w-5 h-5"></i></button></div><p id="total-value" class="text-3xl sm:text-4xl font-black mt-2 break-all">₹0</p></div>
                     <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Low Stock Items</p><p id="low-stock" class="text-3xl sm:text-4xl font-black mt-2">0</p></div>
                     <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Out of Stock</p><p id="out-of-stock" class="text-3xl sm:text-4xl font-black mt-2 text-[var(--color-status-danger)]">0</p></div>
+                    <div class="industrial-card p-6 flex flex-col justify-between"><p class="text-sm font-semibold text-[var(--color-text-secondary)] opacity-80">Incomplete Items</p><p id="incomplete-items" class="text-3xl sm:text-4xl font-black mt-2 text-[var(--color-status-warning)]">0</p></div>
                 </div>
             </div>
             <div class="bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)] rounded-lg p-4 mb-8">
@@ -814,23 +823,63 @@
         renderPaginationControls();
       }
       function createGridCard(item) {
-        const card = document.createElement('div'); card.className = 'industrial-card overflow-hidden flex flex-col group';
+        const card = document.createElement('div');
+        const hasPrice = item.price && item.price.trim() !== '';
+        const hasImages = item.imageLinks && item.imageLinks.trim() !== '';
+        card.className = `industrial-card overflow-hidden flex flex-col group ${!hasPrice || !hasImages ? 'missing-info-indicator' : ''}`;
+        
         const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
         const firstImage = getDriveThumbnail(images[0]) || `https://placehold.co/512x512/E9ECEF/212529?text=${encodeURIComponent(item.itemName || 'N/A')}`;
         const quantity = parseInt(item.quantity) || 0;
         const statusColor = quantity === 0 ? 'bg-[var(--color-status-danger)]' : quantity < 5 ? 'bg-[var(--color-status-warning)]' : 'bg-[var(--color-status-success)]';
         const statusText = quantity > 0 ? `${quantity} in Stock` : 'Out of Stock';
         const isChecked = comparisonList.has(item.id);
-        card.innerHTML = `<div class="relative image-gallery bg-[var(--color-bg-tertiary)]" data-images="${images.join(',')}"><img loading="lazy" src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-52 object-contain" onerror="this.src='https://placehold.co/512x512/F8D7DA/721C24?text=Error';">${images.length > 1 ? `<button aria-label="Previous image" class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="-1"><i data-lucide="chevron-left"></i></button><button aria-label="Next image" class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}<div class="absolute top-2 left-2 flex items-center gap-2 text-xs font-bold px-2 py-1 rounded text-white ${statusColor}">${statusText}</div><input type="checkbox" data-id="${item.id}" class="compare-checkbox absolute top-2 right-2 h-5 w-5" ${isChecked ? 'checked' : ''}></div><div class="p-4 flex-grow flex flex-col"><h3 class="font-bold leading-tight capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3><p class="text-sm text-[var(--color-text-secondary)] mt-1">Price: <span class="font-semibold text-[var(--color-text-primary)]">₹${item.price || 'N/A'}</span></p><div class="mt-auto pt-4 text-right"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">View Details &rarr;</button></div></div>`;
+
+        card.innerHTML = `
+            <div class="relative image-gallery bg-[var(--color-bg-tertiary)]" data-images="${images.join(',')}">
+                <img loading="lazy" src="${firstImage}" alt="${item.itemName}" class="gallery-image w-full h-52 object-contain" onerror="this.src='https://placehold.co/512x512/F8D7DA/721C24?text=Error';">
+                ${images.length > 1 ? `<button aria-label="Previous image" class="gallery-arrow absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="-1"><i data-lucide="chevron-left"></i></button><button aria-label="Next image" class="gallery-arrow absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-black/50 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity" data-direction="1"><i data-lucide="chevron-right"></i></button>` : ''}
+                <div class="absolute top-2 left-2 flex items-center gap-2 text-xs font-bold px-2 py-1 rounded text-white ${statusColor}">${statusText}</div>
+                <input type="checkbox" data-id="${item.id}" class="compare-checkbox absolute top-2 right-2 h-5 w-5" ${isChecked ? 'checked' : ''}>
+                ${!hasImages ? `<div class="absolute bottom-2 right-2 p-1.5 bg-yellow-500/80 rounded-full text-white" title="Image missing"><i data-lucide="image-off" class="w-4 h-4"></i></div>` : ''}
+            </div>
+            <div class="p-4 flex-grow flex flex-col">
+                <h3 class="font-bold leading-tight capitalize">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</h3>
+                <p class="text-sm text-[var(--color-text-secondary)] mt-1">Price: <span class="font-semibold ${!hasPrice ? 'missing-info-text' : 'text-[var(--color-text-primary)]'}">${hasPrice ? '₹' + item.price : 'Not Set'}</span></p>
+                <div class="mt-auto pt-4 text-right">
+                    <button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">View Details &rarr;</button>
+                </div>
+            </div>`;
         return card;
       }
       function createTableView(items) {
-        const table = document.createElement('table'); table.className = 'w-full text-left border-collapse industrial-table';
-        const headers = [{ key: 'compare', label: ''}, { key: 'component', label: 'Component'}, { key: 'price', label: 'Price'}, { key: 'quantity', label: 'Quantity'}, { key: 'actions', label: 'Actions'}];
-        let head = `<thead><tr class="border-b border-[var(--color-border-primary)]">`; headers.forEach(h => { head += `<th class="p-4 font-semibold">${h.label}</th>`; }); head += `</tr></thead>`;
-        let body = '<tbody>';
-        items.forEach(item => { const quantity = parseInt(item.quantity) || 0; const statusColor = quantity === 0 ? 'text-[var(--color-status-danger)]' : quantity < 5 ? 'text-[var(--color-status-warning)]' : 'text-[var(--color-status-success)]'; const isChecked = comparisonList.has(item.id); body += `<tr class="border-b border-[var(--color-border-primary)] last:border-b-0"><td data-label="${headers[0].label}" class="p-4"><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5" ${isChecked ? 'checked' : ''}></td><td data-label="${headers[1].label}" class="p-4 capitalize font-medium">${[item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase()}</td><td data-label="${headers[2].label}" class="p-4 text-[var(--color-text-secondary)]">₹${item.price || 'N/A'}</td><td data-label="${headers[3].label}" class="p-4 font-medium ${statusColor}">${quantity}</td><td data-label="${headers[4].label}" class="p-4"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button></td></tr>`; });
-        body += '</tbody>'; table.innerHTML = head + body; return table;
+          const table = document.createElement('table');
+          table.className = 'w-full text-left border-collapse industrial-table';
+          const headers = [{ key: 'compare', label: '' }, { key: 'component', label: 'Component' }, { key: 'price', label: 'Price' }, { key: 'quantity', label: 'Quantity' }, { key: 'actions', label: 'Actions' }];
+          let head = `<thead><tr class="border-b border-[var(--color-border-primary)]">`;
+          headers.forEach(h => { head += `<th class="p-4 font-semibold">${h.label}</th>`; });
+          head += `</tr></thead>`;
+          let body = '<tbody>';
+          items.forEach(item => {
+              const quantity = parseInt(item.quantity) || 0;
+              const statusColor = quantity === 0 ? 'text-[var(--color-status-danger)]' : quantity < 5 ? 'text-[var(--color-status-warning)]' : 'text-[var(--color-status-success)]';
+              const isChecked = comparisonList.has(item.id);
+              const hasPrice = item.price && item.price.trim() !== '';
+              const hasImages = item.imageLinks && item.imageLinks.trim() !== '';
+              const componentName = [item.model, item.device, item.size, item.itemName].filter(Boolean).join(' ').toLowerCase();
+
+              body += `
+                  <tr class="border-b border-[var(--color-border-primary)] last:border-b-0 ${!hasPrice || !hasImages ? 'bg-yellow-500/10' : ''}">
+                      <td data-label="${headers[0].label}" class="p-4"><input type="checkbox" data-id="${item.id}" class="compare-checkbox h-5 w-5" ${isChecked ? 'checked' : ''}></td>
+                      <td data-label="${headers[1].label}" class="p-4 capitalize font-medium">${componentName} ${!hasImages ? '<i data-lucide="image-off" class="inline-block w-4 h-4 ml-2 text-[var(--color-status-warning)]" title="Image missing"></i>' : ''}</td>
+                      <td data-label="${headers[2].label}" class="p-4 ${!hasPrice ? 'missing-info-text' : 'text-[var(--color-text-secondary)]'}">${hasPrice ? '₹' + item.price : 'Not Set'}</td>
+                      <td data-label="${headers[3].label}" class="p-4 font-medium ${statusColor}">${quantity}</td>
+                      <td data-label="${headers[4].label}" class="p-4"><button class="view-details-btn text-sm font-bold text-[var(--color-accent-main)] hover:underline" data-id="${item.id}">Details</button></td>
+                  </tr>`;
+          });
+          body += '</tbody>';
+          table.innerHTML = head + body;
+          return table;
       }
       function switchLayout(layout) {
         currentLayout = layout; localStorage.setItem('layout', layout);
@@ -954,9 +1003,53 @@
       function openDetailPanel(item) { populateDetailPanel(item); dom.detailModal.classList.remove('hidden'); requestAnimationFrame(() => { dom.detailModal.classList.remove('opacity-0', 'scale-95'); trapFocus(dom.detailModal); }); }
       function closeDetailPanel() { dom.detailModal.classList.add('opacity-0', 'scale-95'); setTimeout(() => { dom.detailModal.classList.add('hidden'); }, 300); }
       function populateDetailPanel(item) {
-        const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean); let teethSpecsHtml = ''; let otherSpecsHtml = ''; const teethKeys = ['spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth'];
+        const images = (item.imageLinks || '').split(',').map(link => link.trim()).filter(Boolean);
+        const hasPrice = item.price && item.price.trim() !== '';
+        const hasImages = images.length > 0;
+        let teethSpecsHtml = ''; 
+        let otherSpecsHtml = ''; 
+        const teethKeys = ['spec_teeth', 'spec_numberOfTeeth', 'spec_numberOfTeethInOd', 'spec_numberOfTeethInId', 'spec_bigTeethOd', 'spec_bigTeeth', 'spec_bigTeethLength', 'spec_smallTeethOd', 'spec_smallTeeth', 'spec_smallTeethLength', 'spec_teethOd', 'spec_outsideTeeth', 'spec_insideTeeth'];
         Object.keys(item).forEach(key => { if (key.startsWith('spec_') && item[key]) { const label = key.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()); const specRow = `<div class="flex justify-between py-2"><dt class="text-[var(--color-text-secondary)]">${label}</dt><dd class="font-semibold text-right">${item[key]}</dd></div>`; if (teethKeys.includes(key)) teethSpecsHtml += specRow; else otherSpecsHtml += specRow; } });
-        dom.detailContent.innerHTML = `<div class="lg:col-span-2 p-6 flex items-center justify-center bg-[var(--color-bg-primary)] image-gallery" data-images="${images.join(',')}" data-current-index="0">${images.length > 0 ? `<div class="relative w-full h-full"><img loading="lazy" src="${getDriveThumbnail(images[0])}" class="gallery-image w-full max-h-[75vh] h-full object-contain rounded-lg" onerror="this.src='https://placehold.co/512x512/E9ECEF/212529?text=No+Image';">${images.length > 1 ? `<button aria-label="Previous image" class="detail-gallery-arrow absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/75 transition-colors" data-direction="-1"><i data-lucide="chevron-left" class="pointer-events-none"></i></button><button aria-label="Next image" class="detail-gallery-arrow absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/75 transition-colors" data-direction="1"><i data-lucide="chevron-right" class="pointer-events-none"></i></button>` : ''}</div>` : `<div class="h-full flex items-center justify-center text-[var(--color-text-secondary)]">No Images</div>`}</div><div class="lg:col-span-1 p-6 space-y-6 border-l border-[var(--color-border-primary)]"><div><p class="text-sm font-bold text-[var(--color-accent-main)] uppercase">${item.itemName || 'Component'}</p><h3 class="text-3xl font-black capitalize">${[item.model, item.device, item.size].filter(Boolean).join(' ').toLowerCase()}</h3></div><div class="bg-[var(--color-bg-tertiary)] p-4 rounded-lg border border-[var(--color-border-primary)]"><h4 class="text-lg font-bold mb-3">Stock & Ordering</h4><dl class="space-y-2"><div class="flex justify-between items-baseline"><dt class="text-[var(--color-text-secondary)]">Price</dt><dd class="text-2xl font-bold">₹${item.price || 'N/A'}</dd></div><div class="flex justify-between items-baseline"><dt class="text-[var(--color-text-secondary)]">Quantity</dt><dd class="text-2xl font-bold">${item.quantity || '0'}</dd></div></dl><div class="flex items-center gap-3 mt-4"><button data-id="${item.id}" class="edit-btn btn btn--secondary flex-1"><i data-lucide="edit"></i>Edit</button><button data-id="${item.id}" class="delete-btn btn btn--danger flex-1"><i data-lucide="trash-2"></i>Delete</button></div></div>${teethSpecsHtml ? `<div><h4 class="text-lg font-bold mb-2">Teeth Details</h4><dl class="text-sm divide-y divide-[var(--color-border-primary)] border-y border-[var(--color-border-primary)]">${teethSpecsHtml}</dl></div>` : ''}${otherSpecsHtml ? `<div><h4 class="text-lg font-bold mb-2">General Specifications</h4><dl class="text-sm divide-y divide-[var(--color-border-primary)] border-y border-[var(--color-border-primary)]">${otherSpecsHtml}</dl></div>` : ''}${item.note ? `<div><h4 class="text-lg font-bold mb-2">Notes</h4><p class="text-sm p-3 bg-[var(--color-bg-tertiary)] rounded border border-[var(--color-border-primary)]">${item.note}</p></div>` : ''}</div>`;
+        
+        dom.detailContent.innerHTML = `
+            <div class="lg:col-span-2 p-6 flex items-center justify-center bg-[var(--color-bg-primary)] image-gallery" data-images="${images.join(',')}" data-current-index="0">
+                ${hasImages ? `
+                    <div class="relative w-full h-full">
+                        <img loading="lazy" src="${getDriveThumbnail(images[0])}" class="gallery-image w-full max-h-[75vh] h-full object-contain rounded-lg" onerror="this.src='https://placehold.co/512x512/E9ECEF/212529?text=No+Image';">
+                        ${images.length > 1 ? `<button aria-label="Previous image" class="detail-gallery-arrow absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/75 transition-colors" data-direction="-1"><i data-lucide="chevron-left" class="pointer-events-none"></i></button><button aria-label="Next image" class="detail-gallery-arrow absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/75 transition-colors" data-direction="1"><i data-lucide="chevron-right" class="pointer-events-none"></i></button>` : ''}
+                    </div>` : `
+                    <div class="h-full w-full flex flex-col items-center justify-center text-[var(--color-text-secondary)] border-2 border-dashed border-[var(--color-status-warning)] rounded-lg p-8">
+                        <i data-lucide="image-off" class="w-16 h-16 mb-4 text-[var(--color-status-warning)]"></i>
+                        <h4 class="font-bold">No Images Uploaded</h4>
+                        <p class="text-sm">Please edit this component to add images.</p>
+                    </div>`}
+            </div>
+            <div class="lg:col-span-1 p-6 space-y-6 border-l border-[var(--color-border-primary)]">
+                <div>
+                    <p class="text-sm font-bold text-[var(--color-accent-main)] uppercase">${item.itemName || 'Component'}</p>
+                    <h3 class="text-3xl font-black capitalize">${[item.model, item.device, item.size].filter(Boolean).join(' ').toLowerCase()}</h3>
+                </div>
+                <div class="bg-[var(--color-bg-tertiary)] p-4 rounded-lg border border-[var(--color-border-primary)]">
+                    <h4 class="text-lg font-bold mb-3">Stock & Ordering</h4>
+                    <dl class="space-y-2">
+                        <div class="flex justify-between items-baseline">
+                            <dt class="text-[var(--color-text-secondary)]">Price</dt>
+                            <dd class="text-2xl font-bold ${!hasPrice ? 'missing-info-text' : ''}">${hasPrice ? '₹' + item.price : 'NOT SET'}</dd>
+                        </div>
+                        <div class="flex justify-between items-baseline">
+                            <dt class="text-[var(--color-text-secondary)]">Quantity</dt>
+                            <dd class="text-2xl font-bold">${item.quantity || '0'}</dd>
+                        </div>
+                    </dl>
+                    <div class="flex items-center gap-3 mt-4">
+                        <button data-id="${item.id}" class="edit-btn btn btn--secondary flex-1"><i data-lucide="edit"></i>Edit</button>
+                        <button data-id="${item.id}" class="delete-btn btn btn--danger flex-1"><i data-lucide="trash-2"></i>Delete</button>
+                    </div>
+                </div>
+                ${teethSpecsHtml ? `<div><h4 class="text-lg font-bold mb-2">Teeth Details</h4><dl class="text-sm divide-y divide-[var(--color-border-primary)] border-y border-[var(--color-border-primary)]">${teethSpecsHtml}</dl></div>` : ''}
+                ${otherSpecsHtml ? `<div><h4 class="text-lg font-bold mb-2">General Specifications</h4><dl class="text-sm divide-y divide-[var(--color-border-primary)] border-y border-[var(--color-border-primary)]">${otherSpecsHtml}</dl></div>` : ''}
+                ${item.note ? `<div><h4 class="text-lg font-bold mb-2">Notes</h4><p class="text-sm p-3 bg-[var(--color-bg-tertiary)] rounded border border-[var(--color-border-primary)]">${item.note}</p></div>` : ''}
+            </div>`;
         lucide.createIcons();
       }
 
@@ -967,7 +1060,20 @@
       function columnToLetter(column) { let temp, letter = ''; while (column > 0) { temp = (column - 1) % 26; letter = String.fromCharCode(temp + 65) + letter; column = (column - temp - 1) / 26; } return letter; }
       function isDuplicate() { const form = dom.partForm; const model = form.querySelector('#model').value.trim().toLowerCase(); const device = form.querySelector('#device').value.trim().toLowerCase(); const size = form.querySelector('#size').value.trim().toLowerCase(); const itemName = form.querySelector('#item-name-main').value.trim().toLowerCase(); const editId = form.querySelector('#edit-id').value; return allItems.some(item => { if (item.id === editId) return false; return (item.model || '').trim().toLowerCase() === model && (item.device || '').trim().toLowerCase() === device && (item.size || '').trim().toLowerCase() === size && (item.itemName || '').trim().toLowerCase() === itemName; }); }
       function populateFilters() { const devices = [...new Set(allItems.map(item => item.device).filter(Boolean))]; const sizes = [...new Set(allItems.map(item => item.size).filter(Boolean))]; dom.filterDevice.innerHTML = '<option value="">All Devices</option>'; devices.forEach(d => dom.filterDevice.innerHTML += `<option value="${d}">${d}</option>`); dom.filterSize.innerHTML = '<option value="">All Sizes</option>'; sizes.forEach(s => dom.filterSize.innerHTML += `<option value="${s}">${s}</option>`); }
-      function updateAnalytics(items) { document.getElementById('total-components').textContent = items.length; const totalValue = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0), 0); localStorage.setItem('inventoryTotalValue', totalValue); updateValueVisibility(); const lowStockCount = items.filter(item => (parseInt(item.quantity) || 0) < 5 && (parseInt(item.quantity) || 0) > 0).length; const lowStockEl = document.getElementById('low-stock'); lowStockEl.textContent = lowStockCount; lowStockEl.style.color = lowStockCount > 0 ? 'var(--color-status-warning)' : 'var(--color-status-success)'; const outOfStockCount = items.filter(item => (parseInt(item.quantity) || 0) === 0).length; document.getElementById('out-of-stock').textContent = outOfStockCount; }
+      function updateAnalytics(items) {
+        document.getElementById('total-components').textContent = items.length;
+        const totalValue = items.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0), 0);
+        localStorage.setItem('inventoryTotalValue', totalValue);
+        updateValueVisibility();
+        const lowStockCount = items.filter(item => (parseInt(item.quantity) || 0) < 5 && (parseInt(item.quantity) || 0) > 0).length;
+        const lowStockEl = document.getElementById('low-stock');
+        lowStockEl.textContent = lowStockCount;
+        lowStockEl.style.color = lowStockCount > 0 ? 'var(--color-status-warning)' : 'var(--color-status-success)';
+        const outOfStockCount = items.filter(item => (parseInt(item.quantity) || 0) === 0).length;
+        document.getElementById('out-of-stock').textContent = outOfStockCount;
+        const incompleteCount = items.filter(item => !item.price || !item.price.trim() || !item.imageLinks || !item.imageLinks.trim()).length;
+        document.getElementById('incomplete-items').textContent = incompleteCount;
+      }
       function toggleValueVisibility() { isValueVisible = !isValueVisible; updateValueVisibility(); }
       function updateValueVisibility() { const totalValue = parseFloat(localStorage.getItem('inventoryTotalValue') || '0'); dom.totalValue.textContent = `₹${totalValue.toLocaleString('en-IN')}`; if (isValueVisible) { dom.totalValue.classList.remove('blurred-value'); dom.valueToggleBtn.innerHTML = `<i data-lucide="eye" class="w-5 h-5"></i>`; } else { dom.totalValue.classList.add('blurred-value'); dom.valueToggleBtn.innerHTML = `<i data-lucide="eye-off" class="w-5 h-5"></i>`; } lucide.createIcons(); }
       function renderPaginationControls() { const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE); dom.paginationControls.innerHTML = ''; if (totalPages <= 1) return; let html = `<button data-page="${currentPage - 1}" class="btn btn--secondary" ${currentPage === 1 ? 'disabled' : ''}>&larr; Prev</button>`; html += `<span class="font-semibold text-[var(--color-text-secondary)]">Page ${currentPage} of ${totalPages}</span>`; html += `<button data-page="${currentPage + 1}" class="btn btn--secondary" ${currentPage === totalPages ? 'disabled' : ''}>Next &rarr;</button>`; dom.paginationControls.innerHTML = html; }
