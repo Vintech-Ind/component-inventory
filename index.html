@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vinayaka  | Component Database</title>
+  <title>Vinayaka Industries | Component Database</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -996,6 +996,34 @@
       // 7. ITEM TYPE MANAGEMENT
       // ================================================================================
       
+      function populateCommonSpecs() {
+        const allSpecs = new Set();
+        allItems.forEach(item => {
+            Object.keys(item).forEach(key => {
+                if (key.startsWith('spec_')) {
+                    allSpecs.add(key);
+                }
+            });
+        });
+
+        dom.commonSpecsList.innerHTML = ''; // Clear existing specs
+        if (allSpecs.size === 0) {
+            dom.commonSpecsList.innerHTML = '<p class="text-xs text-[var(--color-text-secondary)]">No common specs found in the database yet.</p>';
+            return;
+        }
+
+        const sortedSpecs = [...allSpecs].sort(); // Sort for consistent order
+
+        sortedSpecs.forEach(specName => {
+            const tag = document.createElement('span');
+            tag.className = 'spec-tag bg-[var(--color-bg-secondary)] text-sm font-semibold px-3 py-1 rounded-full border border-[var(--color-border-primary)]';
+            tag.textContent = specName.replace('spec_', '').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+            tag.draggable = true;
+            tag.dataset.spec = specName;
+            dom.commonSpecsList.appendChild(tag);
+        });
+      }
+
       function renderItemTypesList() {
           dom.itemTypesList.innerHTML = '';
           if (itemTypeDefinitions.size === 0) {
@@ -1070,7 +1098,7 @@
                       await logAction('UPDATE_ITEM_TYPE', newName, { from: editName, to: newName, specs });
                       Swal.fire('Success', 'Item type updated successfully.', 'success');
                   } else {
-                       throw new Error('Could not find item type to update.');
+                      throw new Error('Could not find item type to update.');
                   }
               } else { // Add new
                   await gapi.client.sheets.spreadsheets.values.append({
@@ -1375,9 +1403,9 @@
                       detailsText = 'Component data recorded.';
                   } else if (log.action.startsWith('UNDO_')) {
                       try {
-                        detailsText = `Reverted action from ${new Date(JSON.parse(log.details).originalLogTimestamp).toLocaleString()}`;
+                          detailsText = `Reverted action from ${new Date(JSON.parse(log.details).originalLogTimestamp).toLocaleString()}`;
                       } catch {
-                        detailsText = 'Reverted an action.';
+                          detailsText = 'Reverted an action.';
                       }
                   }
 
@@ -1496,6 +1524,7 @@
           dom.itemTypesModal.classList.remove('hidden');
           dom.itemTypesModal.classList.add('flex');
           renderItemTypesList();
+          populateCommonSpecs(); // <-- FIXED: Called the function here
       });
       dom.closeItemTypesModalBtn.addEventListener('click', () => {
           dom.itemTypesModal.classList.add('hidden');
@@ -1570,6 +1599,37 @@
           if (button && !button.disabled) {
               activityCurrentPage = parseInt(button.dataset.page);
               renderActivityLog();
+          }
+      });
+
+      // *** FIXED: Added Drag and Drop for Common Specs ***
+      dom.commonSpecsList.addEventListener('dragstart', (e) => {
+          if (e.target.classList.contains('spec-tag')) {
+              e.dataTransfer.setData('text/plain', e.target.dataset.spec);
+              e.dataTransfer.effectAllowed = 'copy';
+          }
+      });
+
+      dom.itemTypeSpecsTextarea.addEventListener('dragover', (e) => {
+          e.preventDefault(); // Necessary to allow dropping
+          e.currentTarget.classList.add('drag-over');
+          e.dataTransfer.dropEffect = 'copy';
+      });
+
+      dom.itemTypeSpecsTextarea.addEventListener('dragleave', (e) => {
+          e.currentTarget.classList.remove('drag-over');
+      });
+
+      dom.itemTypeSpecsTextarea.addEventListener('drop', (e) => {
+          e.preventDefault();
+          e.currentTarget.classList.remove('drag-over');
+          const specName = e.dataTransfer.getData('text/plain');
+          if (specName) {
+              const textarea = e.currentTarget;
+              const currentValue = textarea.value.trim();
+              const separator = currentValue ? ', ' : '';
+              textarea.value = currentValue + separator + specName;
+              textarea.dispatchEvent(new Event('input'));
           }
       });
 
