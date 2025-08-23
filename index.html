@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vinayaka  | Component Database</title>
+  <title>Vinayaka Industries | Component Database</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -326,7 +326,7 @@
                         <div><div class="filter-control-group"><label for="filter-device">Device</label><select id="filter-device" class="filter-control-input"><option value="">All Devices</option></select></div></div>
                         <div><div class="filter-control-group"><label for="filter-size">Size</label><select id="filter-size" class="filter-control-input"><option value="">All Sizes</option></select></div></div>
                     </div>
-                    <div class="flex-shrink-0"><div class="filter-control-group"><label for="sort-by">Sort By</label><select id="sort-by" class="filter-control-input"><option value="model-asc">Model (A-Z)</option><option value="price-desc">Price (High-Low)</option><option value="quantity-asc">Quantity (Low-High)</option></select></div></div>
+                    <div class="flex-shrink-0"><div class="filter-control-group"><label for="sort-by">Sort By</label><select id="sort-by" class="filter-control-input"><option value="model-asc">Model (A-Z)</option><option value="price-desc">Price (High-Low)</option><option value="quantity-asc">Quantity (Low-High)</option><option value="incomplete">Incomplete Items</option></select></div></div>
                 </div>
             </div>
             <div id="skeleton-loader" class="hidden"></div>
@@ -802,8 +802,29 @@
         const sizeFilter = dom.filterSize.value;
         const sortBy = dom.sortBy.value;
         filteredItems = allItems.filter(item => { const searchMatch = Object.values(item).join(' ').toLowerCase().includes(searchTerm); const deviceMatch = !deviceFilter || item.device === deviceFilter; const sizeMatch = !sizeFilter || item.size === sizeFilter; return searchMatch && deviceMatch && sizeMatch; });
-        switch (sortBy) { case 'price-desc': filteredItems.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0)); break; case 'quantity-asc': filteredItems.sort((a, b) => (parseInt(a.quantity) || 0) - (parseInt(b.quantity) || 0)); break; default: filteredItems.sort((a, b) => (a.model || '').localeCompare(b.model || '')); break; }
-        updateAnalytics(allItems); renderItems();
+        
+        switch (sortBy) {
+            case 'price-desc':
+                filteredItems.sort((a, b) => (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0));
+                break;
+            case 'quantity-asc':
+                filteredItems.sort((a, b) => (parseInt(a.quantity) || 0) - (parseInt(b.quantity) || 0));
+                break;
+            case 'incomplete':
+                filteredItems.sort((a, b) => {
+                    const aIncomplete = isItemIncomplete(a);
+                    const bIncomplete = isItemIncomplete(b);
+                    if (aIncomplete && !bIncomplete) return -1;
+                    if (!aIncomplete && bIncomplete) return 1;
+                    return 0;
+                });
+                break;
+            default: // model-asc
+                filteredItems.sort((a, b) => (a.model || '').localeCompare(b.model || ''));
+                break;
+        }
+        updateAnalytics(allItems);
+        renderItems();
       }
       function renderItems() {
         if (!gapiInited || !gapi.client || (typeof gapi.client.getToken !== 'function')) return;
@@ -1056,6 +1077,9 @@
       // ================================================================================
       // 6. ANALYTICS & HELPERS
       // ================================================================================
+      function isItemIncomplete(item) {
+        return !item.price || !item.price.trim() || !item.imageLinks || !item.imageLinks.trim();
+      }
       function handleApiError(err, contextTitle) { let userMessage = 'An unexpected error occurred. Please check your connection and try again.'; const error = err.result?.error; console.error(`API Error in ${contextTitle}:`, err); if (error) { if (error.code === 403 || error.status === 'PERMISSION_DENIED') { userMessage = 'You do not have permission to perform this action. Please check your Google Sheet permissions.'; } else if (error.code === 400) { userMessage = 'The data sent was invalid. Please check the form fields and try again.'; } else if (error.code === 404) { userMessage = 'Could not find the requested data. The spreadsheet or sheet may have been moved or deleted.'; } } Swal.fire({ title: contextTitle, text: userMessage, icon: 'error' }); }
       function columnToLetter(column) { let temp, letter = ''; while (column > 0) { temp = (column - 1) % 26; letter = String.fromCharCode(temp + 65) + letter; column = (column - temp - 1) / 26; } return letter; }
       function isDuplicate() { const form = dom.partForm; const model = form.querySelector('#model').value.trim().toLowerCase(); const device = form.querySelector('#device').value.trim().toLowerCase(); const size = form.querySelector('#size').value.trim().toLowerCase(); const itemName = form.querySelector('#item-name-main').value.trim().toLowerCase(); const editId = form.querySelector('#edit-id').value; return allItems.some(item => { if (item.id === editId) return false; return (item.model || '').trim().toLowerCase() === model && (item.device || '').trim().toLowerCase() === device && (item.size || '').trim().toLowerCase() === size && (item.itemName || '').trim().toLowerCase() === itemName; }); }
@@ -1071,7 +1095,7 @@
         lowStockEl.style.color = lowStockCount > 0 ? 'var(--color-status-warning)' : 'var(--color-status-success)';
         const outOfStockCount = items.filter(item => (parseInt(item.quantity) || 0) === 0).length;
         document.getElementById('out-of-stock').textContent = outOfStockCount;
-        const incompleteCount = items.filter(item => !item.price || !item.price.trim() || !item.imageLinks || !item.imageLinks.trim()).length;
+        const incompleteCount = items.filter(isItemIncomplete).length;
         document.getElementById('incomplete-items').textContent = incompleteCount;
       }
       function toggleValueVisibility() { isValueVisible = !isValueVisible; updateValueVisibility(); }
