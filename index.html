@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vinayaka Industries | Component Database</title>
+  <title>Vinayaka  | Component Database</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -585,61 +585,30 @@
       // ================================================================================
       // 2. AUTHENTICATION & API
       // ================================================================================
-      
-      // **FIX**: Helper functions to manage granted status in localStorage.
-      const setGranted = v => localStorage.setItem('gis_granted',''+(v?1:0));
-      const hasGranted = () => localStorage.getItem('gis_granted') === '1';
-
-      async function initializeGapiClient() { 
-          await gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS }); 
-          gapiInited = true; 
-          maybeEnableButtons(); 
-      }
+      async function initializeGapiClient() { await gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS }); gapiInited = true; maybeEnableButtons(); }
       
       function initializeGis() { 
         tokenClient = google.accounts.oauth2.initTokenClient({ 
             client_id: CLIENT_ID, 
             scope: SCOPES, 
             callback: (resp) => {
-                // This callback handles both silent and interactive sign-in attempts.
-                if (resp && !resp.error) {
-                    gapi.client.setToken(resp); 
-                    setGranted(true); // **FIX**: Remember that the user has granted access.
-                    updateAuthStatus(true);
-                } else if (resp.error) {
+                if (resp.error) {
                     console.error("Authentication failed:", resp.error);
-                    // This error typically happens if a silent sign-in fails.
-                    // We don't show a popup here to avoid being intrusive.
-                    // The user can click the sign-in button to trigger the flow manually.
+                    if (document.body.dataset.manualSignIn === 'true') {
+                        Swal.fire({ title: 'Authentication Error', text: 'Could not sign in. Please try again.', icon: 'error' });
+                        document.body.removeAttribute('data-manual-sign-in');
+                    }
+                    return;
                 }
+                gapi.client.setToken(resp); 
+                updateAuthStatus(true); 
             }
         }); 
         gisInited = true; 
         maybeEnableButtons(); 
       }
       
-      function maybeEnableButtons() { 
-          if (gapiInited && gisInited) { 
-              dom.signInButtonMain.onclick = handleAuthClick; 
-              dom.signOutBtn.onclick = handleAuthClick; 
-              lucide.createIcons(); 
-              trySilentSignIn(); // **FIX**: Attempt a silent sign-in now that everything is ready.
-          } 
-      }
-
-      // **FIX**: New function to attempt a silent sign-in on page load.
-      function trySilentSignIn() {
-          if (hasGranted()) {
-              try {
-                  // This will not open a popup. If the user is already signed in
-                  // and has granted consent, the callback will be triggered.
-                  // Otherwise, it will fail silently.
-                  tokenClient.requestAccessToken({ prompt: '' });
-              } catch (e) {
-                  console.error("Silent sign-in error:", e);
-              }
-          }
-      }
+      function maybeEnableButtons() { if (gapiInited && gisInited) { dom.signInButtonMain.onclick = handleAuthClick; dom.signOutBtn.onclick = handleAuthClick; lucide.createIcons(); } }
       
       function handleAuthClick() {
         if (!gapiInited || !gisInited) {
@@ -647,26 +616,10 @@
             return;
         }
         if (gapi.client.getToken() === null) {
-            // User is signing in
-            // **FIX**: Check if we need to ask for consent. The first time, this will be true
-            // and show the full consent screen. Subsequent clicks will be faster.
-            const needsConsent = !hasGranted();
-            tokenClient.requestAccessToken({ prompt: needsConsent ? 'consent' : '' });
+            document.body.dataset.manualSignIn = 'true';
+            tokenClient.requestAccessToken({ prompt: 'consent' });
         } else {
-            // User is signing out
-            Swal.fire({ 
-                title: 'Sign Out', 
-                text: 'Are you sure you want to sign out?', 
-                icon: 'warning', 
-                showCancelButton: true, 
-                confirmButtonText: 'Yes, sign out'
-            }).then((result) => { 
-                if (result.isConfirmed) { 
-                    gapi.client.setToken(null); 
-                    setGranted(false); // **FIX**: Forget the granted status on sign out.
-                    updateAuthStatus(false); 
-                } 
-            });
+            Swal.fire({ title: 'Sign Out', text: 'Are you sure you want to sign out?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes, sign out'}).then((result) => { if (result.isConfirmed) { gapi.client.setToken(null); updateAuthStatus(false); } });
         }
       }
 
